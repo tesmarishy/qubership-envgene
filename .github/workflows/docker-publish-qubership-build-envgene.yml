@@ -42,5 +42,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            GIT_USER=${{ secrets.GIT_USER }}
-            GIT_TOKEN=${{ secrets.GIT_TOKEN }}
+            GIT_USER=${{ github.actor }}
+            GIT_TOKEN=${{ secrets.GITHUB_TOKEN }}
