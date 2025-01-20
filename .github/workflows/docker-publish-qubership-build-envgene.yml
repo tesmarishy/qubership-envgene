@@ -19,6 +19,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Debug Token Permissions
+        run: |
+          echo "Token permissions:"
+          curl -u $GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }} https://ghcr.io/v2/
+
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
