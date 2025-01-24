@@ -23,7 +23,7 @@ def build_ci_jobs():
     parameter_set = set()
 
     all_templates = findAllYamlsInDir(f'{base_dir}/templates/env_templates')
-
+    logger.info(f'all_templates {all_templates}')
     artifact_definition = openYaml('/build_env/scripts/build_template/template/artifact_definition.yml')
 
     delete_dir(f'{base_dir}/templates/parameters_containers/source')
@@ -33,6 +33,7 @@ def build_ci_jobs():
 
     for template_path in all_templates:
         template_yml = openYaml(template_path)
+        logger.info(f'template_yml {template_yml}')
         if "namespaces" in template_yml:
             download_source_files(artifact_definition, base_dir, parameter_set, template_yml)
             merge_template_parameters(template_yml, f'{base_dir}/templates')
@@ -40,6 +41,7 @@ def build_ci_jobs():
             logger.warning(f'No namespaces found in template: {template_path}')
 
     all_parameters = findAllYamlsInDir(f'{base_dir}/templates/parameters_containers/merge')
+    logger.info(f'all_parameters {all_parameters}')
     all_parameters = sorted(set(all_parameters))
 
     delete_dir(f'{base_dir}/gitlab-ci/prefix_build')
@@ -53,6 +55,7 @@ def build_ci_jobs():
     logger.info(f"files = {all_parameters}")
 
     for parameter_path in all_parameters:
+        logger.info(f'parameter_path {parameter_path}')
         parameter_name = extractNameFromFile(parameter_path)
         check_dir_exist_and_create(f'{base_dir}/gitlab-ci/prefix_build/{parameter_name}')
         copy_path(parameter_path, f'{base_dir}/gitlab-ci/prefix_build/{parameter_name}/{parameter_name}.yml')
