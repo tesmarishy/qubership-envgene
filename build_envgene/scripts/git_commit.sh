@@ -6,13 +6,42 @@ exit_code=0
 
 pattern="^[A-Z]+-[0-9]+$"
 
-echo "CI_PROJECT_DIR=${CI_PROJECT_DIR}"
-echo "CI_SERVER_HOST=${CI_SERVER_HOST}"
-echo "CI_PROJECT_PATH=${CI_PROJECT_PATH}"
-echo "CI_COMMIT_REF_NAME=${CI_COMMIT_REF_NAME}"
-echo "GITLAB_USER_EMAIL=${GITLAB_USER_EMAIL}"
-echo "GITLAB_USER_LOGIN=${GITLAB_USER_LOGIN}"
-echo "GITLAB_TOKEN=${GITLAB_TOKEN}"
+if [ -n "${GITHUB_ACTIONS}" ]; then
+    # Logic for GitHub
+    PLATFORM="github"
+    SERVER_PROTOCOL="https"
+    SERVER_HOST="github.com"
+    PROJECT_PATH="${GITHUB_REPOSITORY}"
+    REF_NAME="${GITHUB_REF_NAME}"
+    USER_EMAIL="${GITHUB_USER_EMAIL}"
+    USER_NAME="${GITHUB_USER_NAME}"
+    TOKEN="${GITHUB_TOKEN}"
+elif [ -n "${GITLAB_CI}" ]; then
+    # Logic for GitLab
+    PLATFORM="gitlab"
+    SERVER_PROTOCOL="${CI_SERVER_PROTOCOL}"
+    SERVER_HOST="${CI_SERVER_HOST}"
+    PROJECT_PATH="${CI_PROJECT_PATH}"
+    REF_NAME="${CI_COMMIT_REF_NAME}"
+    USER_EMAIL="${GITLAB_USER_EMAIL}"
+    USER_NAME="${GITLAB_USER_LOGIN}"
+    TOKEN="${GITLAB_TOKEN}"
+fi
+
+
+echo "Platform: ${PLATFORM}"
+echo "Server Protocol: ${SERVER_PROTOCOL}"
+echo "Server Host: ${SERVER_HOST}"
+echo "Project Path: ${PROJECT_PATH}"
+echo "Branch/Ref Name: ${REF_NAME}"
+echo "User Email: ${USER_EMAIL}"
+echo "User Name: ${USER_NAME}"
+
+if [ -z "${TOKEN}" ]; then
+    echo "No auth token was found. Please check!"
+    exit 1
+fi
+
 echo "ENV_NAME=${ENV_NAME}"
 echo "CLUSTER_NAME=${CLUSTER_NAME}"
 echo "ENVIRONMENT_NAME=${ENVIRONMENT_NAME}"
@@ -23,23 +52,25 @@ echo "COMMIT_MESSAGE=${COMMIT_MESSAGE}"
 export ticket_id=${DEPLOYMENT_TICKET_ID}
 
 # commit message
-if [ -z "${COMMIT_MESSAGE}" ]; then 
+if [ -z "${COMMIT_MESSAGE}" ]; then
     message="${ticket_id} [ci_skip] Update \"${CLUSTER_NAME}/${ENVIRONMENT_NAME}\" environment"
-else 
+else
     message="${ticket_id} ${COMMIT_MESSAGE}"
 fi
-echo "Commit message is: ${message}"
+echo "Commit message: ${message}"
+
+
 
 # copying environments folder to temp storage
+
 echo "Moving env environments/${CLUSTER_NAME}/${ENVIRONMENT_NAME} artifacts to temporary location"
-mkdir -p /tmp/artifact_environments
 mkdir -p /tmp/artifact_environments/${CLUSTER_NAME}
 
 if [ "${COMMIT_ENV}" = "true" ]; then
   cp -r environments/${CLUSTER_NAME}/${ENVIRONMENT_NAME} /tmp/artifact_environments/${CLUSTER_NAME}/
 fi
 
-if [ -e environments/${CLUSTER_NAME}/cloud-passport ]; then 
+if [ -e environments/${CLUSTER_NAME}/cloud-passport ]; then
   cp -r environments/${CLUSTER_NAME}/cloud-passport /tmp/artifact_environments/${CLUSTER_NAME}/
 fi
 
@@ -64,71 +95,84 @@ fi
 echo "Clearing contents of repository"
 rm -rf ".git"
 rm -rf -- ..?* .[!.]* *
+
+
 # creating empty git repo
 echo "Initing new repository"
 git init
-git config --global --add safe.directory ${CI_PROJECT_DIR}
-git config --global user.email ${GITLAB_USER_EMAIL}
-git config --global user.name ${GITLAB_USER_LOGIN}
+git config --global --add safe.directory "$(pwd)"
+git config --global user.email "${USER_EMAIL}"
+git config --global user.name "${USER_NAME}"
 git config pull.rebase true
-# pulling into empty git repo
-git remote add origin "${CI_SERVER_PROTOCOL}://project_22172_bot:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
-echo "Pulling contents from GIT"
-git pull origin ${CI_COMMIT_REF_NAME}
-# moving back environments folder and committing
-echo "Moving back /tmp/artifact_environments/${CLUSTER_NAME}/${ENVIRONMENT_NAME}"
 
+# pulling into empty git repo
+REMOTE_URL="${SERVER_PROTOCOL}://${TOKEN}@${SERVER_HOST}/${PROJECT_PATH}.git"
+echo "Adding remote: ${REMOTE_URL}"
+git remote add origin "${REMOTE_URL}"
+
+
+echo "Pulling contents from GIT (branch: ${REF_NAME})"
+git pull origin "${REF_NAME}"
+
+
+
+# moving back environments folder and committing
+echo "Restoring environments/${CLUSTER_NAME}/${ENVIRONMENT_NAME}"
 if [ "${COMMIT_ENV}" = "true" ]; then
-  rm -rf environments/${CLUSTER_NAME}/${ENVIRONMENT_NAME}
-  cp -r /tmp/artifact_environments/${CLUSTER_NAME}/${ENVIRONMENT_NAME} environments/${CLUSTER_NAME}/
+  rm -rf "environments/${CLUSTER_NAME}/${ENVIRONMENT_NAME}"
+  cp -r /tmp/artifact_environments/${CLUSTER_NAME}/${ENVIRONMENT_NAME} "environments/${CLUSTER_NAME}/"
 fi
 
 if [ -e /tmp/artifact_environments/${CLUSTER_NAME}/cloud-passport ]; then
   rm -rf environments/${CLUSTER_NAME}/cloud-passport
-  cp -r /tmp/artifact_environments/${CLUSTER_NAME}/cloud-passport environments/${CLUSTER_NAME}/
+  cp -r /tmp/artifact_environments/${CLUSTER_NAME}/cloud-passport "environments/${CLUSTER_NAME}/"
 fi
 
 if [ -e /tmp/configuration ]; then
-  echo "Moving back config folder"
+  echo "Restoring config folder"
   cp -r /tmp/configuration .
 fi
 
 if [ -e /tmp/gitlab-ci ]; then
   rm -rf gitlab-ci
-  echo "Moving back gitlab-ci folder"
+  echo "Restoring gitlab-ci folder"
   cp -r /tmp/gitlab-ci .
 
   rm -rf templates
-  echo "Moving back templates folder"
+  echo "Restoring templates folder"
   cp -r /tmp/templates .
+
   message="${ticket_id} [ci_build_parameters] Update gitlab-ci configurations"
 fi
 
-echo "Commiting changes"
+echo "Checking changes..."
 git add ./*
 diff_status=0
 git diff --cached --exit-code || diff_status=$?
-if [ $diff_status -ne 0 ]; then 
-  echo "See diff above for changed files. Committing..."
+
+if [ $diff_status -ne 0 ]; then
+  echo "Changes detected. Committing..."
   git commit -am "${message}"
-  # pushing to repo
-  git push origin HEAD:${CI_COMMIT_REF_NAME} || exit_code=$?
+
+  echo "Pushing to origin HEAD:${REF_NAME}"
+  git push origin HEAD:"${REF_NAME}" || exit_code=$?
 else
-  echo "We have NOTHING to commit. Skipping..."
+  echo "No changes to commit. Skipping..."
 fi
 
 # echo "exit CODE: ${exit_code}"
-if [ "$exit_code" -ne 0 ]
-then
-    while [ "$exit_code" -ne 0 ] && [ "$retries" -ne 10 ]
-    do
-        echo "fail to push, retries: $retries"
+
+if [ "$exit_code" -ne 0 ]; then
+    while [ "$exit_code" -ne 0 ] && [ "$retries" -lt 10 ]; do
+        echo "⚠Push failed, retry: $retries"
         exit_code=0
         retries=$((retries+1))
+
         echo "Try to pull changes"
-        git pull origin ${CI_COMMIT_REF_NAME}
-        echo "Try to push, retries: $retries"
-        git push origin HEAD:${CI_COMMIT_REF_NAME} || exit_code=$?
+        git pull origin "${REF_NAME}"
+
+        echo "Try to push, attempt: $retries"
+        git push origin HEAD:"${REF_NAME}"
         sleep 5
     done
 fi
