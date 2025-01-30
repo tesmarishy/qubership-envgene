@@ -5,7 +5,6 @@
 
     <groupId>org.qubership</groupId>
     <artifactId>qubership_envgene_templates</artifactId>
-    <revision>0.0.0.1</revision>
     <packaging>zip</packaging>
 
     <name>Qubership Envgene Templates</name>
@@ -104,4 +103,7 @@
 
         </plugins>
     </build>
+    <properties>
+        <revision>0.0.0.1</revision>
+    </properties>
 </project>
