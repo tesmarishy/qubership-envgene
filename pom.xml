@@ -3,6 +3,7 @@
 
     <groupId>org.qubership</groupId>
     <artifactId>qubership_envgene_templates</artifactId>
+    <version>${revision}</version>
     <packaging>zip</packaging>
 
     <name>Qubership Envgene Templates</name>
