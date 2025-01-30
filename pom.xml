@@ -4,7 +4,7 @@
     <groupId>org.qubership</groupId>
     <artifactId>qubership_envgene_templates</artifactId>
     <version>${revision}</version>
-    <packaging>zip</packaging>
+    <packaging>jar</packaging>
 
     <name>Qubership Envgene Templates</name>
     <description>A Maven artifact that contains templates for Qubership Envgene Instance</description>
