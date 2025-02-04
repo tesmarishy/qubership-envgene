@@ -1,4 +1,5 @@
-from os import getenv
+import os
+from os import *
 
 from envgenehelper import check_for_cyrillic, logger, findAllYamlsInDir, openYaml, check_dir_exists, get_cluster_name_from_full_name, get_environment_name_from_full_name, check_environment_is_valid_or_fail, check_file_exists, validate_yaml_by_scheme_or_fail
 from pipeline_parameters import PipelineParameters
