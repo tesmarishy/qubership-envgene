@@ -5,6 +5,7 @@ from envgenehelper import check_for_cyrillic, logger, findAllYamlsInDir, openYam
 from pipeline_parameters import PipelineParameters
 
 project_dir = os.getenv('CI_PROJECT_DIR') or os.getenv('GITHUB_WORKSPACE')
+logger.info(f"Info about project_dir: {project_dir}")
 
 def validate_pipeline(params: PipelineParameters):
     basic_checks(params.env_names)
