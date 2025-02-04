@@ -9,6 +9,7 @@ COPY build_envgene/build/requirements.txt /build/requirements.txt
 COPY build_envgene/build/requirements.yml /build/requirements.yml
 COPY build_envgene/ansible /module/ansible
 COPY build_envgene/scripts /module/scripts
+COPY build_envgene/workflows /workflows
 COPY python /python
 
 COPY build_* create_* produce_* sort* /build_env/

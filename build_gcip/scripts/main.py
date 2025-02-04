@@ -28,7 +28,7 @@ def generate_pipeline():
 def perform_generation():
     params = prepare_input_params()
     validate_pipeline(params)
-    build_pipeline(params)  
+    #build_pipeline(params)
 
 if __name__ == "__main__":
     gcip()

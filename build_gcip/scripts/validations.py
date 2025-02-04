@@ -3,6 +3,8 @@ from os import getenv
 from envgenehelper import check_for_cyrillic, logger, findAllYamlsInDir, openYaml, check_dir_exists, get_cluster_name_from_full_name, get_environment_name_from_full_name, check_environment_is_valid_or_fail, check_file_exists, validate_yaml_by_scheme_or_fail
 from pipeline_parameters import PipelineParameters
 
+project_dir = os.getenv('CI_PROJECT_DIR') or os.getenv('GITHUB_WORKSPACE')
+
 def validate_pipeline(params: PipelineParameters):
     basic_checks(params.env_names)
     if params.is_template_test:
@@ -17,7 +19,7 @@ def basic_checks(env_names):
 
 
 def template_test_checks():
-    templates_dir = f"{getenv('CI_PROJECT_DIR')}/templates"
+    templates_dir = f"{project_dir}/templates"
     # Check for Cyrillic characters in all YAML files in the templates directory if is_template_test is true
     yaml_files = findAllYamlsInDir(templates_dir)
     errorFound = False
@@ -49,13 +51,13 @@ def check_environment(environment_name, cluster_name, get_passport, env_build, c
     if env_inventory_init == "true":
         return
     schemas_dir = getenv("JSON_SCHEMAS_DIR", "/module/schemas")
-    all_environments_dir = f"{getenv('CI_PROJECT_DIR')}/environments"
+    all_environments_dir = f"{project_dir}/environments"
     skip_env_definition_check = get_passport and not env_build and not cmdb_import
     check_environment_is_valid_or_fail(environment_name, cluster_name, all_environments_dir, skip_env_definition_check, not skip_env_definition_check, schemas_dir=schemas_dir)
     
 def check_passport_params(get_passport):
     if get_passport:
-        integration_path = f"{getenv('CI_PROJECT_DIR')}/configuration/integration.yml"
+        integration_path = f"{project_dir}/configuration/integration.yml"
         integration_schema_path = f"{getenv('JSON_SCHEMAS_DIR', '/module/schemas')}/integration.schema.json"
         if check_file_exists(integration_path):
             validate_yaml_by_scheme_or_fail(integration_path, integration_schema_path)
