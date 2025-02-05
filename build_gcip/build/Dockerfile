@@ -20,7 +20,11 @@ RUN apk update \
         libffi-dev \
         curl \
         bash \
-    && apk add --no-cache --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community" gh \
+    && curl -fsSL https://github.com/cli/cli/releases/download/v2.41.0/gh_2.41.0_linux_amd64.tar.gz -o gh.tar.gz \
+    && tar -xvf gh.tar.gz \
+    && mv gh_2.41.0_linux_amd64/bin/gh /usr/local/bin/gh \
+    && chmod +x /usr/local/bin/gh \
+    && rm -rf gh_2.41.0_linux_amd64 gh.tar.gz \
     && test -d /module/venv || python3 -m venv /module/venv \
     && source /module/venv/bin/activate \
     && pip install --no-deps --no-cache-dir -r /build/requirements.txt \
