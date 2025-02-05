@@ -20,7 +20,7 @@ RUN apk update \
         libffi-dev \
         curl \
         bash \
-    && apk add --no-cache --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community/x86_64" github-cli \
+    && apk add --no-cache --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community" github-cli \
     && test -d /module/venv || python3 -m venv /module/venv \
     && source /module/venv/bin/activate \
     && pip install --no-deps --no-cache-dir -r /build/requirements.txt \
