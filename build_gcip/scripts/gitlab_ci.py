@@ -15,6 +15,11 @@ from pipeline_parameters import PipelineParameters
 
 project_dir = os.getenv('CI_PROJECT_DIR') or os.getenv('GITHUB_WORKSPACE')
 
+is_gitlab = bool(os.getenv('CI_PROJECT_DIR')) and not bool(os.getenv('GITHUB_ACTIONS'))
+is_github = bool(os.getenv('GITHUB_WORKSPACE')) or bool(os.getenv('GITHUB_ACTIONS'))
+
+logger.info(f"Detected environment - GitLab: {is_gitlab}, GitHub: {is_github}")
+
 def build_pipeline(params: PipelineParameters):
     # if we are in template testing during template build
     if params.is_template_test:
@@ -81,9 +86,9 @@ def build_pipeline(params: PipelineParameters):
             logger.info(f"Generation of cloud passport for environment '{env}' is skipped")
 
         if is_inventory_generation_needed(params.is_template_test, params.env_inventory_generation_params):
-            if os.getenv('CI_PROJECT_DIR'):
+            if is_gitlab:
                 jobs_map["env_inventory_generation_job"] = prepare_inventory_generation_job(pipeline, env, environment_name, cluster_name, params.env_inventory_generation_params)
-            elif os.getenv('GITHUB_WORKSPACE'):
+            elif is_github:
                 prepare_inventory_generation_job_github_actions(env, environment_name, cluster_name, params.env_inventory_generation_params)
         else:
             logger.info(f'Preparing of env inventory generation job for {env} is skipped because we are in template test mode.')
