@@ -13,15 +13,18 @@ COPY schemas /module/schemas
 COPY python/integration /python/integration
 
 RUN apk update \
-    && apk add --update --no-cache \
+    && apk add --no-cache \
         git \
         gcc \
         musl-dev \
         libffi-dev \
-        gh \
+        curl \
+        bash \
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /usr/share/keyrings/githubcli-archive-keyring.gpg >/dev/null \
+    && echo "https://cli.github.com/packages stable main" | tee -a /etc/apk/repositories \
+    && apk add --no-cache gh \
     && test -d /module/venv || python3 -m venv /module/venv \
     && source /module/venv/bin/activate \
-    && . /module/venv/bin/activate \
     && pip install --no-deps --no-cache-dir -r /build/requirements.txt \
     && python3 -m pip install /python/integration \
     && python3 -m pip install /python/jschon-sort \
