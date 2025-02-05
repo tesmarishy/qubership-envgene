@@ -10,7 +10,7 @@ from pipeline_helper import get_gav_coordinates_from_build, find_predecessor_job
 
 from passport_jobs import prepare_trigger_passport_job, prepare_passport_job, prepare_decryption_mode_job
 from env_build_jobs import prepare_env_build_job, prepare_generate_effective_set_job, prepare_git_commit_job
-from inventory_generation_job import prepare_inventory_generation_job, is_inventory_generation_needed
+from inventory_generation_job import prepare_inventory_generation_job, is_inventory_generation_needed,prepare_inventory_generation_job_github_actions
 from pipeline_parameters import PipelineParameters
 
 project_dir = os.getenv('CI_PROJECT_DIR') or os.getenv('GITHUB_WORKSPACE')
