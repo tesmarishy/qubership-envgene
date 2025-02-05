@@ -20,9 +20,7 @@ RUN apk update \
         libffi-dev \
         curl \
         bash \
-    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /usr/share/keyrings/githubcli-archive-keyring.gpg >/dev/null \
-    && echo "https://cli.github.com/packages stable main" | tee -a /etc/apk/repositories \
-    && apk add --no-cache gh \
+    && apk add --no-cache --repository="http://dl-cdn.alpinelinux.org/alpine/edge/community" gh \
     && test -d /module/venv || python3 -m venv /module/venv \
     && source /module/venv/bin/activate \
     && pip install --no-deps --no-cache-dir -r /build/requirements.txt \
