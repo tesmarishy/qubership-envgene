@@ -18,6 +18,7 @@ RUN apk update \
         gcc \
         musl-dev \
         libffi-dev \
+        gh \
     && test -d /module/venv || python3 -m venv /module/venv \
     && source /module/venv/bin/activate \
     && . /module/venv/bin/activate \
