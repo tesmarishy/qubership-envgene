@@ -31,6 +31,8 @@ RUN apk update \
 # Stage 2
 FROM ghcr.io/netcracker/base-images-module-base:main
 
+USER root
+
 COPY --from=build /module /module
 
 RUN apk update \
