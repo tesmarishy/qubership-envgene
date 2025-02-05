@@ -41,8 +41,7 @@ RUN apk update \
         curl \
     && echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
     && apk add --no-cache github-cli@community \
-    && gh --version \
-    && git --version
+    && git config --global --add safe.directory /repo
 
 ENV PATH=/module/venv/bin:/usr/bin:/usr/local/bin:$PATH
 
