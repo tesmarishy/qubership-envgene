@@ -2,6 +2,7 @@ from gcip import WhenStatement
 from envgenehelper import logger
 from pipeline_helper import job_instance
 import json
+import os
 
 def is_inventory_generation_needed(is_template_test, inv_gen_params):
     if is_template_test:
@@ -41,3 +42,27 @@ def prepare_inventory_generation_job(pipeline, full_env, environment_name, clust
     job.artifacts.when = WhenStatement.ALWAYS
     pipeline.add_children(job)
     return job
+
+def prepare_inventory_generation_job_github_actions(full_env, environment_name, cluster_name, env_generation_params):
+    logger.info(f"Preparing inventory generation job for {full_env}")
+
+    command = f"""
+    gh workflow run env_inventory.yml \
+      --ref main \
+      -f ENV_NAME="{environment_name}" \
+      -f CLUSTER_NAME="{cluster_name}" \
+      -f ENV_GENERATION_PARAMS='{env_generation_params}' \
+      -f module_ansible_dir="/module/ansible" \
+      -f module_inventory="/repo/configuration/inventory.yaml" \
+      -f module_ansible_cfg="/module/ansible/ansible.cfg" \
+      -f module_config_default="/module/templates/defaults.yaml"
+    """
+
+    logger.info(f"Executing command: {command}")
+
+    exit_code = os.system(command)
+
+    if exit_code == 0:
+        logger.info(f"Workflow `env_inventory.yml` was executed on {environment_name}!")
+    else:
+        logger.error(f"Erro during running the workflow! Exit code: {exit_code}")

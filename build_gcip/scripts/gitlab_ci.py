@@ -13,12 +13,13 @@ from env_build_jobs import prepare_env_build_job, prepare_generate_effective_set
 from inventory_generation_job import prepare_inventory_generation_job, is_inventory_generation_needed
 from pipeline_parameters import PipelineParameters
 
+project_dir = os.getenv('CI_PROJECT_DIR') or os.getenv('GITHUB_WORKSPACE')
 
 def build_pipeline(params: PipelineParameters):
     # if we are in template testing during template build
     if params.is_template_test:
         logger.info("We are generating jobs in template test mode.")
-        templates_dir = f"{getenv('CI_PROJECT_DIR')}/templates/env_templates"
+        templates_dir = f"{project_dir}/templates/env_templates"
         # getting build artifact
         build_artifact = get_gav_coordinates_from_build()
         group_id = build_artifact["group_id"]
@@ -44,7 +45,7 @@ def build_pipeline(params: PipelineParameters):
 
     for env in params.env_names.split("\n"):
         logger.info(f'----------------start processing for {env}---------------------')
-        ci_project_dir = getenv("CI_PROJECT_DIR")
+        ci_project_dir = project_dir
 
         if params.is_template_test:
             cluster_name = ""
@@ -80,7 +81,10 @@ def build_pipeline(params: PipelineParameters):
             logger.info(f"Generation of cloud passport for environment '{env}' is skipped")
 
         if is_inventory_generation_needed(params.is_template_test, params.env_inventory_generation_params):
-            jobs_map["env_inventory_generation_job"] = prepare_inventory_generation_job(pipeline, env, environment_name, cluster_name, params.env_inventory_generation_params)
+            if os.getenv('CI_PROJECT_DIR'):
+                jobs_map["env_inventory_generation_job"] = prepare_inventory_generation_job(pipeline, env, environment_name, cluster_name, params.env_inventory_generation_params)
+            elif os.getenv('GITHUB_WORKSPACE'):
+                prepare_inventory_generation_job_github_actions(env, environment_name, cluster_name, params.env_inventory_generation_params)
         else:
             logger.info(f'Preparing of env inventory generation job for {env} is skipped because we are in template test mode.')
 
