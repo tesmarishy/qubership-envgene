@@ -37,7 +37,6 @@ FROM ghcr.io/netcracker/base-images-module-base:main
 COPY --from=build /module /module
 
 COPY --from=build /usr/bin/gh /usr/bin/gh
-COPY --from=build /usr/local/bin/gh /usr/local/bin/gh
 
 ENV PATH=/module/venv/bin:/usr/bin:/usr/local/bin:$PATH
 
