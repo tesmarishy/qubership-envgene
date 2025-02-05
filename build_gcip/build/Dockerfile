@@ -20,10 +20,6 @@ RUN apk update \
         libffi-dev \
         curl \
         bash \
-    && echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-    && apk add --no-cache github-cli@community \
-    && gh --version \
-    && git --version \
     && test -d /module/venv || python3 -m venv /module/venv \
     && source /module/venv/bin/activate \
     && pip install --no-deps --no-cache-dir -r /build/requirements.txt \
@@ -37,7 +33,14 @@ FROM ghcr.io/netcracker/base-images-module-base:main
 
 COPY --from=build /module /module
 
-COPY --from=build /usr/bin/gh /usr/bin/gh
+RUN apk update \
+    && apk add --no-cache \
+        git \
+        curl \
+    && echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+    && apk add --no-cache github-cli@community \
+    && gh --version \
+    && git --version
 
 ENV PATH=/module/venv/bin:/usr/bin:/usr/local/bin:$PATH
 
