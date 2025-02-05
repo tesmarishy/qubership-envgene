@@ -47,7 +47,7 @@ def prepare_inventory_generation_job_github_actions(full_env, environment_name, 
     logger.info(f"Preparing inventory generation job for {full_env}")
 
     command = f"""
-    /usr/local/bin/gh workflow run env_inventory.yml \
+    gh workflow run env_inventory.yml \
       --ref main \
       -f ENV_NAME="{environment_name}" \
       -f CLUSTER_NAME="{cluster_name}" \
