@@ -31,17 +31,7 @@ RUN apk update \
 # Stage 2
 FROM ghcr.io/netcracker/base-images-module-base:main
 
-USER root
-
 COPY --from=build /module /module
-
-RUN apk update \
-    && apk add --no-cache \
-        git \
-        curl \
-    && echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-    && apk add --no-cache github-cli@community \
-    && git config --global --add safe.directory /repo
 
 ENV PATH=/module/venv/bin:/usr/bin:/usr/local/bin:$PATH
 
