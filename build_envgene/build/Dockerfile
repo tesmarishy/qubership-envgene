@@ -39,6 +39,7 @@ RUN apk update \
         libxml2-dev \
         libxslt-dev \
         zlib-dev \
+        jq \
     && curl --retry 3 --retry-connrefused --retry-delay 5 -LO https://github.com/mozilla/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64 \
     && chmod +x sops-v3.9.0.linux.amd64 \
     && mv sops-v3.9.0.linux.amd64 /usr/local/bin/sops \
