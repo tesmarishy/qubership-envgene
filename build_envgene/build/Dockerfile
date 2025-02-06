@@ -53,6 +53,6 @@ RUN apk update \
     && chmod 754 /module/scripts/* \
     && apk del build-base libxml2-dev libxslt-dev zlib-dev \
     && rm -rf /var/cache/apk/* /tmp/* /var/tmp/* \
-    && pip install PyYAML \
+    && pip install PyYAML
 
 WORKDIR /module/ansible
