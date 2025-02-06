@@ -25,7 +25,8 @@ RUN apk update \
     && pip install --no-deps --no-cache-dir -r /build/requirements.txt \
     && python3 -m pip install /python/integration \
     && python3 -m pip install /python/jschon-sort \
-    && python3 -m pip install /python/envgene
+    && python3 -m pip install /python/envgene \
+    && python3 -m pip install PyYAML
 
 #######################################
 # Stage 2
