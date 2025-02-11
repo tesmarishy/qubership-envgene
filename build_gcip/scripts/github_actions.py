@@ -22,11 +22,34 @@ def prepare_input_params() -> PipelineParameters:
     logger.info(params_log)
     return params
 
+def read_gav_coordinates(params: PipelineParameters):
+    if params.is_template_test:
+        logger.info("We are generating jobs in template test mode.")
+        templates_dir = f"{project_dir}/templates/env_templates"
+        # getting build artifact
+        build_artifact = get_gav_coordinates_from_build()
+        group_id = build_artifact["group_id"]
+        artifact_id = build_artifact["artifact_id"]
+        params.env_template_version = build_artifact["version"]
+        # get env_names for all templates types
+        templateFiles = [
+            os.path.splitext(f)[0]
+            for f in listdir(templates_dir)
+            if os.path.isfile(os.path.join(templates_dir, f))
+            and (f.endswith(".yaml") or f.endswith(".yml"))
+        ]
+        params.env_names = "\n".join(templateFiles)
+    else:
+        group_id = ""
+        artifact_id = ""
+
 
 @cli.command("validate_pipeline")
 def validate_pipeline_command():
     params = prepare_input_params()
     validate_pipeline(params)
+    read_gav_coordinates(params)
+
 
 if __name__ == "__main__":
  cli()
