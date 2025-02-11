@@ -31,6 +31,7 @@ def read_gav_coordinates(params: PipelineParameters):
         group_id = build_artifact["group_id"]
         artifact_id = build_artifact["artifact_id"]
         params.env_template_version = build_artifact["version"]
+        version = build_artifact["version"]
         # get env_names for all templates types
         templateFiles = [
             os.path.splitext(f)[0]
@@ -42,7 +43,7 @@ def read_gav_coordinates(params: PipelineParameters):
     else:
         group_id = ""
         artifact_id = ""
-        version= ""
+        version = ""
 
     gav_data = f"{group_id},{artifact_id},{version}"
     with open("/repo/gav_output.txt", "w") as f:
