@@ -42,6 +42,13 @@ def read_gav_coordinates(params: PipelineParameters):
     else:
         group_id = ""
         artifact_id = ""
+        version= ""
+
+    gav_data = f"{group_id},{artifact_id},{version}"
+    with open("/repo/gav_output.txt", "w") as f:
+        f.write(gav_data)
+
+    logger.info(f"GAV data saved: {gav_data}")
 
 
 @cli.command("validate_pipeline")
