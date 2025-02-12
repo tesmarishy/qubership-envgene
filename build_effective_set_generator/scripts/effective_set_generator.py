@@ -58,39 +58,64 @@ def get_and_check_env_creds_or_fail(env_dir):
         raise ReferenceError(f"Error while validating credentials in file {envCredPath}. See logs above.")
     return envCreds
 
-def check_is_cred_and_update_cred_yaml(key, value, credentials_yaml, env_creds, comment):
+def check_is_cred_and_update_cred_yaml(key: str, value: object, credentials_yaml: dict, env_creds: dict, comment: str) -> bool:
     if isinstance(value, str) and check_is_cred(key, value):
         expandedValue = expand_cred_macro_and_return_value(key, value, env_creds)
         store_value_to_yaml(credentials_yaml, key, expandedValue, comment)
         return True
     return False
 
-def check_is_creds_list_and_expand_creds(key, value_list, credentials_yaml, env_creds, comment):
+def check_is_creds_list_and_expand_creds(key: str, value_list: list, result_yaml: dict, credentials_yaml: dict, env_creds: dict, comment: str) -> bool:
     updatedValueList = value_list.copy()
-    credFound = False
-    for idx, item in enumerate(value_list):
-        if check_is_cred(idx, item):
-            expandedValue = expand_cred_macro_and_return_value(idx, item, env_creds)
-            credFound = True
+    is_cred_found = False
+    result_yaml[key] = []
+    credentials_yaml[key] = []
+    for idx, value in enumerate(value_list):
+        if isinstance(value, dict):
+            res_yaml = empty_yaml()
+            cred_yaml = empty_yaml()
+            if apply_parameters_from_dict_recursive(value, res_yaml, cred_yaml, env_creds, comment):
+                is_cred_found = True
+                res_yaml.update(cred_yaml)
+                updatedValueList[idx] = res_yaml
+        elif isinstance(value, list):
+            if not check_is_creds_list_and_expand_creds(key, value, result_yaml, credentials_yaml, env_creds, comment):
+                store_value_to_yaml(result_yaml, key, value, comment)
+            else:
+                is_cred_found = True
+        elif check_is_cred(idx, value):
+            expandedValue = expand_cred_macro_and_return_value(idx, value, env_creds)
+            is_cred_found = True
             updatedValueList[idx] = expandedValue
-    if (credFound):
+    if (is_cred_found):
         store_value_to_yaml(credentials_yaml, key, updatedValueList, comment)
-    return credFound
+        if len(result_yaml[key]) == 0:
+            result_yaml.pop(key, None)
+    else:
+        credentials_yaml.pop(key, None)
+    return is_cred_found
 
-def apply_parameters_from_dict_recursive(template_dict, result_yaml, credentials_yaml, env_creds, comment) :
+def apply_parameters_from_dict_recursive(template_dict: dict, result_yaml: dict, credentials_yaml: dict, env_creds: dict, comment: str) -> bool:
+    is_cred_found = False
     for key in template_dict:
         value = template_dict[key]
         if isinstance(value, dict):
             result_yaml[key] = empty_yaml()
             credentials_yaml[key] = empty_yaml()
-            apply_parameters_from_dict_recursive(value, result_yaml[key], credentials_yaml[key], env_creds, comment)
+            if apply_parameters_from_dict_recursive(value, result_yaml[key], credentials_yaml[key], env_creds, comment):
+                is_cred_found = True
         elif isinstance(value, list):
-            if not check_is_creds_list_and_expand_creds(key, value, credentials_yaml, env_creds, comment):
+            if not check_is_creds_list_and_expand_creds(key, value, result_yaml, credentials_yaml, env_creds, comment):
                 store_value_to_yaml(result_yaml, key, value, comment)
+            else:
+                is_cred_found = True
         else:
             # adding key to effective set if it is not cred
             if not check_is_cred_and_update_cred_yaml(key, value, credentials_yaml, env_creds, comment):
                 store_value_to_yaml(result_yaml, key, value, comment)
+            else:
+                is_cred_found = True
+    return is_cred_found
 
 def apply_parameters_from_template(resultYaml, templateYaml, parameters_tag, credentials_yaml, env_creds, comment) :
     if parameters_tag in templateYaml:
