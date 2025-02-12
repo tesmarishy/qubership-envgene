@@ -4,7 +4,7 @@
     crypt_type: "decrypt"
     source_file: "{{ cred_config_path }}"
   register: decrypt_creds
-  no_log: True
+  no_log: false
 
 - name: Set env_definition path
   set_fact:
@@ -17,7 +17,7 @@
 - name: Include vars from credentials file
   set_fact:
     cred_config: "{{ decrypt_creds.result | from_yaml }}"
-  no_log: True
+  no_log: false
 
 - name: include old logic
   include_tasks: 02_prepare_vars_old.yaml
