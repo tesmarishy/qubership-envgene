@@ -6,7 +6,7 @@ def prepare_env_build_job(pipeline, is_template_test, env_template_version, full
   logger.info(f'prepare env_build job for {full_env}')
   # prepare script
   script = [
-     'if [ -d "${CI_PROJECT_DIR}/configuration/certs" ]; then cert_path=$(ls -A "${CI_PROJECT_DIR}/configuration/certs"); for path in $cert_path; do . /module/scripts/update_ca_cert.sh ${CI_PROJECT_DIR}/configuration/certs/$path; done; fi'
+     'if [ -d "${CI_PROJECT_DIR}/configuration/certs" ]; then cert_path=$(ls -A "${CI_PROJECT_DIR}/configuration/certs"); for path in $cert_path; do . /module/scripts/update_ca_cert.sh ${CI_PROJECT_DIR}/configuration/certs/$path; done; fi',
   ]
   # adding update template version
   if env_template_version and env_template_version != "" and not is_template_test:
@@ -129,3 +129,4 @@ def prepare_git_commit_job(pipeline, full_env, enviroment_name, cluster_name):
   git_commit_job.artifacts.when = WhenStatement.ALWAYS
   pipeline.add_children(git_commit_job)
   return git_commit_job
+
