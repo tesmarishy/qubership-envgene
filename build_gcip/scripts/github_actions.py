@@ -25,8 +25,6 @@ def prepare_input_params() -> PipelineParameters:
 def validate_pipeline_command():
     params = prepare_input_params()
     validate_pipeline(params)
-    read_gav_coordinates(params)
-
 
 if __name__ == "__main__":
  cli()
