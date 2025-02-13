@@ -16,10 +16,10 @@
     repository_template_type: "{{env_definition['envTemplate']['templateArtifact']['templateRepository']}}"
     registry_name:      "{{ env_definition['envTemplate']['templateArtifact']['registry'] }}"
 
-- name: Set repository from url {{ registry_config }}
+- name: Set repository from url registry_config
   set_fact:
-    template_repository_url: "{{ registry_config[registry_name][repository_template_type] }}"
-    repository_url:          "{{ registry_config[registry_name][repository_type] }}"
+    template_repository_url: "{{ registry_config[registry_name]['repository_template_type'] }}"
+    repository_url:          "{{ registry_config[registry_name]['repository_type'] }}"
     creds_id_username:       "{{ registry_config[registry_name]['username'] | credid }}"
     creds_id_password:       "{{ registry_config[registry_name]['password'] | credid }}"
 
