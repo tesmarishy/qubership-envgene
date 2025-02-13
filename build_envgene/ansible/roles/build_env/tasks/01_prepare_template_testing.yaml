@@ -52,12 +52,12 @@
   set_fact:
     env_definition: "{{ lookup('file', env_definition_conf_path) | from_yaml }}"
     registry_config:  "{{ lookup('file', registry_config_path) | from_yaml }}"
-  no_log: True
+  no_log: false
 
 - name: Set tenant_name
   set_fact:
     tenant_name: "{{ env_definition['inventory']['tenantName'] }}"
-  no_log: True
+  no_log: false
 
 - name: Create environment directory
   file:
