@@ -3,6 +3,10 @@
   set_fact:
     registry_config:  "{{ lookup('file', registry_config_path) | from_yaml }}"
 
+- name: Debug vars
+  debug:
+    msg: "{{ registry_config }} {{ registry_config_path }}"
+
 - name: Set artifact vars from env_definition
   set_fact:
     group_id:           "{{ env_definition['envTemplate']['templateArtifact']['artifact']['group_id'] }}"
