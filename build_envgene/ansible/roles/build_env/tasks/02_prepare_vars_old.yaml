@@ -23,4 +23,4 @@
   set_fact:
     repository_username:  "{{ cred_config[creds_id_username[0]]['data'][creds_id_username[1]] }}"
     repository_password:  "{{ cred_config[creds_id_password[0]]['data'][creds_id_password[1]] }}"
-  no_log: True
+  no_log: false

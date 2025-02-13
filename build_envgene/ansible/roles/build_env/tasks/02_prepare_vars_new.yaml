@@ -27,7 +27,7 @@
   set_fact:
     repository_username: "{{ cred_config[configs['registry']['credentialsId']]['data']['username'] }}"
     repository_password: "{{ cred_config[configs['registry']['credentialsId']]['data']['password'] }}"
-  no_log: True
+  no_log: false
 
 - name: Run maven discovery repository
   maven_artifact:
