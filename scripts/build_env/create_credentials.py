@@ -185,7 +185,7 @@ def mergeSharedCreds(credYamlPath, envDir, instancesDir) :
 def create_credentials(envDir, envInstancesDir, instancesDir) :
     logger.info(f"Start to create credentials: envDir={envDir}, envInstancesDir={envInstancesDir}, instancesDir={instancesDir}")
     logger.info(f"Creating credentials for environment directory: {envDir}")
-    credsSchema="schemas/credentials.schema.json"
+    credsSchema="schemas/credential.schema.json"
     resultingCreds = []
     #tenant
     tenantFileName = envDir+"/tenant.yml"

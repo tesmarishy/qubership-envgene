@@ -38,7 +38,7 @@ def main():
     updated_data = preparation(sensitive_data)
     with open(cred_file, mode="w", encoding="utf-8") as file:
         safe_dump(updated_data,file)
-    creds_schema="/build_env/schemas/credentials.schema.json"
+    creds_schema="/build_env/schemas/credential.schema.json"
     beautifyYaml(cred_file, creds_schema)
     with open(cred_file, mode="r", encoding="utf-8") as file:
         beautified_data = safe_load(file)

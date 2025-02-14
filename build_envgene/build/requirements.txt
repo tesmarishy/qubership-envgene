@@ -12,6 +12,5 @@ typing==3.7.4.3
 ansible-core==2.13.3
 ansible-base==2.10.17
 ansible_runner==2.3.5
-hiyapyco==0.6.0
 cffi==1.16.0
 click==8.1.3
