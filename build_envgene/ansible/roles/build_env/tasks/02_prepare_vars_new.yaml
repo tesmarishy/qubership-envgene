@@ -36,7 +36,7 @@
     version: "{{ template_split[1] }}"
     username: "{{ repository_username }}"
     password: "{{ repository_password }}"
-    extension: json
+    extension: zip
   no_log: false
   register: discovery_output
 
