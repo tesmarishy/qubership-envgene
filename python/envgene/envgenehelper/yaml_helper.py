@@ -158,6 +158,8 @@ def set_nested_yaml_attribute(yaml_content, attribute_str, value, comment="", is
     else:
         logger.debug(f'Setting {attribute_str} is skipped. Attribute already exists and is_overwriting is set to False')
 
+primitiveTypes = (int, str, bool, float)
+
 def merge_yaml_into_target(yaml_content, target_attribute_str, source_yaml, overwrite_existing_values=True,  overwrite_existing_comments=True):
     if source_yaml == None:
         return
@@ -181,7 +183,26 @@ def merge_yaml_into_target(yaml_content, target_attribute_str, source_yaml, over
         if isinstance(target_yaml[k], dict) and isinstance(v, dict):
             merge_yaml_into_target(target_yaml[k], "", v, overwrite_existing_values, overwrite_existing_comments)
         elif isinstance(target_yaml[k], list) and isinstance(v, list):
-            target_yaml[k].extend(v)
+            target_yaml[k].extend(v_el for v_el in v if v_el not in target_yaml[k] and (isinstance(v_el, primitiveTypes) or isinstance(v_el, list)))
+            src_dicts = {}
+            for v_k, v_el in enumerate(v):
+                if isinstance(v_el, dict):
+                    src_dicts.update({v_k:v_el})
+            for t_k, t_el in enumerate(target_yaml[k]):
+                if not isinstance(t_el, dict):
+                    continue
+                if not t_k in src_dicts:
+                    continue
+                merge = False
+                for t_el_k in t_el.keys():
+                    if t_el_k in src_dicts[t_k].keys():
+                        merge = True
+                        break
+                if merge:
+                    target_yaml[k][t_k] = merge_yaml_into_target(t_el, '', src_dicts[t_k], overwrite_existing_values, overwrite_existing_comments)
+                    del src_dicts[k]
+            for _, src_dicts_el in src_dicts.items():
+                target_yaml[k].append(src_dicts_el)
             target_yaml[k] = list(set(target_yaml[k]))
         elif overwrite_existing_values:
             target_yaml[k] = v

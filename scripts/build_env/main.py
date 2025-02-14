@@ -8,7 +8,6 @@ from resource_profiles import get_env_specific_resource_profiles
 from envgenehelper import *
 from envgenehelper.deployer import *
 import ansible_runner
-import hiyapyco
 
 # const
 INVENTORY_DIR_NAME = "Inventory"
@@ -70,8 +69,10 @@ def handle_template_override(render_dir):
     all_files = findAllFilesInDir(render_dir, "ml_override")
     for file in all_files:
         template_path = file.replace("_override", "")
-        merged_yaml = hiyapyco.load([template_path, file], method=hiyapyco.METHOD_MERGE)
-        writeToFile(template_path, hiyapyco.dump(merged_yaml))
+        yaml_to_override = openYaml(template_path)
+        src = openYaml(file)
+        merge_yaml_into_target(yaml_to_override, '', src)
+        writeYamlToFile(template_path, yaml_to_override)
         deleteFile(file)
 
 
@@ -242,7 +243,9 @@ def merge_template_parameters(template_yml, templates_dir, override_source=False
                                                              f'override/{parameterContainer["override"]["name"]}.y')
                         logger.info(f'merge parameters from {override_parameters_path} to {source_parameters_path}')
 
-                        merged_yaml = hiyapyco.load([source_parameters_path, override_parameters_path], method=hiyapyco.METHOD_MERGE)
+                        yaml_to_override = openYaml(source_parameters_path)
+                        src = openYaml(override_parameters_path)
+                        merge_yaml_into_target(yaml_to_override, '', src)
 
                         source_parameters_path = source_parameters_path[0]
                         if not override_source:
@@ -250,7 +253,7 @@ def merge_template_parameters(template_yml, templates_dir, override_source=False
                             source_parameters_path = source_parameters_path.replace("/source/", "/merge/")
                             source_parameters_path = source_parameters_path.replace(f'/{source_file_name}-{source_file_version}.', f'/{parameterContainer["override"]["artifact_name"]}.')
 
-                        writeToFile(source_parameters_path, hiyapyco.dump(merged_yaml))
+                        writeYamlToFile(source_parameters_path, yaml_to_override)
 
 
 def render_environment(env_name, cluster_name, templates_dir, all_instances_dir, output_dir, g_template_version, work_dir):

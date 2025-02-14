@@ -25,7 +25,7 @@ def fill_creds(env_dir):
     if check_file_exists(cred_file_name):
       logger.info(f'File with creds exists: {cred_file_name}. Filling cred values.')
       contents = openFileAsString(cred_file_name)
-      writeToFile(cred_file_name, contents.replace(" null ", " test_cred_val "))
+      writeToFile(cred_file_name, contents.replace(" \"envgeneNullValue\" ", " test_cred_val ").replace(" envgeneNullValue ", " test_cred_val "))
 
 @pytest.mark.parametrize("cluster_name, env_name, sd_version", test_data)
 def test_render_envs(cluster_name, env_name, sd_version):
