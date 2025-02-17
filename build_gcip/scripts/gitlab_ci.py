@@ -86,10 +86,7 @@ def build_pipeline(params: PipelineParameters):
             logger.info(f"Generation of cloud passport for environment '{env}' is skipped")
 
         if is_inventory_generation_needed(params.is_template_test, params.env_inventory_generation_params):
-            if is_gitlab:
-                jobs_map["env_inventory_generation_job"] = prepare_inventory_generation_job(pipeline, env, environment_name, cluster_name, params.env_inventory_generation_params)
-            elif is_github:
-                prepare_inventory_generation_job_github_actions(env, environment_name, cluster_name, params.env_inventory_generation_params)
+            jobs_map["env_inventory_generation_job"] = prepare_inventory_generation_job(pipeline, env, environment_name, cluster_name, params.env_inventory_generation_params)
         else:
             logger.info(f'Preparing of env inventory generation job for {env} is skipped because we are in template test mode.')
 
