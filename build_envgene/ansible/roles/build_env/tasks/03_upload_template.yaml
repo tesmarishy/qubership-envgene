@@ -9,7 +9,7 @@
     password:       "{{ repository_password }}"
     dest:           "{{ dd_dest }}"
     extension: json
-  when: env_definition['envTemplate']['templateArtifact']['templateRepository'] == ""
+  when: (env_definition['envTemplate']['templateArtifact']['templateRepository'] | default('')) == ""
 
 - name: Run maven artifact to find artifact version
   maven_artifact:
@@ -24,33 +24,38 @@
   no_log: false
   when:
     - version is search('SNAPSHOT')
-    - env_definition['envTemplate']['templateArtifact']['templateRepository'] == ""
+    - (env_definition['envTemplate']['templateArtifact']['templateRepository'] | default('')) == ""
   register: module_output
 
 - debug:
     var: module_output.version_dd
   when:
     - version is search('SNAPSHOT')
-    - env_definition['envTemplate']['templateArtifact']['templateRepository'] == ""
+    - (env_definition['envTemplate']['templateArtifact']['templateRepository'] | default('')) == ""
 
 - name: Set artifact version from snapshot
   set_fact:
     atrifact_latest_version: "{{ module_output.version_dd  | default(version) }}"
+  when: (env_definition['envTemplate']['templateArtifact']['templateRepository'] | default('')) == ""
 
 - name: Lookup artifact version from downloaded artifact
   set_fact:
     atrifact_name_list: "{{ lookup('file',lookup('ansible.builtin.vars','dd_dest')) | from_json | json_query('configurations[0].artifacts[0].id')| split(':') }}"
+  when: (env_definition['envTemplate']['templateArtifact']['templateRepository'] | default('')) == ""
 
 - name: Lookup template repository from downloaded artifact
   set_fact:
     template_repository_url: "{{ (lookup('file',lookup('ansible.builtin.vars','dd_dest')) | from_json | json_query('configurations[0].maven_repository')) or repository_url }}"
-  when: env_definition['envTemplate']['artifact'] is defined
+  when:
+    - env_definition['envTemplate']['artifact'] is defined
+    - (env_definition['envTemplate']['templateArtifact']['templateRepository'] | default('')) == ""
+
 
 - name: Download a real artifact using Artifactory username/password
   community.general.maven_artifact:
-    group_id:       "{{ atrifact_name_list[0] }}"
-    artifact_id:    "{{ atrifact_name_list[1] }}"
-    version:        "{{ atrifact_name_list[2] }}"
+    group_id:       "{{ atrifact_name_list[0] | default(group_id) }}"
+    artifact_id:    "{{ atrifact_name_list[1] | default(artifact_id) }}"
+    version:        "{{ atrifact_name_list[2] | default(version)  }}"
     repository_url: "{{ template_repository_url }}"
     username:       "{{ repository_username }}"
     password:       "{{ repository_password }}"
