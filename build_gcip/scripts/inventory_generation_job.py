@@ -22,8 +22,6 @@ def prepare_inventory_generation_job(pipeline, full_env, environment_name, clust
         "image": "${envgen_image}",
         "stage": "env_inventory_generation",
         "script": [
-            "bash /module/scripts/handle_certs.sh",
-            "source ~/.bashrc",
             f"python3 /build_env/scripts/build_env/env_inventory_generation.py",
         ],
     }
