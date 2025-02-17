@@ -3,17 +3,13 @@
   set_fact:
     registry_config:  "{{ lookup('file', registry_config_path) | from_yaml }}"
 
-- name: Debug vars
-  debug:
-    msg: "{{ registry_config }} {{ registry_config_path }}"
-
 - name: Set artifact vars from env_definition
   set_fact:
     group_id:           "{{ env_definition['envTemplate']['templateArtifact']['artifact']['group_id'] }}"
     artifact_id:        "{{ env_definition['envTemplate']['templateArtifact']['artifact']['artifact_id'] }}"
     version:            "{{ env_definition['envTemplate']['templateArtifact']['artifact']['version'] }}"
     repository_type:    "{{ env_definition['envTemplate']['templateArtifact']['repository'] }}"
-    repository_template_type: "{{env_definition['envTemplate']['templateArtifact']['templateRepository']}}"
+    repository_template_type: "{{ env_definition['envTemplate']['templateArtifact']['templateRepository'] }}"
     registry_name:      "{{ env_definition['envTemplate']['templateArtifact']['registry'] }}"
 
 - name: Set repository from url registry_config
@@ -27,4 +23,4 @@
   set_fact:
     repository_username:  "{{ cred_config[creds_id_username[0]]['data'][creds_id_username[1]] }}"
     repository_password:  "{{ cred_config[creds_id_password[0]]['data'][creds_id_password[1]] }}"
-  no_log: false
+  no_log: true

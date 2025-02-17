@@ -9,6 +9,7 @@
     password:       "{{ repository_password }}"
     dest:           "{{ dd_dest }}"
     extension: json
+  when: env_definition['envTemplate']['templateArtifact']['templateRepository'] == ""
 
 - name: Run maven artifact to find artifact version
   maven_artifact:
@@ -21,12 +22,16 @@
     dest:           "{{ dd_dest }}"
     extension: json
   no_log: false
-  when: version is search('SNAPSHOT')
+  when:
+    - version is search('SNAPSHOT')
+    - env_definition['envTemplate']['templateArtifact']['templateRepository'] == ""
   register: module_output
 
 - debug:
     var: module_output.version_dd
-  when: version is search('SNAPSHOT')
+  when:
+    - version is search('SNAPSHOT')
+    - env_definition['envTemplate']['templateArtifact']['templateRepository'] == ""
 
 - name: Set artifact version from snapshot
   set_fact:

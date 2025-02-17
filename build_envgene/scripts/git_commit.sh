@@ -106,7 +106,15 @@ git config --global user.name "${USER_NAME}"
 git config pull.rebase true
 
 # pulling into empty git repo
-REMOTE_URL="${SERVER_PROTOCOL}://${TOKEN}@${SERVER_HOST}/${PROJECT_PATH}.git"
+
+git remote add origin "${CI_SERVER_PROTOCOL}://project_22172_bot:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+
+if [ -n "${GITHUB_ACTIONS}" ]; then
+    REMOTE_URL="${SERVER_PROTOCOL}://${TOKEN}@${SERVER_HOST}/${PROJECT_PATH}.git"
+elif [ -n "${GITLAB_CI}" ]; then
+    REMOTE_URL="${SERVER_PROTOCOL}://project_22172_bot:${TOKEN}@${SERVER_HOST}/${PROJECT_PATH}.git"
+fi
+
 echo "Adding remote: ${REMOTE_URL}"
 git remote add origin "${REMOTE_URL}"
 
