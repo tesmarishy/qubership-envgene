@@ -66,7 +66,7 @@ jobs:
       ref: v${{ inputs.version }}
       download-artifact: false
       dry-run: ${{ inputs.dry-run }}
-      component: '[{"name": "test-name", "file": "./build/Dockerfile", "context": "."}]'
+      component: ${{ inputs.component }}
 
   github-release:
     needs: [tag]
