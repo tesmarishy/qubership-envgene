@@ -83,6 +83,11 @@ def build_environment(env_name, cluster_name, templates_dir, source_env_dir, all
     render_profiles_dir = getAbsPath('tmp/resource_profiles')
     # preparing folders for generation
     render_env_dir = prepare_folders_for_rendering(env_name, cluster_name, source_env_dir, templates_dir, render_dir, render_parameters_dir, render_profiles_dir, output_dir)
+
+    logger.info(f'Validate {render_env_dir}')
+    logger.info(f'Validate {source_env_dir}r')
+    logger.info(f'Validate {all_instances_dir}')
+
     pre_process_env_before_rendering(render_env_dir, source_env_dir, all_instances_dir)
     # get deployer parameters
     cmdb_url, _, _ = get_deployer_config(f"{cluster_name}/{env_name}", work_dir, all_instances_dir, None, None, False)
