@@ -5,7 +5,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: netcracker/qubership-build-gcip
+  IMAGE_NAME: netcracker/qubership-gcip
 
 jobs:
   build-and-push-image:
