@@ -42,6 +42,7 @@ def prepare_env_build_job(pipeline, is_template_test, env_template_version, full
       "ARTIFACT_ID": artifact_id,
       "ENV_TEMPLATE_TEST": "true" if is_template_test else "false",
       "INSTANCES_DIR": "${CI_PROJECT_DIR}/environments",
+      "CI_PLATFORM": "gitlab",
       "envgen_image": "$envgen_image",
       "envgen_args": " -vv",
       "envgen_debug": "true",
