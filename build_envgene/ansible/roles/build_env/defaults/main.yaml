@@ -47,3 +47,4 @@ build_env_stagingTemplateRepository: "{{ lookup('env', 'ansible_var_build_env_st
 
 ###CI Platform
 ci_platform: "{{ lookup('env', 'CI_PLATFORM') | default('Gitlab') }}"
+
