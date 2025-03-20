@@ -157,7 +157,6 @@ def findSharedCredentials(cred_name, env_dir, instances_dir):
     logger.debug(f"Searching for cred file {cred_name} from {env_dir} to {instances_dir}")
     credFiles = []
     cred_paths = [env_dir, os.path.split(os.path.normpath(env_dir))[0], instances_dir]
-    logger.info(cred_paths) # remove debug
     for path in cred_paths:
         credFiles.extend(findYamls(os.path.join(path, 'Credentials'), f"/{cred_name}"))
         credFiles.extend(findYamls(os.path.join(path, 'credentials'), f"/{cred_name}"))
