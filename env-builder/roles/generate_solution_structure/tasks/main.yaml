@@ -69,5 +69,5 @@
 
 - name: Show all transformed data
   debug:
-    var: all_environments
+    var: merged_apps
   when: sd_file_existence.stat.exists
