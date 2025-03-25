@@ -45,7 +45,7 @@
   when: sd_file_existence.stat.exists
 
 - name: Process each environment
-  include_tasks: prepare_solution_structure_variable.yml
+  include_tasks: prepare_solution_structure_variable.yaml
   loop: "{{ namespace_var }}"
   loop_control:
     loop_var: env_file
@@ -56,3 +56,4 @@
 - name: Show all transformed data
   debug:
     var: all_environments
+  when: sd_file_existence.stat.exists
