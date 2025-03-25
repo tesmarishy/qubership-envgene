@@ -97,6 +97,7 @@ def build_environment(env_name, cluster_name, templates_dir, source_env_dir, all
     ansible_vars["template_version"] = g_template_version
     ansible_vars["cloud_passport_file_path"] = find_cloud_passport_definition(source_env_dir, all_instances_dir)
     ansible_vars["cmdb_url"] = cmdb_url
+    ansible_vars["output_dir"] = output_dir
     logger.info(f"Starting rendering environment {env_name} with ansible. Input params are:\n{dump_as_yaml_format(ansible_vars)}")
     r = ansible_runner.run(playbook=getAbsPath('env-builder/main.yaml'), envvars=ansible_vars, verbosity=2)
     if (r.rc != 0):
