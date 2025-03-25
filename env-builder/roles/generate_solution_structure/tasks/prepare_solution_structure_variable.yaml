@@ -25,6 +25,16 @@
         {{- '' -}}
       {%- endif -%}
 
+- name: Update environments data
+  set_fact:
+    all_environments: >-
+      {{
+        all_environments | combine(
+          {template_path: {}},
+          recursive=true
+        )
+      }}
+
 - name: Transform applications
   set_fact:
     all_environments: >-
