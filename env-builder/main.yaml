@@ -15,6 +15,7 @@
         template_version: "{{ lookup('ansible.builtin.env', 'template_version') }}"
         cloud_passport_file_path: "{{ lookup('ansible.builtin.env', 'cloud_passport_file_path') }}"
         cmdb_url: "{{ lookup('ansible.builtin.env', 'cmdb_url') }}"
+        output_dir: "{{ lookup('ansible.builtin.env', 'output_dir') }}"
         render_parameters_dir: "{{ lookup('ansible.builtin.env', 'render_parameters_dir') }}"
     - name: Print arguments
       debug:
@@ -74,6 +75,17 @@
       ansible.builtin.include_vars:
         file: "{{ templates_dir }}/env_templates/{{current_env.env_template}}.yaml"
         name: current_env_template 
+
+
+    - name: Generate solution_structure variable
+      ansible.builtin.include_role:
+        name: generate_solution_structure
+      vars:
+        namespace_var: "{{ current_env_template.namespaces }}"
+        sd_output_dir: "{{ output_dir }}"
+        sd_cluster_name: "{{ cluster_name }}"
+        sd_env: "{{ env }}"
+
 
     - name: Gen tenant
       ansible.builtin.include_role:
