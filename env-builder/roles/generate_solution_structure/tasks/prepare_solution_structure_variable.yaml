@@ -35,19 +35,20 @@
         )
       }}
 
-- name: Transform applications
+- name: Transform and merge applications
   set_fact:
     all_environments: >-
-      {%- set result = {} -%}
+      {%- set ns = namespace(result=all_environments) -%}
       {%- for app in applications -%}
-        {%- set app_parts = app.version.split(':') -%}
-        {%- set app_name = app_parts[0] | trim -%}
-        {%- set app_version = app_parts[1] | trim -%}
-        {%- set entry = {
-            'deployPostfix': app.deployPostfix,
-            'namespace': current_namespace,
-            'version': app_version
-          } -%}
-        {%- set _ = result.update({app_name: entry}) -%}
+        {%- set app_parts = app.version.split(':', 1) -%}
+        {%- if app_parts | length >= 2 -%}
+          {%- set app_name = app_parts[0] | trim -%}
+          {%- set entry = {
+              'deployPostfix': app.deployPostfix,
+              'namespace': current_namespace,
+              'version': app_parts[1] | trim
+            } -%}
+          {%- set ns.result[template_path] = ns.result[template_path] | combine({app_name: entry}, recursive=true) -%}
+        {%- endif -%}
       {%- endfor -%}
-      {{ result }}
+      {{ ns.result }}
