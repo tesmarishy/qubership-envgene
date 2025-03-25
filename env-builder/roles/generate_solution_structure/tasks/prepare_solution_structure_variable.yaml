@@ -25,17 +25,11 @@
         {{- '' -}}
       {%- endif -%}
 
-- name: Update environments data
+- name: Initialize environment entry
   set_fact:
-    all_environments: >-
-      {{
-        all_environments | combine(
-          {template_path: {}},
-          recursive=true
-        )
-      }}
+    all_environments: "{{ all_environments | combine({template_path: {}}, recursive=true) }}"
 
-- name: Transform and merge applications
+- name: Transform applications
   set_fact:
     all_environments: >-
       {%- set ns = namespace(result=all_environments) -%}
@@ -48,7 +42,8 @@
               'namespace': current_namespace,
               'version': app_parts[1] | trim
             } -%}
-          {%- set ns.result[template_path] = ns.result[template_path] | combine({app_name: entry}, recursive=true) -%}
+          {%- set env_data = ns.result[template_path] | combine({app_name: entry}, recursive=true) -%}
+          {%- set _ = ns.result.update({template_path: env_data}) -%}
         {%- endif -%}
       {%- endfor -%}
       {{ ns.result }}
