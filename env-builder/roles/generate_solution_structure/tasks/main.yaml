@@ -2,12 +2,12 @@
 
 - name: Check if sd.yaml exists in {{ sd_output_dir }}/{{ sd_cluster_name }}/{{ sd_env }}/Inventory/solution-descriptor
   stat:
-    path: {{ sd_output_dir }}/{{ sd_cluster_name }}/{{ sd_env }}/Inventory/solution-descriptor/sd.yaml
+    path: "{{ sd_output_dir }}/{{ sd_cluster_name }}/{{ sd_env }}/Inventory/solution-descriptor/sd.yaml"
   register: sd_file_existence
 
 - name: Load applications data from sd.yaml
   include_vars:
-    file: {{ sd_output_dir }}/{{ sd_cluster_name }}/{{ sd_env }}/Inventory/solution-descriptor/sd.yaml
+    file: "{{ sd_output_dir }}/{{ sd_cluster_name }}/{{ sd_env }}/Inventory/solution-descriptor/sd.yaml"
     name: sd_config
   when: sd_file_existence.stat.exists
 
