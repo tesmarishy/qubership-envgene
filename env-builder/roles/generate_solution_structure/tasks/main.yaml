@@ -53,18 +53,16 @@
     applications: "{{ sd_config.applications }}"
   when: sd_file_existence.stat.exists
 
-- name: Merge all applications
+- name: Merge applications from all environments
   set_fact:
     merged_apps: >-
-      {%
-        set result = {} %
-        for env in all_environments.values() %
-          for app_name, app_data in env.items() %
-            set _ = result.update({app_name: app_data}) %
-          endfor %
-        endfor %
-        result
-      %}
+      {%- set result = {} -%}
+      {%- for env in all_environments.values() -%}
+        {%- for app_name, app_data in env.items() -%}
+          {%- set _ = result.update({app_name: app_data}) -%}
+        {%- endfor -%}
+      {%- endfor -%}
+      {{ result }}
   when: sd_file_existence.stat.exists
 
 - name: Show all transformed data
