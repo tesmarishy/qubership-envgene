@@ -18,10 +18,12 @@
   set_fact:
     current_namespace: >-
       {%- set content = lookup('file', template_path).split('\n') -%}
-      {%- for line in content if line.strip().startswith('name:') -%}
-        {{- line.split('name:', 1)[1] | trim -}}
-        {%- break -%}
-      {%- endfor -%}
+      {%- set ns_line = content | select('match', '^name:') | list | first -%}
+      {%- if ns_line -%}
+        {{- ns_line.split('name:', 1)[1] | trim -}}
+      {%- else -%}
+        {{- '' -}}
+      {%- endif -%}
 
 - name: Transform applications
   set_fact:
