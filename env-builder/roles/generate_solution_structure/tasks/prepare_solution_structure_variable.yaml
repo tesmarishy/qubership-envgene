@@ -33,17 +33,20 @@
   set_fact:
     all_environments: >-
       {%- set ns = namespace(result=all_environments) -%}
+      {%- set template_base = template_path | basename | splitext | first | splitext | first -%}
       {%- for app in applications -%}
-        {%- set app_parts = app.version.split(':', 1) -%}
-        {%- if app_parts | length >= 2 -%}
-          {%- set app_name = app_parts[0] | trim -%}
-          {%- set entry = {
-              'deployPostfix': app.deployPostfix,
-              'namespace': current_namespace,
-              'version': app_parts[1] | trim
-            } -%}
-          {%- set env_data = ns.result[template_path] | combine({app_name: entry}, recursive=true) -%}
-          {%- set _ = ns.result.update({template_path: env_data}) -%}
+        {%- if app.deployPostfix == template_base -%}
+          {%- set app_parts = app.version.split(':', 1) -%}
+          {%- if app_parts | length >= 2 -%}
+            {%- set app_name = app_parts[0] | trim -%}
+            {%- set entry = {
+                'deployPostfix': app.deployPostfix,
+                'namespace': current_namespace,
+                'version': app_parts[1] | trim
+              } -%}
+            {%- set env_data = ns.result[template_path] | combine({app_name: entry}, recursive=true) -%}
+            {%- set _ = ns.result.update({template_path: env_data}) -%}
+          {%- endif -%}
         {%- endif -%}
       {%- endfor -%}
       {{ ns.result }}
