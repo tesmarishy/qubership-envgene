@@ -71,3 +71,12 @@
   debug:
     var: merged_apps
   when: sd_file_existence.stat.exists
+
+- set_fact:
+    current_env: "{{ current_env | combine({'solution_structure': merged_apps}) }}"
+  when: sd_file_existence.stat.exists
+
+- name: Show current_env.solution_structure
+  debug:
+    var: current_env.solution_structure
+  when: sd_file_existence.stat.exists
