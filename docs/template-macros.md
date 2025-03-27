@@ -1,5 +1,21 @@
 # Jinja Template Macros
 
+- [Jinja Template Macros](#jinja-template-macros)
+  - [Basic macros](#basic-macros)
+    - [`templates_dir`](#templates_dir)
+    - [`current_env.name`](#current_envname)
+    - [`current_env.tenant`](#current_envtenant)
+    - [`current_env.cloud`](#current_envcloud)
+    - [`current_env.cloudNameWithCluster`](#current_envcloudnamewithcluster)
+    - [`current_env.cmdb_name`](#current_envcmdb_name)
+    - [`current_env.cmdb_url`](#current_envcmdb_url)
+    - [`current_env.description`](#current_envdescription)
+    - [`current_env.owners`](#current_envowners)
+    - [`current_env.env_template`](#current_envenv_template)
+    - [`current_env.additionalTemplateVariables`](#current_envadditionaltemplatevariables)
+    - [`current_env.cloud_passport`](#current_envcloud_passport)
+    - [`current_env.solution_structure`](#current_envsolution_structure)
+
 This documentation provides a list of Jinja macros that can be used during template generation
 
 ## Basic macros
@@ -212,6 +228,8 @@ deployParameters:
 ```
 
 The variable is obtained by transforming the file defined in the path `/configuration/environments/<CLUSTER-NAME>/<ENV-NAME>/solution-descriptor/sd.yml` in your inventory.
+
+The value of the `namespace` attribute in this variable is obtained from the `name` attribute of the **already rendered** `Namespace` object. The definition of this **already rendered** `Namespace` object is located at `/configuration/environments/<CLUSTER-NAME>/<ENV-NAME>/Namespaces/<deployPostfix>/namespace.yml`.
 
 Default value is `{}`
 
