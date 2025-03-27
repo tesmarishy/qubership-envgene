@@ -12,6 +12,15 @@
   set_fact:
     template_override: "{{ namespace.template_override | default('') }}"
 
+- name: Fully render current_env.solution_structure
+  set_fact:
+    current_env: >-
+      {{
+        current_env | combine({
+          'solution_structure': current_env.solution_structure | to_yaml | from_yaml
+        })
+      }}
+
 - name: Pre-render Jinja2 template (1st pass)
   set_fact:
     namespace_template_pre_rendered: "{{ lookup('template', namespace.template_path) }}"
