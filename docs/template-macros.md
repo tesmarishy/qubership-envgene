@@ -33,7 +33,7 @@ This documentation provides a list of Jinja macros that can be used during templ
 tenant: "{{ templates_dir }}/env_templates/composite-dev/tenant.yml.j2"  
 ```
 
-**Usage in sample:**: [Sample](samples/templates/env_templates/simple.yaml)  
+**Usage in sample:** [Sample](samples/templates/env_templates/simple.yaml)  
 
 ### `current_env.name`
 
@@ -48,7 +48,7 @@ tenant: "{{ templates_dir }}/env_templates/composite-dev/tenant.yml.j2"
 name: "{{current_env.name }}-oss" 
 ```
 
-**Usage in sample:**: [Sample](samples/templates/env_templates/composite-dev/Namespaces/oss.yml.j2)  
+**Usage in sample:** [Sample](samples/templates/env_templates/composite-dev/Namespaces/oss.yml.j2)  
 
 ### `current_env.tenant`
 
@@ -63,7 +63,7 @@ name: "{{current_env.name }}-oss"
 name: "{{ current_env.tenant }}"
 ```
 
-**Usage in sample:**: [Sample](samples/templates/env_templates/composite-dev/tenant.yml.j2)  
+**Usage in sample:** [Sample](samples/templates/env_templates/composite-dev/tenant.yml.j2)  
 
 ### `current_env.cloud`
 
@@ -78,7 +78,7 @@ name: "{{ current_env.tenant }}"
 name: "{{ current_env.cloud }}"
 ```
 
-**Usage in sample:**: [Sample](samples/templates/env_templates/simple/cloud.yml.j2)  
+**Usage in sample:** [Sample](samples/templates/env_templates/simple/cloud.yml.j2)  
 
 ### `current_env.cloudNameWithCluster`
 
@@ -102,7 +102,7 @@ Else:
 name: "{{ current_env.cloudNameWithCluster }}"
 ```
 
-**Usage in sample:**: [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)  
+**Usage in sample:** [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)  
 
 ### `current_env.cmdb_name`
 
@@ -116,7 +116,7 @@ name: "{{ current_env.cloudNameWithCluster }}"
 ```yaml
 ```
 
-**Usage in sample:**:  
+**Usage in sample:**  
 
 ### `current_env.cmdb_url`
 
@@ -130,7 +130,7 @@ name: "{{ current_env.cloudNameWithCluster }}"
 ```yaml
 ```
 
-**Usage in sample:**:  
+**Usage in sample:**  
 
 ### `current_env.description`
 
@@ -144,7 +144,7 @@ name: "{{ current_env.cloudNameWithCluster }}"
 ```yaml
 ```
 
-**Usage in sample:**: [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)  
+**Usage in sample:** [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)  
 
 ### `current_env.owners`
 
@@ -158,7 +158,7 @@ name: "{{ current_env.cloudNameWithCluster }}"
 ```yaml
 ```
 
-**Usage in sample:**: [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)  
+**Usage in sample:** [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)  
 
 ### `current_env.env_template`
 
@@ -172,7 +172,7 @@ name: "{{ current_env.cloudNameWithCluster }}"
 ```yaml
 ```
 
-**Usage in sample:**:  
+**Usage in sample:**  
 
 ### `current_env.additionalTemplateVariables`
 
@@ -189,7 +189,7 @@ deployParameters:
   INSTANCES_LEVEL_VAR_CLOUD: "{{ current_env.additionalTemplateVariables.CLOUD_LEVEL_PARAM1 }}"
 ```
 
-**Usage in sample:**: [Sample](samples/templates/env_templates/composite-prod/cloud.yml.j2)
+**Usage in sample:** [Sample](samples/templates/env_templates/composite-prod/cloud.yml.j2)
 
 ### `current_env.cloud_passport`
 
@@ -209,7 +209,7 @@ deployParameters:
 {% endif %}
 ```
 
-**Usage in sample:**: [Sample](test_data/test_templates/env_templates/composite-dev/cloud.yml.j2)
+**Usage in sample:** [Sample](test_data/test_templates/env_templates/composite-dev/cloud.yml.j2)
 
 ### `current_env.solution_structure`
 
