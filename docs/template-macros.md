@@ -218,13 +218,13 @@ deployParameters:
 
 ```yaml
 <application-name-A>:
-  deployPostfix: <deploy-postfix-value>
-  namespace: <namespace>
-  version: <application-version>
+  deployPostfix: <deploy-postfix-value-A>
+  namespace: <namespace-A>
+  version: <application-version-A>
 <application-name-B>:
-  deployPostfix: <deploy-postfix-value>
-  namespace: <namespace>
-  version: <application-version>
+  deployPostfix: <deploy-postfix-value-B>
+  namespace: <namespace-B>
+  version: <application-version-B>
 ```
 
 The variable is obtained by transforming the file defined in the path `/configuration/environments/<CLUSTER-NAME>/<ENV-NAME>/solution-descriptor/sd.yml` in your inventory.
