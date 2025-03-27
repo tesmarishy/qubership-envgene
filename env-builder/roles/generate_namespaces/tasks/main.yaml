@@ -1,26 +1,32 @@
 ---
-- name: Get namespace template name from {{ namespace.template_path }}
+- name: Extract namespace template name from path
   set_fact:
-    _namespace_template_name: "{{ namespace.template_path.split('/')|last|replace('.yml.j2', '')|replace('.yaml.j2', '') }}"
+    _namespace_template_name: "{{ namespace.template_path.split('/') | last | regex_replace('\\.ya?ml\\.j2$', '') }}"
 
-- name: Generate Envs Namespace dir {{ _namespace_template_name }}
+- name: Create Namespace output directory
   ansible.builtin.file:
     path: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}"
     state: directory
 
-- name: Set templates
+- name: Set template override if provided
   set_fact:
-    template_override: "{{ namespace.template_override| default('') }}"
+    template_override: "{{ namespace.template_override | default('') }}"
 
-- name: Generate Envs Namespace yaml {{ _namespace_template_name }} for {{ namespace.name }} 
-  ansible.builtin.blockinfile:
-    path: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}/namespace.yml"
-    block: "{{ lookup('template', namespace.template_path) }}"
-    create: yes
+- name: Pre-render Jinja2 template (1st pass)
+  set_fact:
+    namespace_template_pre_rendered: "{{ lookup('template', namespace.template_path) }}"
 
-- name: Generate Envs Namespace yaml {{ _namespace_template_name }} for {{ namespace.name }}
-  ansible.builtin.blockinfile:
-    path: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}/namespace.yml_override"
-    block: "{{ template_override }}"
-    create: yes
+- name: Fully render pre-rendered template (2nd pass)
+  set_fact:
+    namespace_template_final: "{{ namespace_template_pre_rendered | to_yaml | from_yaml }}"
+
+- name: Write final namespace YAML
+  copy:
+    dest: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}/namespace.yml"
+    content: "{{ namespace_template_final }}"
+
+- name: Write namespace override YAML (if provided)
+  copy:
+    dest: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}/namespace.yml_override"
+    content: "{{ template_override }}"
   when: template_override != ''
