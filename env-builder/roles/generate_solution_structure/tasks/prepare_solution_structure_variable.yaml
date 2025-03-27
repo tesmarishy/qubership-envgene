@@ -54,3 +54,10 @@
         {%- endif -%}
       {%- endfor -%}
       {{ ns.result }}
+
+- name: Show template content nicely
+  debug:
+    msg: |
+      === TEMPLATE CONTENT ===
+      {{ lookup('file', template_path) }}
+      ========================
