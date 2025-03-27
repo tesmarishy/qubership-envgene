@@ -20,7 +20,7 @@
       {%- set content = lookup('file', template_path).split('\n') -%}
       {%- set ns_line = content | select('match', '^\\s*name:') | list | first -%}
       {%- if ns_line -%}
-        {{- ns_line.split(':', 1)[1] | trim | replace('"', '') -}}
+        {{- ns_line.split(':', 1)[1] | regex_replace('^\\s*"(.*)"\\s*$', '\\1') -}}
       {%- else -%}
         {{- '' -}}
       {%- endif -%}
