@@ -67,6 +67,11 @@
       {{ result }}
   when: sd_file_existence.stat.exists
 
+- name: Show all transformed data
+  debug:
+    var: merged_apps
+  when: sd_file_existence.stat.exists
+
 - set_fact:
     current_env: "{{ current_env | combine({'solution_structure': merged_apps}) }}"
   when: sd_file_existence.stat.exists
