@@ -16,15 +16,18 @@
 
 - name: Extract Namespace
   set_fact:
-    current_namespace: >-
+    extracted_namespace: >-
       {%- set content = lookup('file', template_path).split('\n') -%}
       {%- set ns_line = content | select('match', '^\\s*name:') | list | first -%}
       {%- if ns_line -%}
-        {%- set raw_ns = ns_line.split(':', 1)[1] | trim | replace('"', '') -%}
-        {{ raw_ns | regex_replace(r'{{\s*([^}\s]+)\s*}}', r'{{ \1 }}') }}
+        {{- ns_line.split(':', 1)[1] | trim | replace('"', '') -}}
       {%- else -%}
-        {{ '' }}
+        {{- '' -}}
       {%- endif -%}
+
+- name: Update the syntax for variables
+  set_fact:
+    current_namespace: "{{ extracted_namespace | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
 
 - name: Initialize environment entry
   set_fact:
