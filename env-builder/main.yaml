@@ -107,6 +107,10 @@
         _current_env_dir: "{{ current_env_dir }}"
         _template: "{{ current_env_template.cloud }}"
 
+    - name: Print solution_structure
+      debug:
+        var: current_env.solution_structure
+
     - name: Gen namespaces 
       ansible.builtin.include_role:
         name: generate_namespaces
