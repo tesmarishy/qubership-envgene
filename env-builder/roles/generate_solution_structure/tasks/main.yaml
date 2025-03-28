@@ -44,63 +44,14 @@
     all_environments: {}
   when: sd_file_existence.stat.exists
 
-- name: Process each application
-  block:
-    - name: Extract application components
-      set_fact:
-        app_name: "{{ item.version.split(':')[0] | trim }}"
-        app_version: "{{ item.version.split(':')[1] | trim if (item.version | count(':') > 0) else '' }}"
-        deploy_postfix: "{{ item.deployPostfix }}"
-
-    - name: Build template path
-      set_fact:
-        template_path: >-
-          {{ 
-            (current_env_template.namespaces | default('templates')) | regex_replace('/$', '') 
-            ~ '/' 
-            ~ deploy_postfix 
-            ~ '.yml.j2' 
-          }}
-
-    - name: Debug template path
-      debug:
-        msg: "Looking for template at: {{ template_path }}"
-
-    - name: Check template existence
-      stat:
-        path: "{{ template_path }}"
-      register: template_check
-
-    - name: Extract namespace from template
-      set_fact:
-        namespace: >-
-          {% if template_check.stat.exists %}
-            {% set content = lookup('file', template_path).split('\n') %}
-            {% set ns_line = content | select('match', '^\\s*name:') | list | first %}
-            {{ 
-              (ns_line.split(':', 1)[1] | trim | regex_replace('[\'"]', '')) 
-              | default('NULL') 
-            }}
-          {% else %}
-            NULL
-          {% endif %}
-
-    - name: Update environment structure
-      set_fact:
-        all_environments: >-
-          {{
-            all_environments | combine({
-              app_name: {
-                'deployPostfix': deploy_postfix,
-                'namespace': namespace | default('NULL'),
-                'version': app_version
-              }
-            }, recursive=true)
-          }}
+- name: Process all applications
+  include_tasks: prepare_solution_structure_variable.yml
   loop: "{{ sd_config.applications }}"
   loop_control:
-    label: "Processing {{ item.version }}"
-  when: sd_file_existence.stat.exists
+    loop_var: item
+  when:
+    - sd_file_existence.stat.exists
+    - item.version is defined
 
 
 - name: Merge apps with env prefixes
