@@ -12,6 +12,7 @@ profile:
   baseline: dev
 deployParameters: 
   OVERRIDE_PARAMETER: "template-value"
+  core_ns: "{{ current_env.solution_structure['a-core-app'].namespace }}"
 {% if current_env.additionalTemplateVariables.ci is defined %}
 e2eParameters: 
 {{ current_env.additionalTemplateVariables.e2eParameters | ansible.builtin.to_nice_yaml | indent(2, true) }}

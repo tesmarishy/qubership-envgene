@@ -1,0 +1,82 @@
+---
+
+- name: Check if sd.yaml exists in {{ sd_output_dir }}/{{ sd_cluster_name }}/{{ sd_env }}/Inventory/solution-descriptor
+  stat:
+    path: "{{ sd_output_dir }}/{{ sd_cluster_name }}/{{ sd_env }}/Inventory/solution-descriptor/sd.yaml"
+  register: sd_file_existence
+
+- name: Load applications data from sd.yaml
+  include_vars:
+    file: "{{ sd_output_dir }}/{{ sd_cluster_name }}/{{ sd_env }}/Inventory/solution-descriptor/sd.yaml"
+    name: sd_config
+  when: sd_file_existence.stat.exists
+
+- name: Check that 'applications'-key exists
+  assert:
+    that:
+      - "'applications' in sd_config"
+      - "sd_config.applications is sequence"
+    success_msg: "Root 'applications' key exists and is a list"
+    fail_msg: "Missing or invalid 'applications' key in root"
+  when: sd_file_existence.stat.exists
+
+- name: Validate each application entry
+  assert:
+    that:
+      - "'version' in item"
+      - "'deployPostfix' in item"
+      - "item.version is string"
+      - "item.deployPostfix is string"
+    success_msg: "Valid application entry: {{ item }}"
+    fail_msg: "Invalid application entry: {{ item | to_nice_json }}"
+  loop: "{{ sd_config.applications }}"
+  loop_control:
+    label: "Application {{ item.version | default('unknown') }}"
+  when: sd_file_existence.stat.exists
+
+- name: All checks passed
+  debug:
+    msg: "All required fields are present and valid!"
+  when: sd_file_existence.stat.exists
+
+- name: Initialize result structure
+  set_fact:
+    all_environments: {}
+  when: sd_file_existence.stat.exists
+
+- name: Process each environment
+  include_tasks: prepare_solution_structure_variable.yaml
+  loop: "{{ namespace_var }}"
+  loop_control:
+    loop_var: env_file
+  vars:
+    applications: "{{ sd_config.applications }}"
+  when: sd_file_existence.stat.exists
+
+- name: Merge apps with env prefixes
+  set_fact:
+    merged_apps: >-
+      {%- set result = {} -%}
+      {%- for env_path, env_data in all_environments.items() -%}
+        {%- set env_name = env_path | basename | splitext | first -%}
+        {%- for app_name, app_data in env_data.items() -%}
+          {%- set unique_key = app_name -%}
+          {%- set _ = result.update({unique_key: app_data}) -%}
+        {%- endfor -%}
+      {%- endfor -%}
+      {{ result }}
+  when: sd_file_existence.stat.exists
+
+- name: Show all transformed data
+  debug:
+    var: merged_apps
+  when: sd_file_existence.stat.exists
+
+- set_fact:
+    current_env: "{{ current_env | combine({'solution_structure': merged_apps}) }}"
+  when: sd_file_existence.stat.exists
+
+- name: Show current_env.solution_structure
+  debug:
+    var: current_env.solution_structure
+  when: sd_file_existence.stat.exists
