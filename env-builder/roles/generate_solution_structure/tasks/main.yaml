@@ -45,7 +45,7 @@
   when: sd_file_existence.stat.exists
 
 - name: Process all applications
-  include_tasks: prepare_solution_structure_variable.yml
+  include_tasks: prepare_solution_structure_variable.yaml
   loop: "{{ sd_config.applications }}"
   loop_control:
     loop_var: item
