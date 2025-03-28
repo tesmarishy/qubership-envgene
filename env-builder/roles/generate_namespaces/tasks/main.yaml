@@ -12,20 +12,15 @@
   set_fact:
     template_override: "{{ namespace.template_override | default('') }}"
 
-- name: Clear current_env.solution_structure if SD file does not exist
-  set_fact:
-    current_env: "{{ current_env | combine({'solution_structure': {}}) }}"
-  when: not sd_file_existence.stat.exists
-
 - name: Write temporary Jinja2 template for solution_structure
   copy:
-    dest: "/build_env/solution_structure.j2"
+    dest: "{{ render_dir }}/{{ env }}/solution_structure.j2"
     content: |
       {{ current_env.solution_structure | to_nice_yaml }}
 
 - name: Fully render solution_structure using Jinja2 engine
   set_fact:
-    _rendered_solution_structure: "{{ lookup('template', '/build_env/solution_structure.j2') | from_yaml }}"
+    _rendered_solution_structure: "{{ lookup('template', '/{{ render_dir }}/{{ env }}/solution_structure.j2') | from_yaml }}"
 
 - name: Update current_env with rendered solution_structure
   set_fact:
