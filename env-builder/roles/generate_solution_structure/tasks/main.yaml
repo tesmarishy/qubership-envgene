@@ -44,15 +44,14 @@
     all_environments: {}
   when: sd_file_existence.stat.exists
 
-- name: Process all applications
+- name: Process each environment
   include_tasks: prepare_solution_structure_variable.yaml
-  loop: "{{ sd_config.applications }}"
+  loop: "{{ namespace_var }}"
   loop_control:
-    loop_var: item
-  when:
-    - sd_file_existence.stat.exists
-    - item.version is defined
-
+    loop_var: env_file
+  vars:
+    applications: "{{ sd_config.applications }}"
+  when: sd_file_existence.stat.exists
 
 - name: Merge apps with env prefixes
   set_fact:
