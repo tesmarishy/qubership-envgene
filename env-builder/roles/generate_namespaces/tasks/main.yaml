@@ -12,26 +12,22 @@
     template_override: "{{ namespace.template_override | default('') }}"
 
 
-- name: Print solution_structure
-  debug:
-    var: _solution_structure
-
 - name: Skip rendering if solution_structure is empty
   set_fact:
     _rendered_solution_structure: {}
-  when: _solution_structure == {}
+  when: current_env.solution_structure is not defined or current_env.solution_structure == {}
 
 - name: Write temporary Jinja2 template for solution_structure
   copy:
     dest: "{{ render_dir }}/{{ env }}/solution_structure.j2"
     content: |
       {{ current_env.solution_structure | to_nice_yaml }}
-  when: _solution_structure != {}
+  when: current_env.solution_structure is defined and current_env.solution_structure != {}
 
 - name: Fully render solution_structure using Jinja2 engine
   set_fact:
     _rendered_solution_structure: "{{ lookup('template', render_dir + '/' + env + '/solution_structure.j2') | from_yaml }}"
-  when: _solution_structure != {}
+  when: current_env.solution_structure is defined and current_env.solution_structure != {}
 
 - name: Update current_env with rendered solution_structure
   set_fact:
