@@ -12,7 +12,11 @@
   set_fact:
     template_override: "{{ namespace.template_override | default('') }}"
 
-# 🔧 Рендерим solution_structure вручную через шаблонный файл
+- name: Clear current_env.solution_structure if SD file does not exist
+  set_fact:
+    current_env: "{{ current_env | combine({'solution_structure': {}}) }}"
+  when: not sd_file_existence.stat.exists
+
 - name: Write temporary Jinja2 template for solution_structure
   copy:
     dest: "/build_env/solution_structure.j2"
@@ -27,23 +31,19 @@
   set_fact:
     current_env: "{{ current_env | combine({'solution_structure': _rendered_solution_structure}) }}"
 
-# 📥 Первый рендер шаблона
 - name: Pre-render Jinja2 template (1st pass)
   set_fact:
     namespace_template_pre_rendered: "{{ lookup('template', namespace.template_path) }}"
 
-# 🔁 Второй рендер, если вдруг остались шаблоны
 - name: Fully render pre-rendered template (2nd pass)
   set_fact:
     namespace_template_final: "{{ namespace_template_pre_rendered | to_yaml | from_yaml }}"
 
-# 💾 Сохраняем итоговый результат
 - name: Write final namespace YAML
   copy:
     dest: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}/namespace.yml"
     content: "{{ namespace_template_final }}"
 
-# 🔁 Пишем override, если есть
 - name: Write namespace override YAML (if provided)
   copy:
     dest: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}/namespace.yml_override"
