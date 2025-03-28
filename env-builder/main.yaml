@@ -115,6 +115,7 @@
         _tenant: "{{ tenant }}"
         _cloud: "{{ current_env.cloud }}"
         _current_env_dir: "{{ current_env_dir }}"
+        _solution_structure: "{{ current_env.solution_structure }}"
       loop: "{{ current_env_template.namespaces }}"
       loop_control:
         loop_var: namespace
