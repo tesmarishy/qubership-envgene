@@ -86,13 +86,6 @@
         sd_cluster_name: "{{ cluster_name }}"
         sd_env: "{{ env }}"
 
-    - name: Show template content nicely
-      debug:
-        msg: |
-          === TEMPLATE CONTENT ===
-          {{ lookup('file', "/build_env/templates/env_templates/dev/Namespaces/bss.yml.j2") }}
-          ========================    
-
 
     - name: Gen tenant
       ansible.builtin.include_role:
