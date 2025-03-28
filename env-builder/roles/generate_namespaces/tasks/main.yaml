@@ -12,6 +12,10 @@
     template_override: "{{ namespace.template_override | default('') }}"
 
 
+- name: Print solution_structure
+  debug:
+    var: _solution_structure
+
 - name: Skip rendering if solution_structure is empty
   set_fact:
     _rendered_solution_structure: {}
