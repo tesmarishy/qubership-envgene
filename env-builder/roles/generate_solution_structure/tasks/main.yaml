@@ -39,25 +39,52 @@
     msg: "All required fields are present and valid!"
   when: sd_file_existence.stat.exists
 
+- name: Find all possible templates
+  find:
+    paths: "{{ namespace_var }}"
+    patterns:
+      - "*.yaml.j2"
+      - "*.yml.j2"
+      - "*.j2"
+  register: template_files
+  when: sd_file_existence.stat.exists
+
+- name: Build namespace map from templates
+  set_fact:
+    namespace_map: >-
+      {%- set ns_map = {} -%}
+      {%- for file in template_files.files -%}
+        {%- set base_name = file.path | basename %}
+        {%- set deploy_postfix = base_name.split('.') | first %}
+        {%- set template_content = lookup('file', file.path) %}
+        {%- set ns_name = (template_content | from_yaml).get('name', null) %}
+        {%- ns_map.update({deploy_postfix: ns_name}) -%}
+      {%- endfor -%}
+      {{ ns_map }}
+  when: sd_file_existence.stat.exists
+
 - name: Transform structure in variable
   set_fact:
     all_environments: >-
-      {%- set apps = sd_config.applications -%}
-      {%- set grouped = {} -%}
-      {%- for app in apps -%}
-        {%- set parts = app.version.split(':', 1) -%}
-        {%- set name = parts[0] -%}
-        {%- set version = parts[1] if parts|length > 1 else '' -%}
-        {%- if name not in grouped -%}
-          {%- set _ = grouped.update({name: {}}) -%}
-        {%- endif -%}
-        {%- set _ = grouped[name].update({app.deployPostfix: {'version': version}}) -%}
-      {%- endfor -%}
       {%- set result = {} -%}
-      {%- for name in grouped.keys()|sort(reverse=true) -%}
-        {%- set _ = result.update({name: grouped[name]}) -%}
+      {%- for app in sd_config.applications -%}
+        {%- set parts = app.version.split(':', 1) -%}
+        {%- set service = parts[0] -%}
+        {%- set postfix = app.deployPostfix -%}
+
+        {%- if not result.get(service) -%}
+          {%- result.update({service: {}}) -%}
+        {%- endif -%}
+
+        {%- set ns_value = namespace_map.get(postfix, null) -%}
+        {%- service_entry = {
+            'version': parts[1],
+            'namespace': ns_value
+        } -%}
+
+        {%- result[service].update({postfix: service_entry}) -%}
       {%- endfor -%}
-      {{ result }}
+      {{ result | dictsort(reverse=true) | from_json }}
   when: sd_file_existence.stat.exists
 
 - name: Show all_environments
