@@ -41,7 +41,7 @@
 
 - name: Find all possible templates
   find:
-    paths: "{{ namespace_var }}"
+    paths: "{{ templates_dir }}/env_templates/{{ env_template_name }}"
     patterns:
       - "*.yaml.j2"
       - "*.yml.j2"
