@@ -41,7 +41,7 @@
 
 - name: Find all possible templates
   find:
-    paths: "{{ templates_dir }}/env_templates/{{ env_template_name }}"
+    paths: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
     patterns:
       - "*.yaml.j2"
       - "*.yml.j2"
@@ -54,11 +54,11 @@
     namespace_map: >-
       {%- set ns_map = {} -%}
       {%- for file in template_files.files -%}
-        {%- set base_name = file.path | basename %}
-        {%- set deploy_postfix = base_name.split('.') | first %}
-        {%- set template_content = lookup('file', file.path) %}
-        {%- set ns_name = (template_content | from_yaml).get('name', null) %}
-        {%- ns_map.update({deploy_postfix: ns_name}) -%}
+        {%- set base_name = file.path | basename -%}
+        {%- set deploy_postfix = base_name.split('.') | first -%}
+        {%- set template_content = lookup('file', file.path) -%}
+        {%- set ns_name = (template_content | from_yaml).get('name', null) -%}
+        {%- set ns_map = ns_map | combine({deploy_postfix: ns_name}) -%}
       {%- endfor -%}
       {{ ns_map }}
   when: sd_file_existence.stat.exists
@@ -72,19 +72,19 @@
         {%- set service = parts[0] -%}
         {%- set postfix = app.deployPostfix -%}
 
-        {%- if not result.get(service) -%}
+        {%- if service not in result -%}
           {%- result.update({service: {}}) -%}
         {%- endif -%}
 
         {%- set ns_value = namespace_map.get(postfix, null) -%}
-        {%- service_entry = {
+        {%- set service_entry = {
             'version': parts[1],
             'namespace': ns_value
         } -%}
 
         {%- result[service].update({postfix: service_entry}) -%}
       {%- endfor -%}
-      {{ result | dictsort(reverse=true) | from_json }}
+      {{ dict(result | dictsort(reverse=true)) }}
   when: sd_file_existence.stat.exists
 
 - name: Show all_environments
