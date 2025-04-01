@@ -51,14 +51,14 @@
 
 - name: Build namespace map from templates
   set_fact:
-    namespace_map: >-
+    namespace_map: |
       {%- set ns_map = {} -%}
-      {%- for file in template_files.files -%}
-        {%- set base_name = file.path | basename -%}
-        {%- set deploy_postfix = base_name.split('.') | first -%}
-        {%- set template_content = lookup('file', file.path) -%}
-        {%- set ns_name = (template_content | from_yaml).get('name', null) -%}
-        {%- set ns_map = ns_map | combine({deploy_postfix: ns_name}) -%}
+      {%- for result in rendered_templates.results -%}
+        {%- set file_path = result.dest -%}
+        {%- set base_name = file_path | basename | splitext | first -%}
+        {%- set content = lookup('file', file_path) | from_yaml(default={}) -%}
+        {%- set ns_name = content.name | default('undefined') -%}
+        {%- set ns_map = ns_map | combine({base_name: ns_name}) -%}
       {%- endfor -%}
       {{ ns_map }}
   when: sd_file_existence.stat.exists
