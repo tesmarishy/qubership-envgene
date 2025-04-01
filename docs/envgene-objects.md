@@ -43,7 +43,7 @@ namespaces:
 
 Any YAML file located in the `/templates/env_templates/` folder is considered a Template Descriptor.
 
-The name of this file effectively serves as the name of the Environment Template. In the Environment Inventory, this name is used to specify which Environment Template from the artifact should be used.
+The name of this file serves as the name of the Environment Template. In the Environment Inventory, this name is used to specify which Environment Template from the artifact should be used.
 
 ### Tenant Template
 
@@ -152,7 +152,7 @@ satellites:
 
 The Composite Structure is located in the path `/configuration/environments/<CLUSTER-NAME>/<ENV-NAME>/composite-structure.yml`
 
-[Composite Structure JSON schema](TBD)
+[Composite Structure JSON schema](/schemas/composite-structure.schema.json)
 
 Example:
 
