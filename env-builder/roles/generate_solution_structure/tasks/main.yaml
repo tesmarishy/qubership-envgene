@@ -39,44 +39,28 @@
     msg: "All required fields are present and valid!"
   when: sd_file_existence.stat.exists
 
-- name: Initialize result structure
+- name: Transform structure in variable
   set_fact:
-    all_environments: {}
-  when: sd_file_existence.stat.exists
-
-- name: Process each environment
-  include_tasks: prepare_solution_structure_variable.yaml
-  loop: "{{ namespace_var }}"
-  loop_control:
-    loop_var: env_file
-  vars:
-    applications: "{{ sd_config.applications }}"
-  when: sd_file_existence.stat.exists
-
-- name: Merge apps with env prefixes
-  set_fact:
-    merged_apps: >-
+    all_environments: >-
+      {%- set apps = sd_config.applications -%}
+      {%- set grouped = {} -%}
+      {%- for app in apps -%}
+        {%- set parts = app.version.split(':', 1) -%}
+        {%- set name = parts[0] -%}
+        {%- set version = parts[1] if parts|length > 1 else '' -%}
+        {%- if name not in grouped -%}
+          {%- set _ = grouped.update({name: {}}) -%}
+        {%- endif -%}
+        {%- set _ = grouped[name].update({app.deployPostfix: {'version': version}}) -%}
+      {%- endfor -%}
       {%- set result = {} -%}
-      {%- for env_path, env_data in all_environments.items() -%}
-        {%- set env_name = env_path | basename | splitext | first -%}
-        {%- for app_name, app_data in env_data.items() -%}
-          {%- set unique_key = app_name -%}
-          {%- set _ = result.update({unique_key: app_data}) -%}
-        {%- endfor -%}
+      {%- for name in grouped.keys()|sort(reverse=true) -%}
+        {%- set _ = result.update({name: grouped[name]}) -%}
       {%- endfor -%}
       {{ result }}
   when: sd_file_existence.stat.exists
 
-- name: Show all transformed data
+- name: Show all_environments
   debug:
-    var: merged_apps
-  when: sd_file_existence.stat.exists
-
-- set_fact:
-    current_env: "{{ current_env | combine({'solution_structure': merged_apps}) }}"
-  when: sd_file_existence.stat.exists
-
-- name: Show current_env.solution_structure
-  debug:
-    var: current_env.solution_structure
+    var: all_environments
   when: sd_file_existence.stat.exists
