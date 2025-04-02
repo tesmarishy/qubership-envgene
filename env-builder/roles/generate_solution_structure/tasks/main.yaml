@@ -44,15 +44,28 @@
     solution_structure: {}
   when: sd_file_existence.stat.exists
 
-- name: Collect template stats
-  stat:
-    path: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces/{{ item.deployPostfix }}.yaml.j2"
-  loop: "{{ sd_config.applications }}"
-  loop_control:
-    label: "{{ item.deployPostfix }}"
-  register: template_stats
+- name: Find all possible namespace templates
+  find:
+    paths: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
+    patterns:
+      - "*.yaml.j2"
+      - "*.yml.j2"
+      - "*.j2"
+    use_regex: false
+  register: all_template_files
   when: sd_file_existence.stat.exists
 
+- name: Build template path map by deployPostfix
+  set_fact:
+    postfix_template_map: >-
+      {%- set result = {} -%}
+      {%- for file in all_template_files.files -%}
+        {%- set name = file.path | basename -%}
+        {%- set postfix = name.split('.')[0] -%}
+        {%- set result = result | combine({postfix: file.path}) -%}
+      {%- endfor -%}
+      {{ result }}
+  when: sd_file_existence.stat.exists
 
 - name: Build final solution_structure
   set_fact:
@@ -64,14 +77,11 @@
         {%- set version = version_full.split(':')[1] -%}
         {%- set solution = version_full.split(':')[0].split('-')[0] -%}
 
-        {%- set path = templates_dir ~ '/env_templates/' ~ env_template_name ~ '/Namespaces/' ~ postfix ~ '.yaml.j2' -%}
-        {%- set stat_result = (template_stats.results | selectattr('item.deployPostfix', 'equalto', postfix) | list | first) -%}
-        {%- set exists = stat_result.stat.exists if stat_result is defined else false -%}
-
-        {%- if exists -%}
+        {%- set path = postfix_template_map.get(postfix, None) -%}
+        {%- if path -%}
           {%- set lines = lookup('file', path).split('\n') -%}
           {%- set name_line = lines | select('search', '^\\s*name\\s*:\\s*') | list | first | default('') -%}
-          {%- set ns = (name_line.split(':', 1)[1] | trim | replace('"', '')) if name_line else None -%}
+          {%- set ns = (name_line.split(':', 1)[1] | trim | replace('"', '') ) if name_line else None -%}
         {%- else -%}
           {%- set ns = None -%}
         {%- endif -%}
