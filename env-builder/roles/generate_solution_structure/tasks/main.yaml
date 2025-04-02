@@ -62,7 +62,7 @@
         {%- set deploy_postfix = base_name.split('.') | first -%}
         {{ "[DEBUG] deploy_postfix: " ~ deploy_postfix }}
         
-        {%- set template_content = lookup('file', file.path) -%}
+        {%- set template_content = lookup('file', file.path).split('\n') -%}
         {{ "[DEBUG] template_content: " ~ template_content | truncate(50) }}
       
         {%- set ns_name = template_content | select('match', '^\\s*name:') -%}
