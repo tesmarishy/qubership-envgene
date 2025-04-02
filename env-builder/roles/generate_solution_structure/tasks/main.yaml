@@ -55,6 +55,8 @@
       {%- set ns_map = {} -%}
       {%- for file in template_files.files -%}
         {%- set base_name = file.path | basename -%}
+        {{ "[DEBUG] file_path: " ~ file.path }}
+        
         {{ "[DEBUG] base_name: " ~ base_name }}
         
         {%- set deploy_postfix = base_name.split('.') | first -%}
