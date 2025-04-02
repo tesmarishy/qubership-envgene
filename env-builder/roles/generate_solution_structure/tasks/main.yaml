@@ -66,22 +66,23 @@
         all_template_files.files |
         map(attribute='path') |
         map('basename') |
-        map('regex_replace', '^([^.]+)\\..*$', '\\1') |
+        map('regex_replace', '^(.*?)[.]', '\\1') |
         list
       }}    
 
 - name: Build template path map by deployPostfix
   set_fact:
-    postfix_template_map: "{{ _postfix_template_map }}"
+    postfix_template_map: "{{ dict(_postfix_keys | zip(_postfix_paths)) }}"
   vars:
-    _postfix_template_map: >-
-      {%- set result = {} -%}
-      {%- for file in all_template_files.files | default([]) -%}
-        {%- set name = file.path | basename -%}
-        {%- set postfix = name.split('.')[0] -%}
-        {%- set result = result | combine({postfix: file.path}) -%}
-      {%- endfor -%}
-      {{ result }}
+    _postfix_paths: "{{ all_template_files.files | map(attribute='path') | list }}"
+    _postfix_keys: >-
+      {{
+        all_template_files.files
+        | map(attribute='path')
+        | map('basename')
+        | map('regex_replace', '^(.*?)[.]', '\\1')
+        | list
+      }}
 
 - name: Build final solution_structure
   set_fact:
