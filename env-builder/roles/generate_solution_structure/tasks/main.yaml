@@ -55,9 +55,17 @@
       {%- set ns_map = {} -%}
       {%- for file in template_files.files -%}
         {%- set base_name = file.path | basename -%}
+        {{ "[DEBUG] base_name: " ~ base_name | warn }}
+        
         {%- set deploy_postfix = base_name.split('.') | first -%}
+        {{ "[DEBUG] deploy_postfix: " ~ deploy_postfix | warn }}
+        
         {%- set template_content = lookup('file', file.path) -%}
+        {{ "[DEBUG] template_content: " ~ template_content | truncate(50) | warn }}
+      
         {%- set ns_name = template_content | select('match', '^\\s*name:') -%}
+        {{ "[DEBUG] ns_name: " ~ ns_lines | warn }}
+        
         {%- if ns_name -%}
           {{- ns_name.split(':', 1)[1] | trim | replace('"', '') -}}
         {%- else -%}
