@@ -44,16 +44,30 @@
     solution_structure: {}
   when: sd_file_existence.stat.exists
 
+- name: Collect template stats
+  stat:
+    path: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces/{{ item.deployPostfix }}.yaml.j2"
+  loop: "{{ sd_config.applications }}"
+  loop_control:
+    label: "{{ item.deployPostfix }}"
+  register: template_stats
+  when: sd_file_existence.stat.exists
+
+
 - name: Build final solution_structure
-  vars:
-    templates_base: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
   set_fact:
     solution_structure: >-
       {%- set structure = {} -%}
       {%- for app in sd_config.applications -%}
         {%- set postfix = app.deployPostfix -%}
-        {%- set path = templates_base ~ '/' ~ postfix ~ '.yaml.j2' -%}
-        {%- set exists = lookup('ansible.builtin.file', path, errors='ignore') is not none -%}
+        {%- set version_full = app.version -%}
+        {%- set version = version_full.split(':')[1] -%}
+        {%- set solution = version_full.split(':')[0].split('-')[0] -%}
+
+        {%- set path = templates_dir ~ '/env_templates/' ~ env_template_name ~ '/Namespaces/' ~ postfix ~ '.yaml.j2' -%}
+        {%- set stat_result = (template_stats.results | selectattr('item.deployPostfix', 'equalto', postfix) | list | first) -%}
+        {%- set exists = stat_result.stat.exists if stat_result is defined else false -%}
+
         {%- if exists -%}
           {%- set lines = lookup('file', path).split('\n') -%}
           {%- set name_line = lines | select('search', '^\\s*name\\s*:\\s*') | list | first | default('') -%}
@@ -62,19 +76,14 @@
           {%- set ns = None -%}
         {%- endif -%}
 
-        {# разбор имени образа: postgres, postgres-toms и т.д. #}
-        {%- set parts = app.version.split(':')[0].split('-') -%}
-        {%- set solution = parts[0] -%}
-        {%- set key = postfix -%}
-        {%- set version = app.version.split(':')[1] -%}
-        {%- set inner = {'version': version, 'namespace': ns} -%}
-        {%- set group = structure.get(solution, {}) | combine({key: inner}) -%}
-        {%- set structure = structure | combine({solution: group}) -%}
+        {%- set entry = {'version': version, 'namespace': ns} -%}
+        {%- set existing = structure.get(solution, {}) | combine({postfix: entry}) -%}
+        {%- set structure = structure | combine({solution: existing}) -%}
       {%- endfor -%}
       {{ structure }}
   when: sd_file_existence.stat.exists
 
-- name: Show all_environments
+- name: Show solution_structure
   debug:
-    var: all_environments
+    var: solution_structure
   when: sd_file_existence.stat.exists
