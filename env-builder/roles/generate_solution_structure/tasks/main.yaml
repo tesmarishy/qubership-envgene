@@ -59,7 +59,7 @@
   set_fact:
     postfix_template_map: >-
       {%- set result = {} -%}
-      {%- for file in all_template_files.files -%}
+      {%- for file in all_template_files['files'] -%}
         {%- set name = file.path | basename -%}
         {%- set postfix = name.split('.')[0] -%}
         {%- set result = result | combine({postfix: file.path}) -%}
