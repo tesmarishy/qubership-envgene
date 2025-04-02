@@ -67,14 +67,13 @@
       
         {%- set ns_name = template_content | select('match', '^\\s*name:') | list -%} 
       
-        {{ "[DEBUG] ns_name: " ~ ns_name }}
-        
-        {%- if ns_name -%}
-          {{- ns_name.split(':', 1)[1] | trim | replace('"', '') -}}
+        {%- if ns_name | length > 0 -%}
+          {%- set ns_line = ns_name[0] -%}
+          {%- set ns_value = ns_line.split(':', 1)[1] | trim | replace('"', '') -%}
+          {%- set ns_map = ns_map | combine({deploy_postfix: ns_value}) -%}
         {%- else -%}
-          {{- '' -}}
+          {%- set ns_map = ns_map | combine({deploy_postfix: ''}) -%}
         {%- endif -%}
-        {%- set ns_map = ns_map | combine({deploy_postfix: ns_name}) -%}
       {%- endfor -%}
       {{ ns_map }}
   when: sd_file_existence.stat.exists
