@@ -49,6 +49,37 @@
   register: template_files
   when: sd_file_existence.stat.exists
 
+
+- name: Update the syntax for variables
+  set_fact:
+    template_path: "/build_env/templates/env_templates/dev/Namespaces/bss.yml.j2"
+
+- name: Validate template file
+  stat:
+    path: "{{ template_path }}"
+  register: template_existence
+
+- name: Fail if template file is missing
+  fail:
+    msg: "Template file {{ template_path }} is not found!"
+  when: not template_existence.stat.exists
+
+- name: Extract Namespace
+  set_fact:
+    extracted_namespace: >-
+      {%- set content = lookup('file', template_path).split('\n') -%}
+      {%- set ns_line = content | select('match', '^\\s*name:') | list | first -%}
+      {%- if ns_line -%}
+        {{- ns_line.split(':', 1)[1] | trim | replace('"', '') -}}
+      {%- else -%}
+        {{- '' -}}
+      {%- endif -%}
+
+- name: Update the syntax for variables
+  set_fact:
+    current_namespace: "{{ extracted_namespace | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
+
+
 - name: Build namespace map from templates
   set_fact:
     namespace_map: >-
