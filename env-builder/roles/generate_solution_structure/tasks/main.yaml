@@ -57,7 +57,7 @@
         {%- set base_name = file.path | basename -%}
         {%- set deploy_postfix = base_name.split('.') | first -%}
         {%- set template_content = lookup('file', file.path) -%}
-        {%- set ns_name = template_content | select('match', '^\\s*name:') | list | first -%}
+        {%- set ns_name = template_content | select('match', '^\\s*name:') -%}
         {%- if ns_name -%}
           {{- ns_name.split(':', 1)[1] | trim | replace('"', '') -}}
         {%- else -%}
