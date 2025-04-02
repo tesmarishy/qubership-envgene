@@ -80,36 +80,22 @@
     current_namespace: "{{ extracted_namespace | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
 
 
-- name: Build namespace map from templates (with debug)
+- name: Build namespace map from templates
   set_fact:
     namespace_map: >-
       {%- set ns_map = {} -%}
       {%- for file in template_files.files -%}
         {%- set base_name = file.path | basename -%}
         {%- set deploy_postfix = base_name.split('.') | first -%}
-
-        {# Чтение шаблона как текст после рендеринга #}
-        {%- set rendered_content = lookup('template', file.path) -%}
-        {{ '[DEBUG] FILE: ' ~ file.path }}
-        {{ '[DEBUG] POSTFIX: ' ~ deploy_postfix }}
-        {{ '[DEBUG] RENDERED CONTENT:' }}
-        {{ rendered_content }}
-
-        {# Парсим как YAML #}
-        {%- set parsed = rendered_content | from_yaml -%}
-        {{ '[DEBUG] PARSED YAML:' }}
-        {{ parsed }}
-
-        {%- if 'name' in parsed -%}
-          {%- set ns_value = parsed.name | replace('"', '') -%}
-          {{ '[DEBUG] NAMESPACE FOUND: ' ~ ns_value }}
+        {%- set lines = lookup('file', file.path).split('\n') -%}
+        {%- set ns_line = lines | select('search', '^\\s*name\\s*:\\s*') | list | first -%}
+        {%- if ns_line is defined and ns_line != '' -%}
+          {%- set ns_value = ns_line.split(':', 1)[1] | trim | replace('"', '') -%}
           {%- set ns_map = ns_map | combine({deploy_postfix: ns_value}) -%}
         {%- else -%}
-          {{ '[DEBUG] NAMESPACE NOT FOUND — inserting empty string' }}
           {%- set ns_map = ns_map | combine({deploy_postfix: ''}) -%}
         {%- endif -%}
       {%- endfor -%}
-      {{ '[DEBUG] FINAL NS MAP:' }}
       {{ ns_map }}
   when: sd_file_existence.stat.exists
 
