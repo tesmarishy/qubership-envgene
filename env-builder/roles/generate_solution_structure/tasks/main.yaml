@@ -55,6 +55,10 @@
   register: all_template_files
   when: sd_file_existence.stat.exists
 
+- name: show find output
+  debug:
+    var: all_template_files
+
 - name: Build template path map by deployPostfix
   set_fact:
     postfix_template_map: >-
