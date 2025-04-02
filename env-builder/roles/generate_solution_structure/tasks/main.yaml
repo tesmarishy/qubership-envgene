@@ -59,16 +59,6 @@
   debug:
     var: all_template_files
 
-- name: show basename split
-  debug:
-    msg: >-
-      {{
-        all_template_files.files |
-        map(attribute='path') |
-        map('basename') |
-        map('regex_replace', '^(.*?)[.]', '\\1') |
-        list
-      }}    
 
 - name: Build template path map by deployPostfix
   set_fact:
@@ -80,7 +70,8 @@
         all_template_files.files
         | map(attribute='path')
         | map('basename')
-        | map('regex_replace', '^(.*?)\\..*$', '\\\\1')
+        | map('split', '.')
+        | map('first')
         | list
       }}
 
