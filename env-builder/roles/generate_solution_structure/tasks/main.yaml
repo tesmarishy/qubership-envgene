@@ -61,15 +61,16 @@
 
 - name: Build template path map by deployPostfix
   set_fact:
-    postfix_template_map: >-
+    postfix_template_map: "{{ _postfix_template_map }}"
+  vars:
+    _postfix_template_map: >-
       {%- set result = {} -%}
-      {%- for file in all_template_files['files'] -%}
+      {%- for file in all_template_files.files | default([]) -%}
         {%- set name = file.path | basename -%}
         {%- set postfix = name.split('.')[0] -%}
         {%- set result = result | combine({postfix: file.path}) -%}
       {%- endfor -%}
       {{ result }}
-  when: sd_file_existence.stat.exists
 
 - name: Build final solution_structure
   set_fact:
