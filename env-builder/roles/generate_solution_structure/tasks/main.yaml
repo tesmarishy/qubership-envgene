@@ -39,89 +39,39 @@
     msg: "All required fields are present and valid!"
   when: sd_file_existence.stat.exists
 
-- name: Find all possible templates
-  find:
-    paths: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
-    patterns:
-      - "*.yaml.j2"
-      - "*.yml.j2"
-      - "*.j2"
-  register: template_files
+- name: Initialize solution_structure
+  set_fact:
+    solution_structure: {}
   when: sd_file_existence.stat.exists
 
-
-- name: Update the syntax for variables
+- name: Build final solution_structure
+  vars:
+    templates_base: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
   set_fact:
-    template_path: "/build_env/templates/env_templates/dev/Namespaces/bss.yml.j2"
-
-- name: Validate template file
-  stat:
-    path: "{{ template_path }}"
-  register: template_existence
-
-- name: Fail if template file is missing
-  fail:
-    msg: "Template file {{ template_path }} is not found!"
-  when: not template_existence.stat.exists
-
-- name: Extract Namespace
-  set_fact:
-    extracted_namespace: >-
-      {%- set content = lookup('file', template_path).split('\n') -%}
-      {%- set ns_line = content | select('match', '^\\s*name:') | list | first -%}
-      {%- if ns_line -%}
-        {{- ns_line.split(':', 1)[1] | trim | replace('"', '') -}}
-      {%- else -%}
-        {{- '' -}}
-      {%- endif -%}
-
-- name: Update the syntax for variables
-  set_fact:
-    current_namespace: "{{ extracted_namespace | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
-
-
-- name: Build namespace map from templates
-  set_fact:
-    namespace_map: >-
-      {%- set ns_map = {} -%}
-      {%- for file in template_files.files -%}
-        {%- set base_name = file.path | basename -%}
-        {%- set deploy_postfix = base_name.split('.') | first -%}
-        {%- set lines = lookup('file', file.path).split('\n') -%}
-        {%- set ns_line = lines | select('search', '^\\s*name\\s*:\\s*') | list | first -%}
-        {%- if ns_line is defined and ns_line != '' -%}
-          {%- set ns_value = ns_line.split(':', 1)[1] | trim | replace('"', '') -%}
-          {%- set ns_map = ns_map | combine({deploy_postfix: ns_value}) -%}
-        {%- else -%}
-          {%- set ns_map = ns_map | combine({deploy_postfix: ''}) -%}
-        {%- endif -%}
-      {%- endfor -%}
-      {{ ns_map }}
-  when: sd_file_existence.stat.exists
-
-
-- name: Transform structure in variable
-  set_fact:
-    all_environments: >-
-      {%- set result = {} -%}
+    solution_structure: >-
+      {%- set structure = {} -%}
       {%- for app in sd_config.applications -%}
-        {%- set parts = app.version.split(':', 1) -%}
-        {%- set service = parts[0] -%}
         {%- set postfix = app.deployPostfix -%}
-
-        {%- if service not in result -%}
-          {%- result.update({service: {}}) -%}
+        {%- set path = templates_base ~ '/' ~ postfix ~ '.yaml.j2' -%}
+        {%- set exists = lookup('ansible.builtin.file', path, errors='ignore') is not none -%}
+        {%- if exists -%}
+          {%- set lines = lookup('file', path).split('\n') -%}
+          {%- set name_line = lines | select('search', '^\\s*name\\s*:\\s*') | list | first | default('') -%}
+          {%- set ns = (name_line.split(':', 1)[1] | trim | replace('"', '')) if name_line else None -%}
+        {%- else -%}
+          {%- set ns = None -%}
         {%- endif -%}
 
-        {%- set ns_value = namespace_map.get(postfix, null) -%}
-        {%- set service_entry = {
-            'version': parts[1],
-            'namespace': ns_value
-        } -%}
-
-        {%- result[service].update({postfix: service_entry}) -%}
+        {# разбор имени образа: postgres, postgres-toms и т.д. #}
+        {%- set parts = app.version.split(':')[0].split('-') -%}
+        {%- set solution = parts[0] -%}
+        {%- set key = postfix -%}
+        {%- set version = app.version.split(':')[1] -%}
+        {%- set inner = {'version': version, 'namespace': ns} -%}
+        {%- set group = structure.get(solution, {}) | combine({key: inner}) -%}
+        {%- set structure = structure | combine({solution: group}) -%}
       {%- endfor -%}
-      {{ dict(result | dictsort(reverse=true)) }}
+      {{ structure }}
   when: sd_file_existence.stat.exists
 
 - name: Show all_environments
