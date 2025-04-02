@@ -58,6 +58,8 @@
         {%- set deploy_postfix = base_name.split('.') | first -%}
         {%- set template_content = lookup('file', file.path).split('\n') -%}
         {%- set ns_line_list = template_content | select('search', '^\\s*name\\s*:\\s*') | list -%}
+        {{ [DEBUG] ns_line_list }}
+      
         {%- if ns_line_list | length > 0 -%}
           {%- set ns_line = ns_line_list[0] -%}
           {%- set ns_value = ns_line.split(':', 1)[1] | trim | replace('"', '') -%}
