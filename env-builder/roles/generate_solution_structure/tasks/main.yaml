@@ -56,14 +56,17 @@
       {%- for file in template_files.files -%}
         {%- set base_name = file.path | basename -%}
         {%- set deploy_postfix = base_name.split('.') | first -%}
-        {%- set template_content = lookup('file', file.path).split('\n') -%}
-        {%- set ns_line_list = template_content | select('search', 'name:') | list -%}
-      
-        {%- if ns_line_list | length > 0 -%}
-          {%- set ns_line = ns_line_list[0] -%}
-          {%- set ns_value = ns_line.split(':', 1)[1] | trim | replace('"', '') -%}
-          {%- set ns_map = ns_map | combine({deploy_postfix: ns_value}) -%}
-        {%- else -%}
+        {%- set template_content = lookup('file', file.path) | split('\n') -%}
+
+        {%- for line in template_content -%}
+          {%- if line is match('^\\s*name:\\s*') -%}
+            {%- set ns_line = line -%}
+            {%- set ns_value = ns_line.split(':', 1)[1] | trim | replace('"', '') -%}
+            {%- set ns_map = ns_map | combine({deploy_postfix: ns_value}) -%}
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if deploy_postfix not in ns_map -%}
           {%- set ns_map = ns_map | combine({deploy_postfix: ''}) -%}
         {%- endif -%}
       {%- endfor -%}
