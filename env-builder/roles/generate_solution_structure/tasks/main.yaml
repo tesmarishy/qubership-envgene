@@ -75,36 +75,41 @@
 
 
 - name: Build final solution_structure
-  vars:
-    templates_base: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
-    _entry: >-
-      {% set version_full = item.version %}
-      {% set version = version_full.split(':')[1] %}
-      {% set solution = version_full.split(':')[0].split('-')[0] %}
-      {% set postfix = item.deployPostfix %}
-      {% set path = postfix_template_map.get(postfix, None) %}
-
-      {% if path %}
-        {# -- Та самая логика, как в твоём Extract Namespace -- #}
-        {% set content = lookup('file', path).split('\n') %}
-        {% set ns_line = content | select('match', '^\\s*name:') | list | first %}
-        {% if ns_line %}
-          {% set ns_val = ns_line.split(':', 1)[1] | trim | replace('"', '') %}
-        {% else %}
-          {% set ns_val = None %}
-        {% endif %}
-      {% else %}
-        {% set ns_val = None %}
-      {% endif %}
-
-      {# Собираем кусочек структуры. #}
-      {% set small_dict = { solution: { postfix: {'version': version, 'namespace': ns_val} } } %}
-      {{ small_dict }}
   set_fact:
     solution_structure: "{{ solution_structure | combine(_entry) }}"
   loop: "{{ sd_config.applications }}"
   loop_control:
     label: "{{ item.deployPostfix }}"
+  vars:
+    _entry: >-
+      {% set version_full = item.version -%}
+      {% set version = version_full.split(':')[1] -%}
+      {% set solution = version_full.split(':')[0].split('-')[0] -%}
+      {% set postfix = item.deployPostfix -%}
+      {% set path = postfix_template_map.get(postfix, None) -%}
+
+      {% if path %}
+        {% set content = lookup('file', path).split('\n') -%}
+        {% set ns_line = content | select('match', '^\\s*name:') | list | first -%}
+        {% if ns_line %}
+          {% set ns_val = ns_line.split(':', 1)[1] | trim | replace('"', '') -%}
+        {% else %}
+          {% set ns_val = None -%}
+        {% endif -%}
+      {% else %}
+        {% set ns_val = None -%}
+      {% endif -%}
+
+      {% set small_dict = {
+        solution: {
+          postfix: {
+            'version': version,
+            'namespace': ns_val
+          }
+        }
+      } %}
+
+      {{ small_dict }}
   when: sd_file_existence.stat.exists
 
 - name: Show solution_structure
