@@ -113,3 +113,8 @@
   set_fact:
     solution_structure: "{{ solution_structure | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
   when: sd_file_existence.stat.exists
+
+- name: Merge solution_structure into current_env
+  set_fact:
+    current_env: "{{ current_env | combine({'solution_structure': solution_structure}, recursive=True) }}"
+  when: sd_file_existence.stat.exists
