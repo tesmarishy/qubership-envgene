@@ -1,4 +1,4 @@
-name: Create and publish qubership-envgene docker image
+name: Build qubership-envgene dockerimage
 
 on:
   workflow_dispatch:

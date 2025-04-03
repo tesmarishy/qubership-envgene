@@ -81,7 +81,7 @@
       ansible.builtin.include_role:
         name: generate_solution_structure
       vars:
-        namespace_var: "{{ current_env_template.namespaces }}"
+        env_template_name: "{{ current_env.env_template }}"
         sd_output_dir: "{{ output_dir }}"
         sd_cluster_name: "{{ cluster_name }}"
         sd_env: "{{ env }}"
