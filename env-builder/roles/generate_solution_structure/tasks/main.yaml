@@ -71,13 +71,13 @@
       }}
 
 #################DEBUG#################################################################
-- name: Dummy test structure (robust)
+- name: Dummy test structure (robust via search)
   set_fact:
     solution_structure: >-
       {%- set struct = {} -%}
       {%- for postfix, path in postfix_template_map.items() -%}
         {%- set lines = lookup('file', path).split('\n') -%}
-        {%- set name_line = lines | select('startswith', 'name:') | list | first | default('') -%}
+        {%- set name_line = lines | select('search', '^\\s*name\\s*:\\s*') | list | first | default('') -%}
         {%- set ns = name_line.split(':', 1)[1] | trim | replace('"', '') if name_line else None -%}
         {%- set struct = struct | combine({postfix: {'namespace': ns}}) -%}
       {%- endfor -%}
