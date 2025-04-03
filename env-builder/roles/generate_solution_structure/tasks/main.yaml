@@ -83,16 +83,12 @@
       {%- endfor -%}
       {{ struct }}
 
-- name: Show lines from template
+- name: Print lines from each template file
   debug:
-    msg: >-
-      {{
-        postfix_template_map.items()
-        | map('first')
-        | map('extract', postfix_template_map)
-        | map('lookup', 'file')
-        | list
-      }}      
+    msg: "{{ lookup('file', item).split('\n') }}"
+  loop: "{{ postfix_template_map.values() }}"
+  loop_control:
+    label: "{{ item }}"
       
 - name: Print lines from each template file
   debug:
