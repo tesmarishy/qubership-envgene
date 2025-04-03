@@ -76,7 +76,7 @@
 
 - name: Build final solution_structure
   set_fact:
-    solution_structure: "{{ solution_structure | combine(_entry | from_json) }}"
+    solution_structure: "{{ solution_structure | combine(_entry | from_json, recursive=True) }}"
   loop: "{{ sd_config.applications }}"
   loop_control:
     label: "{{ item.deployPostfix }}"
