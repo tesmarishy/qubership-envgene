@@ -39,11 +39,6 @@
     msg: "All required fields are present and valid!"
   when: sd_file_existence.stat.exists
 
-- name: Initialize solution_structure
-  set_fact:
-    solution_structure: {}
-  when: sd_file_existence.stat.exists
-
 - name: Find all possible namespace templates
   find:
     paths: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
@@ -70,65 +65,46 @@
         | list
       }}
 
-#################DEBUG#################################################################
-- name: Dummy test structure (no break, no select)
+
+- name: Initialize solution_structure
   set_fact:
-    solution_structure: >-
-      {%- set struct = {} -%}
-      {%- for postfix, tpl_path in postfix_template_map.items() -%}
-        {%- set lines = lookup('file', tpl_path).split('\n') -%}
-        {%- set name_lines = [] -%}
-        {%- for l in lines -%}
-          {%- if 'name:' in l -%}
-            {%- set name_lines = name_lines + [l] -%}
-          {%- endif -%}
-        {%- endfor -%}
-        {%- set name_line = name_lines[0] if (name_lines|length) > 0 else None -%}
-        {%- set ns = name_line.split(':', 1)[1] | trim | replace('"', '') if name_line else None -%}
-        {%- set struct = struct | combine({postfix: {'namespace': ns}}) -%}
-      {%- endfor -%}
-      {{ struct }}
-
-- name: Print lines from each template file
-  debug:
-    msg: "{{ lookup('file', item).split('\n') }}"
-  loop: "{{ postfix_template_map.values() }}"
-  loop_control:
-    label: "{{ item }}"
-      
-- name: Print lines from each template file
-  debug:
-    msg: "{{ lookup('file', item).split('\n') }}"
-  loop: "{{ postfix_template_map.values() }}"
+    solution_structure: {}
+  when: sd_file_existence.stat.exists
 
 
 
-#############################################################
 
 - name: Build final solution_structure
+  vars:
+    templates_base: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
+    _entry: >-
+      {% set version_full = item.version %}
+      {% set version = version_full.split(':')[1] %}
+      {% set solution = version_full.split(':')[0].split('-')[0] %}
+      {% set postfix = item.deployPostfix %}
+      {% set path = postfix_template_map.get(postfix, None) %}
+
+      {% if path %}
+        {# -- Та самая логика, как в твоём Extract Namespace -- #}
+        {% set content = lookup('file', path).split('\n') %}
+        {% set ns_line = content | select('match', '^\\s*name:') | list | first %}
+        {% if ns_line %}
+          {% set ns_val = ns_line.split(':', 1)[1] | trim | replace('"', '') %}
+        {% else %}
+          {% set ns_val = None %}
+        {% endif %}
+      {% else %}
+        {% set ns_val = None %}
+      {% endif %}
+
+      {# Собираем кусочек структуры. #}
+      {% set small_dict = { solution: { postfix: {'version': version, 'namespace': ns_val} } } %}
+      {{ small_dict }}
   set_fact:
-    solution_structure: >-
-      {%- set structure = {} -%}
-      {%- for app in sd_config.applications -%}
-        {%- set postfix = app.deployPostfix -%}
-        {%- set version_full = app.version -%}
-        {%- set version = version_full.split(':')[1] -%}
-        {%- set solution = version_full.split(':')[0].split('-')[0] -%}
-
-        {%- set path = postfix_template_map.get(postfix, None) -%}
-        {%- if path -%}
-          {%- set lines = lookup('file', path).split('\n') -%}
-          {%- set name_line = lines | select('search', '^\\s*name\\s*:\\s*') | list | first | default('') -%}
-          {%- set ns = (name_line.split(':', 1)[1] | trim | replace('"', '') ) if name_line else None -%}
-        {%- else -%}
-          {%- set ns = None -%}
-        {%- endif -%}
-
-        {%- set entry = {'version': version, 'namespace': ns} -%}
-        {%- set existing = structure.get(solution, {}) | combine({postfix: entry}) -%}
-        {%- set structure = structure | combine({solution: existing}) -%}
-      {%- endfor -%}
-      {{ structure }}
+    solution_structure: "{{ solution_structure | combine(_entry) }}"
+  loop: "{{ sd_config.applications }}"
+  loop_control:
+    label: "{{ item.deployPostfix }}"
   when: sd_file_existence.stat.exists
 
 - name: Show solution_structure
