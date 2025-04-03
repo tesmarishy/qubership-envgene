@@ -71,14 +71,19 @@
       }}
 
 #################DEBUG#################################################################
-- name: Dummy test structure (safe manual search without break)
+- name: Dummy test structure (no break, no select)
   set_fact:
     solution_structure: >-
       {%- set struct = {} -%}
       {%- for postfix, tpl_path in postfix_template_map.items() -%}
         {%- set lines = lookup('file', tpl_path).split('\n') -%}
-        {%- set name_lines = lines | select('search', 'name:') | list -%}
-        {%- set name_line = name_lines[0] if name_lines | length > 0 else None -%}
+        {%- set name_lines = [] -%}
+        {%- for l in lines -%}
+          {%- if 'name:' in l -%}
+            {%- set name_lines = name_lines + [l] -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- set name_line = name_lines[0] if (name_lines|length) > 0 else None -%}
         {%- set ns = name_line.split(':', 1)[1] | trim | replace('"', '') if name_line else None -%}
         {%- set struct = struct | combine({postfix: {'namespace': ns}}) -%}
       {%- endfor -%}
