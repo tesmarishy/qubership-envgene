@@ -64,23 +64,19 @@
         | map('first')
         | list
       }}
-
+  when: sd_file_existence.stat.exists
 
 - name: Initialize solution_structure
   set_fact:
     solution_structure: {}
   when: sd_file_existence.stat.exists
 
-
-
-
-- name: Build final solution_structure
+- name: Build solution_structure variable
   set_fact:
     solution_structure: "{{ solution_structure | combine(_entry | from_json, recursive=True) }}"
   loop: "{{ sd_config.applications }}"
   loop_control:
     label: "{{ item.deployPostfix }}"
-  when: sd_file_existence.stat.exists
   vars:
     _entry: >-
       {% set version_full = item.version -%}
@@ -111,12 +107,9 @@
       } %}
 
       {{ small_dict | to_json }}
+  when: sd_file_existence.stat.exists
 
-- name: Update the syntax for variables
+- name: Update formatting in solution_structure variable
   set_fact:
     solution_structure: "{{ solution_structure | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
-
-- name: Show solution_structure
-  debug:
-    var: solution_structure
   when: sd_file_existence.stat.exists
