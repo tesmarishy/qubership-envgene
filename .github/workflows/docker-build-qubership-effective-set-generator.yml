@@ -1,4 +1,4 @@
-name: Create and publish qubership-effective-set-generator Docker image
+name: Build qubership-effective-set-generator dockerimage
 
 on:
   workflow_dispatch:
