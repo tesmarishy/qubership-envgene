@@ -70,6 +70,7 @@
         | list
       }}
 
+#################DEBUG#################################################################
 - name: Dummy test structure
   set_fact:
     solution_structure: >-
@@ -81,6 +82,26 @@
         {%- set struct = struct | combine({postfix: {'namespace': ns}}) -%}
       {%- endfor -%}
       {{ struct }}
+
+- name: Show lines from template
+  debug:
+    msg: >-
+      {{
+        postfix_template_map.items()
+        | map('first')  # keys
+        | map('extract', postfix_template_map)  # paths
+        | map('lookup', 'file')
+        | list
+      }}      
+      
+- name: Print lines from each template file
+  debug:
+    msg: "{{ lookup('file', item).split('\n') }}"
+  loop: "{{ postfix_template_map.values() }}"
+
+
+
+#############################################################
 
 - name: Build final solution_structure
   set_fact:
