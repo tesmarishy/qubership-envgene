@@ -1,4 +1,4 @@
-name: Create and publish qubership-gcip docker image
+name: Build qubership-gcip dockerimage
 
 on:
   workflow_dispatch:
