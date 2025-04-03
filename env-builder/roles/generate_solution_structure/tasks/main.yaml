@@ -88,8 +88,8 @@
     msg: >-
       {{
         postfix_template_map.items()
-        | map('first')  # keys
-        | map('extract', postfix_template_map)  # paths
+        | map('first')
+        | map('extract', postfix_template_map)
         | map('lookup', 'file')
         | list
       }}      
