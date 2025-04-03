@@ -76,10 +76,11 @@
 
 - name: Build final solution_structure
   set_fact:
-    solution_structure: "{{ solution_structure | combine(_entry) }}"
+    solution_structure: "{{ solution_structure | combine(_entry | from_json) }}"
   loop: "{{ sd_config.applications }}"
   loop_control:
     label: "{{ item.deployPostfix }}"
+  when: sd_file_existence.stat.exists
   vars:
     _entry: >-
       {% set version_full = item.version -%}
@@ -103,14 +104,13 @@
       {% set small_dict = {
         solution: {
           postfix: {
-            'version': version,
-            'namespace': ns_val
+            "version": version,
+            "namespace": ns_val
           }
         }
       } %}
 
-      {{ small_dict }}
-  when: sd_file_existence.stat.exists
+      {{ small_dict | to_json }}
 
 - name: Show solution_structure
   debug:
