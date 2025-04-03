@@ -75,8 +75,8 @@
   set_fact:
     solution_structure: >-
       {%- set struct = {} -%}
-      {%- for postfix, path in postfix_template_map.items() -%}
-        {%- set lines = lookup('file', path).split('') -%}
+      {%- for postfix, tpl_path in postfix_template_map.items() -%}
+        {%- set lines = lookup('file', tpl_path).split('\n') -%}
         {%- set name_lines = lines | select('search', 'name:') | list -%}
         {%- set name_line = name_lines[0] if name_lines | length > 0 else None -%}
         {%- set ns = name_line.split(':', 1)[1] | trim | replace('"', '') if name_line else None -%}
