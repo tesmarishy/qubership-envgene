@@ -112,6 +112,10 @@
 
       {{ small_dict | to_json }}
 
+- name: Update the syntax for variables
+  set_fact:
+    solution_structure: "{{ solution_structure | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
+
 - name: Show solution_structure
   debug:
     var: solution_structure
