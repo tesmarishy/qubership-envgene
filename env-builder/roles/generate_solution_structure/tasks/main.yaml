@@ -124,14 +124,14 @@
 - name: Pre-render the existing templates
   template:
     src: "{{ item.template_path }}"
-    dest: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces/{{ item.template_path | regex_replace('\\.j2$', '') }}"
+    dest: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
   loop: "{{ env_template_path }}"
   when: current_env.solution_structure is defined and current_env.solution_structure != {} and sd_file_existence.stat.exists
 
 - name: Re-write existing templates
   copy:
-    src: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces/{{ item.template_path | regex_replace('\\.j2$', '') }}"
-    dest: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces/{{ item.template_path }}"
+    src: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
+    dest: "{{ item.template_path }}"
     remote_src: yes
     force: yes
   loop: "{{ env_template_path }}"
@@ -139,7 +139,7 @@
 
 - name: Remove temporary created pre-rendered ymls
   file:
-    path: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces/{{ item.template_path | regex_replace('\\.j2$', '') }}"
+    path: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
     state: absent
   loop: "{{ env_template_path }}"
   when: current_env.solution_structure is defined and current_env.solution_structure != {} and sd_file_existence.stat.exists
