@@ -29,6 +29,7 @@
       - "item.deployPostfix is string"
     success_msg: "Valid application entry: {{ item }}"
     fail_msg: "Invalid application entry: {{ item | to_nice_json }}"
+    quiet: true
   loop: "{{ sd_config.applications }}"
   loop_control:
     label: "Application {{ item.version | default('unknown') }}"
