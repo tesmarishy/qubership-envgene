@@ -29,6 +29,7 @@
       - "item.deployPostfix is string"
     success_msg: "Valid application entry: {{ item }}"
     fail_msg: "Invalid application entry: {{ item | to_nice_json }}"
+    quiet: true
   loop: "{{ sd_config.applications }}"
   loop_control:
     label: "Application {{ item.version | default('unknown') }}"
@@ -40,6 +41,7 @@
   when: sd_file_existence.stat.exists
 
 - name: Find all possible namespace templates
+  no_log: True
   find:
     paths: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
     patterns:
@@ -115,6 +117,30 @@
   when: sd_file_existence.stat.exists
 
 - name: Merge solution_structure into current_env
+  no_log: True
   set_fact:
     current_env: "{{ current_env | combine({'solution_structure': solution_structure}, recursive=True) }}"
   when: sd_file_existence.stat.exists
+
+- name: Pre-render the existing templates
+  template:
+    src: "{{ item.template_path }}"
+    dest: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
+  loop: "{{ env_template_path }}"
+  when: current_env.solution_structure is defined and current_env.solution_structure != {} and sd_file_existence.stat.exists
+
+- name: Re-write existing templates
+  copy:
+    src: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
+    dest: "{{ item.template_path }}"
+    remote_src: yes
+    force: yes
+  loop: "{{ env_template_path }}"
+  when: current_env.solution_structure is defined and current_env.solution_structure != {} and sd_file_existence.stat.exists
+
+- name: Remove temporary created pre-rendered ymls
+  file:
+    path: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
+    state: absent
+  loop: "{{ env_template_path }}"
+  when: current_env.solution_structure is defined and current_env.solution_structure != {} and sd_file_existence.stat.exists

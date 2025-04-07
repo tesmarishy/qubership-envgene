@@ -1,57 +1,26 @@
-- name: Extract namespace template name from path
+---
+- name: Get namespace template name from {{ namespace.template_path }}
   set_fact:
-    _namespace_template_name: "{{ namespace.template_path.split('/') | last | regex_replace('\\.ya?ml\\.j2$', '') }}"
+    _namespace_template_name: "{{ namespace.template_path.split('/')|last|replace('.yml.j2', '')|replace('.yaml.j2', '') }}"
 
-- name: Create Namespace output directory
+- name: Generate Envs Namespace dir {{ _namespace_template_name }}
   ansible.builtin.file:
     path: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}"
     state: directory
 
-- name: Set template override if provided
+- name: Set templates
   set_fact:
-    template_override: "{{ namespace.template_override | default('') }}"
+    template_override: "{{ namespace.template_override| default('') }}"
 
+- name: Generate Envs Namespace yaml {{ _namespace_template_name }} for {{ namespace.name }}
+  ansible.builtin.blockinfile:
+    path: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}/namespace.yml"
+    block: "{{ lookup('template', namespace.template_path) }}"
+    create: yes
 
-- name: Skip rendering if solution_structure is empty
-  set_fact:
-    _rendered_solution_structure: {}
-  when: current_env.solution_structure is not defined or current_env.solution_structure == {}
-
-- name: Write temporary Jinja2 template for solution_structure
-  copy:
-    dest: "{{ render_dir }}/{{ env }}/solution_structure.j2"
-    content: |
-      {{ current_env.solution_structure | to_nice_yaml }}
-  when: current_env.solution_structure is defined and current_env.solution_structure != {}
-
-- name: Fully render solution_structure using Jinja2 engine
-  set_fact:
-    _rendered_solution_structure: "{{ lookup('template', render_dir + '/' + env + '/solution_structure.j2') | from_yaml }}"
-  when: current_env.solution_structure is defined and current_env.solution_structure != {}
-
-- name: Update current_env with rendered solution_structure
-  set_fact:
-    current_env: "{{ current_env | combine({'solution_structure': _rendered_solution_structure}) }}"
-
-
-- name: Pre-render Jinja2 template (1st pass)
-  set_fact:
-    namespace_template_pre_rendered: "{{ lookup('template', namespace.template_path) }}"
-
-
-- name: Fully render pre-rendered template (2nd pass)
-  set_fact:
-    namespace_template_final: "{{ namespace_template_pre_rendered | to_yaml | from_yaml }}"
-
-
-- name: Write final namespace YAML
-  copy:
-    dest: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}/namespace.yml"
-    content: "{{ namespace_template_final }}"
-
-
-- name: Write namespace override YAML (if provided)
-  copy:
-    dest: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}/namespace.yml_override"
-    content: "{{ template_override }}"
+- name: Generate Envs Namespace yaml {{ _namespace_template_name }} for {{ namespace.name }}
+  ansible.builtin.blockinfile:
+    path: "{{ _current_env_dir }}/Namespaces/{{ _namespace_template_name }}/namespace.yml_override"
+    block: "{{ template_override }}"
+    create: yes
   when: template_override != ''

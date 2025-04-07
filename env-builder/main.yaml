@@ -76,17 +76,6 @@
         file: "{{ templates_dir }}/env_templates/{{current_env.env_template}}.yaml"
         name: current_env_template 
 
-
-    - name: Generate solution_structure variable
-      ansible.builtin.include_role:
-        name: generate_solution_structure
-      vars:
-        env_template_name: "{{ current_env.env_template }}"
-        sd_output_dir: "{{ output_dir }}"
-        sd_cluster_name: "{{ cluster_name }}"
-        sd_env: "{{ env }}"
-
-
     - name: Gen tenant
       ansible.builtin.include_role:
         name: generate_tenant
@@ -106,6 +95,16 @@
         _cloud: "{{ current_env.cloud }}"
         _current_env_dir: "{{ current_env_dir }}"
         _template: "{{ current_env_template.cloud }}"
+
+    - name: Generate solution_structure variable
+      ansible.builtin.include_role:
+        name: generate_solution_structure
+      vars:
+        env_template_name: "{{ current_env.env_template }}"
+        env_template_path: "{{ current_env_template.namespaces }}"
+        sd_output_dir: "{{ output_dir }}"
+        sd_cluster_name: "{{ cluster_name }}"
+        sd_env: "{{ env }}"
 
     - name: Gen namespaces
       ansible.builtin.include_role:
