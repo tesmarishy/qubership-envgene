@@ -92,7 +92,7 @@
     _entry: >-
       {% set version_full = item.version -%}
       {% set version = version_full.split(':')[1] -%}
-      {% set solution = version_full.split(':')[0].split('-')[0] -%}
+      {% set solution = version_full.split(':')[0] -%}
       {% set postfix = item.deployPostfix -%}
       {% set path = postfix_template_map.get(postfix, None) -%}
 
