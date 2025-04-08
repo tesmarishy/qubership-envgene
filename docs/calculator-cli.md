@@ -132,13 +132,6 @@ The `<value>` can be complex, such as a map or a list, whose elements can also b
 ```yaml
 <key-1>: <value-1>
 <key-2>: <value-2>
-global: &id001
-  <key-1>: <value-1>
-  <key-2>: <value-2>
-<service-name-1>:
-  <<: *id001
-<service-name-2>:
-  <<: *id001
 ```
 
 Each application microservice has its own dedicated section. These sections contain the same set of parameters as defined at the root level.
