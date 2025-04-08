@@ -125,6 +125,12 @@
     solution_structure: "{{ solution_structure | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
   when: sd_file_path is defined
 
+- name: Show solution_structure var
+  debug:
+    var: solution_structure
+  when: sd_file_path is defined
+
+
 - name: Merge solution_structure into current_env
   no_log: True
   set_fact:
