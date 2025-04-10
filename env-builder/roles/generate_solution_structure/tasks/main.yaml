@@ -78,11 +78,13 @@
   when: sd_file_path is defined
 
 - name: Initialize solution_structure
+  no_log: True
   set_fact:
     solution_structure: {}
   when: sd_file_path is defined
 
 - name: Build solution_structure variable
+  no_log: True
   set_fact:
     solution_structure: "{{ solution_structure | combine(_entry | from_json, recursive=True) }}"
   loop: "{{ sd_config.applications }}"
@@ -121,6 +123,7 @@
   when: sd_file_path is defined
 
 - name: Update formatting in solution_structure variable
+  no_log: True
   set_fact:
     solution_structure: "{{ solution_structure | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
   when: sd_file_path is defined
