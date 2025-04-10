@@ -1,4 +1,6 @@
-name: Release And Deploy Docker Artifact
+name: Release EnvGene
+
+run-name: "Release EnvGene: ${{ inputs.version }}"
 
 on:
   workflow_dispatch:
