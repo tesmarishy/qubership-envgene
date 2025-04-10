@@ -106,6 +106,10 @@
         sd_cluster_name: "{{ cluster_name }}"
         sd_env: "{{ env }}"
 
+    - name: Debug ss
+      debug:
+        var: current_env.solution_structure
+
     - name: Gen namespaces
       ansible.builtin.include_role:
         name: generate_namespaces
