@@ -1,4 +1,5 @@
 ---
+
 - name: Get namespace template name from {{ namespace.template_path }}
   set_fact:
     _namespace_template_name: "{{ namespace.template_path.split('/')|last|replace('.yml.j2', '')|replace('.yaml.j2', '') }}"
