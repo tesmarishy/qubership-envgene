@@ -148,13 +148,12 @@
     - sd_files_check is defined
     - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
 
-- name: Show solution_structure var
+- name: Show solution_structure variable
   debug:
     var: solution_structure
   when:
     - sd_files_check is defined
     - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
-
 
 - name: Merge solution_structure into current_env
   no_log: True
