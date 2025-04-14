@@ -1,0 +1,59 @@
+name: Run Pytest
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.10-slim-bookworm
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare environment
+        run: |
+          
+          apt-get update && apt-get install -y --no-install-recommends \
+              build-essential \
+              curl \
+              && rm -rf /var/lib/apt/lists/*
+          
+          if [ -f gitlab-ci/build/pip.conf ]; then
+              mkdir -p /etc/pip
+              cp gitlab-ci/build/pip.conf /etc/pip.conf
+          fi
+          
+          if [ -f gitlab-ci/build/sources.list ]; then
+              cp gitlab-ci/build/sources.list /etc/apt/sources.list
+          fi
+          
+          pip install --no-cache-dir -r gitlab-ci/build/tests_requirements.txt
+          
+          if [ -f python/build_modules.sh ]; then
+              chmod +x python/build_modules.sh
+              ./python/build_modules.sh
+          fi
+
+      - name: Install SOPS
+        run: |
+          curl -LO https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64
+          mv sops-v3.9.0.linux.amd64 /usr/local/bin/sops
+          chmod +x /usr/local/bin/sops
+
+      - name: Run tests
+        run: |
+          cd scripts/build_env
+          pytest --capture=no -W ignore::DeprecationWarning --junitxml=../../junit.xml
+          cd ../..
+          mv junit.xml junit_build_env.xml
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: junit_build_env.xml
