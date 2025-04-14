@@ -11,7 +11,10 @@
   - [`ENV_TEMPLATE_NAME`](#env_template_name)
   - [`ENV_SPECIFIC_PARAMS`](#env_specific_params)
   - [`GENERATE_EFFECTIVE_SET`](#generate_effective_set)
-  - [`EFFECTIVE_SET_CONFIG`](#effective_set_config)
+  - [`SECRET_KEY`](#secret_key)
+  - [`ENVGENE_AGE_PRIVATE_KEY`](#envgene_age_private_key)
+  - [`ENVGENE_AGE_PUBLIC_KEY`](#envgene_age_public_key)
+  - [`PUBLIC_AGE_KEYS`](#public_age_keys)
 
 The following are the launch parameters for the instance repository pipeline. These parameters influence, the execution of specific jobs within the pipeline.
 
@@ -133,32 +136,40 @@ If `true`:
 
 **Example**: `true`
 
-## `EFFECTIVE_SET_CONFIG`
+## `SECRET_KEY`
 
-**Description**: Settings for effective set configuration. This is used together with `GENERATE_EFFECTIVE_SET`. **JSON in string** format.
+**Description**: Fernet key. Used to encrypt/decrypt credentials when `crypt_backend` s set to `Fernet` (mandatory in this case).  
+Used by EnvGene at runtime, when using pre-commit hooks, the same value must be specified in `.git/secret_key.txt`.
 
-```yaml
-version: <v1.0|v2.0>
-effective_set_expiry: <effective-set-expiry-time>
-contexts:
-  operational:
-    consumers:
-      - name: <consumer-component-name>
-        version: <consumer-component-version>
-        schema: <json-schema-in-string>
-```
+>[Note]
+> These are generally configured as GitLab CI/CD variables or GitHub environment variables.
 
-| Attribute | Mandatory | Description | Default | Example |
-|---|---|---|---|---|
-| **version** | Optional | The version of the effective set to be generated. Available options are `v1.0` and `v2.0`. EnvGene uses `--effective-set-version` to pass this attribute to the Calculator CLI. | `v1.0` | `v2.0` |
-| **effective_set_expiry** | Optional | The duration for which the effective set (stored as a job artifact) will remain available for download. Envgene passes this value unchanged to: 1) The `retention-days` job attribute in case of GitHub pipeline. 2) The `expire_in` job attribute in case of GitLab pipeline. The exact syntax and constraints differ between platforms. Refer to the GitHub and GitLab documentation for details. | GitLab: `1 hours`, GitHub: `1` (day) | GitLab: `2 hours`, GitHub: `2` |
-| **contexts.operational.consumers** | Optional | Each entry in this list adds a [consumer-specific operational context component](/docs/calculator-cli.md#version-20-operational-parameter-context) to the Effective Set. EnvGene passes the path to the corresponding JSON schema file to the Calculator CLI using the `--operational-consumer-specific-schema-path` argument. Each list element is passed as a separate argument. | None | None |
-| **contexts.operational.consumers[].name** | Mandatory | The name of the [consumer-specific operational context component](/docs/calculator-cli.md#version-20-operational-parameter-context). If used without `contexts.operational.consumers[].schema`, the component must be pre-registered in EnvGene | None | `dcl` |
-| **contexts.operational.consumers[].version** | Mandatory | The version of the [consumer-specific operational context component](/docs/calculator-cli.md#version-20-operational-parameter-context). If used without `contexts.operational.consumers[].schema`, the component must be pre-registered in EnvGene. | None | `v1.0`|
-| **contexts.operational.consumers[].schema** | Optional | The content of the consumer-specific operational context component JSON schema transformed into a string. It is used to generate a consumer-specific operational context for a consumer not registered in EnvGene. EnvGene saves the value as a JSON file with the name `<contexts.operational[].name>-<contexts.operational[].version>.schema.json` and passes the path to it to the Calculator CLI via `--operational-consumer-specific-schema-path` attribute. The schema obtained in this way is not saved between pipeline runs and must be passed for each run. | None | [consumer-v1.0.json](/examples/consumer-v1.0.json) |
+**Example**: "PjYtYZ4WnZsH2F4AxjDf_-QOSaL1kVHIkPOH7bpTFMI="
 
-Registered component JSON schemas are stored in the EnvGene Docker image as JSON files named: `<consumers-name>-<consumer-version>.schema.json`
+## `ENVGENE_AGE_PRIVATE_KEY`
 
-Consumer-specific operational context components registered in EnvGene:
+**Description**: Private key from EnvGene's AGE key pair. Used to encrypt credentials when `crypt_backend` is set to `SOPS` (mandatory in this case).  
+Used by EnvGene at runtime, when using pre-commit hooks, the same value must be specified in `.git/private-age-key.txt`.
 
-1. None
+>[Note]
+> These are generally configured as GitLab CI/CD variables or GitHub environment variables.
+
+**Example**: "AGE-SECRET-KEY-1N9APQZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY6"
+
+## `ENVGENE_AGE_PUBLIC_KEY`
+
+**Description**: Public key from EnvGene's AGE key pair. Added for logical completeness (not currently used in operations). For decryption, `PUBLIC_AGE_KEYS` is used instead.
+
+**Example**: "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p"
+
+## `PUBLIC_AGE_KEYS`
+
+**Description**: Contains a comma-separated list of public AGE keys from EnvGene and external systems (`<key_1>,<key_2>,...,<key_N>`). Used for credential encryption when `crypt_backend` is `SOPS` (mandatory in this case).  
+Must include at least one key: EnvGene's own AGE public key.  
+If an external system provides encrypted parameters, its public AGE key must also be included.  
+Used by EnvGene at runtime, when using pre-commit hooks, the same value must be specified in `.git/public-age-key.txt`.
+
+>[Note]
+> These are generally configured as GitLab CI/CD variables or GitHub environment variables.
+
+**Example**: "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p,age113z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmca32p"
