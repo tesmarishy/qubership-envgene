@@ -141,7 +141,7 @@ If `true`:
 **Description**: Fernet key. Used to encrypt/decrypt credentials when `crypt_backend` s set to `Fernet` (mandatory in this case).  
 Used by EnvGene at runtime, when using pre-commit hooks, the same value must be specified in `.git/secret_key.txt`.
 
->[Note]
+>[!Note]
 > These are generally configured as GitLab CI/CD variables or GitHub environment variables.
 
 **Example**: "PjYtYZ4WnZsH2F4AxjDf_-QOSaL1kVHIkPOH7bpTFMI="
@@ -151,7 +151,7 @@ Used by EnvGene at runtime, when using pre-commit hooks, the same value must be 
 **Description**: Private key from EnvGene's AGE key pair. Used to encrypt credentials when `crypt_backend` is set to `SOPS` (mandatory in this case).  
 Used by EnvGene at runtime, when using pre-commit hooks, the same value must be specified in `.git/private-age-key.txt`.
 
->[Note]
+>[!Note]
 > These are generally configured as GitLab CI/CD variables or GitHub environment variables.
 
 **Example**: "AGE-SECRET-KEY-1N9APQZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY6"
@@ -169,7 +169,7 @@ Must include at least one key: EnvGene's own AGE public key.
 If an external system provides encrypted parameters, its public AGE key must also be included.  
 Used by EnvGene at runtime, when using pre-commit hooks, the same value must be specified in `.git/public-age-key.txt`.
 
->[Note]
+>[!Note]
 > These are generally configured as GitLab CI/CD variables or GitHub environment variables.
 
 **Example**: "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p,age113z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmca32p"
