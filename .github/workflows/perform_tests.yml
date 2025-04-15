@@ -20,16 +20,16 @@ jobs:
               curl \
               && rm -rf /var/lib/apt/lists/*
           
-          if [ -f gitlab-ci/build/pip.conf ]; then
+          if [ -f dependencies/pip.conf ]; then
               mkdir -p /etc/pip
-              cp gitlab-ci/build/pip.conf /etc/pip.conf
+              cp dependencies/pip.conf /etc/pip.conf
           fi
           
-          if [ -f gitlab-ci/build/sources.list ]; then
-              cp gitlab-ci/build/sources.list /etc/apt/sources.list
+          if [ -f dependencies/sources.list ]; then
+              cp dependencies/sources.list /etc/apt/sources.list
           fi
           
-          pip install --no-cache-dir -r gitlab-ci/build/tests_requirements.txt
+          pip install --no-cache-dir -r dependencies/tests_requirements.txt
           
           if [ -f python/build_modules.sh ]; then
               chmod +x python/build_modules.sh
