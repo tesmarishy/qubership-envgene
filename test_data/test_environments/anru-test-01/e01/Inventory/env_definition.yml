@@ -8,7 +8,7 @@ inventory:
 envTemplate:
   name: "dev"
   envSpecificParamsets:
-    bss: [ "env-specific-bss", "prod-shared" ]
+    bss: [ "bss-internal-integrations" ]
   additionalTemplateVariables:
     key: "value"
   templateArtifact:
