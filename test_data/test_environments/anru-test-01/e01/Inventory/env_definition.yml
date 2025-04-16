@@ -8,8 +8,8 @@ inventory:
 envTemplate:
   name: "dev"
   envSpecificParamsets:
-    cloud: [ "cloud-specific", "integrations","paramsetA" ]
-    main: [ "internal-base-ns", "toms-params","paramsetB" ]
+    cloud: ["cloud-specific","integrations","paramsetA" ]
+    main: ["internal-base-ns","toms-params","paramsetB" ]
   additionalTemplateVariables:
     key: "value"
   templateArtifact:
