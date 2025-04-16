@@ -143,6 +143,9 @@ def updateEnvSpecificParamsets(env_instances_dir, templateName, templateContent,
             envSpecificParamsets = envDefinitionYaml["envTemplate"]["envSpecificParamsets"][templateName]
             logger.info(f"Attaching env-specific deployment paramsets: {dump_as_yaml_format(envSpecificParamsets)} to template {templateName}")
             templateContent["deployParameterSets"] = templateContent["deployParameterSets"] + envSpecificParamsets
+            logger.info(f"Print templateContent: {templateContent}")
+            logger.info(f"Print paramset_map: {paramset_map}")
+
             for pset in envSpecificParamsets:
                 for value in paramset_map[pset]:
                     value["envSpecific"] = True
