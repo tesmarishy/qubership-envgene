@@ -8,14 +8,8 @@ inventory:
 envTemplate:
   name: "dev"
   envSpecificParamsets:
-    cloud:
-      - "cloud-specific"
-      - "integrations"
-      - "paramsetA"
-    main:
-      - "internal-base-ns"
-      - "toms-params"
-      - "paramsetB"
+    cloud: [ "cloud-specific", "integrations","paramsetA" ]
+    main: [ "internal-base-ns", "toms-params","paramsetB" ]
   additionalTemplateVariables:
     key: "value"
   templateArtifact:
@@ -24,7 +18,7 @@ envTemplate:
     artifact:
       group_id: "org.qubership"
       artifact_id: "qubership_envgene_templates"
-      version: "0.0.0.8"
+      version: "0.0.5"
     templateRepository: "releaseTemplateRepository"
 generatedVersions:
-  generateEnvironmentLatestVersion: "0.0.0.8"  # This value is automatically generated during job run.
+  generateEnvironmentLatestVersion: "0.0.5"  # This value is automatically generated during job run.
