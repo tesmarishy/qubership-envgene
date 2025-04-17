@@ -38,13 +38,13 @@ deployParameters:
   ENV_NAME: "e01"
   GRAFANA_UI_URL: "https://anru-test-01.managed.temp.cloud" # cloud passport: anru-test-01 version: 1.5
   GRAYLOG_UI_URL: "https://anru-test-01.managed.temp.cloud" # cloud passport: anru-test-01 version: 1.5
-  POSTGRES_DBA_PASSWORD: "test"                                            # paramset: cloud-specific version: n/a source: instance
-  POSTGRES_DBA_USER: "test"                                                # paramset: cloud-specific version: n/a source: instance
+
+
   PRODUCTION_MODE: "false" # cloud passport: anru-test-01 version: 1.5
-  TBAPI_URL: "http://test"                                                 # paramset: integrations version: n/a source: instance
+
   TRACING_UI_URL: "https://anru-test-01.managed.temp.cloud" # cloud passport: anru-test-01 version: 1.5
   VALUE: "true" # cloud passport: anru-test-01 version: 1.5
-  key1: "value2"                                                           # paramset: paramsetA version: 1 source: instance
+
 e2eParameters:
   INSTANSES_REPO: "https://github.com/Netcracker/qubership-envgene-instance"
   url: "https://toolset.anru-test-01.managed.temp.cloud"
