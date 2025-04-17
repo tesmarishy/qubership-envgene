@@ -6,7 +6,7 @@ from main import render_environment
 from envgenehelper import *
 
 test_data = [
-      ("anru-test-01", "e01", "anru-test-01-e01-version-from-tests")
+      ("anru-test-01", "e01", "0.0.5")
 ]
 g_templates_dir = getAbsPath("../../test_data/test_templates")
 g_inventory_dir = getAbsPath("../../test_data/test_environments")
