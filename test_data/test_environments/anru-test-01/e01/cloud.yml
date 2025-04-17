@@ -38,13 +38,9 @@ deployParameters:
   ENV_NAME: "e01"
   GRAFANA_UI_URL: "https://anru-test-01.managed.temp.cloud" # cloud passport: anru-test-01 version: 1.5
   GRAYLOG_UI_URL: "https://anru-test-01.managed.temp.cloud" # cloud passport: anru-test-01 version: 1.5
-
-
   PRODUCTION_MODE: "false" # cloud passport: anru-test-01 version: 1.5
-
   TRACING_UI_URL: "https://anru-test-01.managed.temp.cloud" # cloud passport: anru-test-01 version: 1.5
   VALUE: "true" # cloud passport: anru-test-01 version: 1.5
-
 e2eParameters:
   INSTANSES_REPO: "https://github.com/Netcracker/qubership-envgene-instance"
   url: "https://toolset.anru-test-01.managed.temp.cloud"
