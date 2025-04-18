@@ -70,13 +70,19 @@ def find_deployer_definition(env_name, work_dir, instances_dir, failonerror=True
             raise ReferenceError(f"Deployer configuration not found in {work_dir}")
             return ""
 
-def get_deployer_config(env_name, work_dir, instances_dir, secret_key=None, is_test=None, failonerror=True):
-    deployer_name = get_deployer(env_name, instances_dir, failonerror)
+def get_deployer_config(env_name=None, work_dir=None, instances_dir=None, secret_key=None, is_test=None, failonerror=True, deployer_name=None):
+    # finding necessary deployer
     basic_deployer_file_path = f"{work_dir}/configuration/deployer.yml"
-    deployer_file_path = find_deployer_definition(env_name, work_dir, instances_dir, failonerror)
-    if not deployer_file_path:
-        logger.info(f"Deployer definition file is not found, exiting.")
-        return "","",""
+    if env_name and work_dir and instances_dir:
+        deployer_name = get_deployer(env_name, instances_dir, failonerror)
+        deployer_file_path = find_deployer_definition(env_name, work_dir, instances_dir, failonerror)
+        if not deployer_file_path:
+            logger.info(f"Deployer definition file is not found, exiting.")
+            return "","",""
+    else:
+        if deployer_name==None:
+            raise ValueError('get_deployer_config() function must be called either with (env_name, work_dir, instances_dir) or with (deployer_name) params')
+        deployer_file_path = basic_deployer_file_path
     deployer_dir = getDirName(deployer_file_path)
     data = openYaml(deployer_file_path)
     if deployer_name not in data:
@@ -89,6 +95,7 @@ def get_deployer_config(env_name, work_dir, instances_dir, secret_key=None, is_t
             raise ReferenceError(f"Deployer with key {deployer_name} not found. See logs above.")
         else:
             return "","",""
+    # getting values
     cmdb_username, cmdb_username_attribute_path = get_value_and_attributes_from_cred(data[deployer_name]['username'], deployer_dir)
     cmdb_api_token, cmdb_api_token_attribute_path = get_value_and_attributes_from_cred(data[deployer_name]['token'], deployer_dir)
     cmdb_url = data[deployer_name]['deployerUrl']
@@ -103,3 +110,8 @@ def get_deployer_config(env_name, work_dir, instances_dir, secret_key=None, is_t
         cmdb_username = get_or_create_nested_yaml_attribute(cred_yaml, cmdb_username_attribute_path)
         cmdb_api_token = get_or_create_nested_yaml_attribute(cred_yaml, cmdb_api_token_attribute_path)
     return cmdb_url, cmdb_username, cmdb_api_token
+
+def get_sbom_generator_deployer_config():
+    sbom_gen_deployer = get_envgene_config_yaml()['sbom_generator_cmdb']
+    return get_deployer_config(deployer_name=sbom_gen_deployer)
+
