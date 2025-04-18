@@ -1,7 +1,7 @@
 from cryptography.fernet import Fernet
 from .config_helper import get_envgene_config_yaml
 from .creds_helper import check_is_envgen_cred, get_cred_id_and_property_from_cred_macros
-from .business_helper import find_env_instances_dir, findResourcesBottomTop, getEnvDefinition
+from .business_helper import find_env_instances_dir, findResourcesBottomTop, getEnvDefinition, getenv_with_error
 from .yaml_helper import openYaml, get_or_create_nested_yaml_attribute
 from .file_helper import getDirName, check_file_exists
 from .logger import logger
@@ -72,7 +72,8 @@ def find_deployer_definition(env_name, work_dir, instances_dir, failonerror=True
 
 def get_deployer_config(env_name=None, work_dir=None, instances_dir=None, secret_key=None, is_test=None, failonerror=True, deployer_name=None):
     # finding necessary deployer
-    basic_deployer_file_path = f"{work_dir}/configuration/deployer.yml"
+    base_dir = getenv_with_error('CI_PROJECT_DIR')
+    basic_deployer_file_path = f"{base_dir}/configuration/deployer.yml"
     if env_name and work_dir and instances_dir:
         deployer_name = get_deployer(env_name, instances_dir, failonerror)
         deployer_file_path = find_deployer_definition(env_name, work_dir, instances_dir, failonerror)
