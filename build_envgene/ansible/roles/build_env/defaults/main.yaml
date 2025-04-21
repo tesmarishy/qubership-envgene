@@ -18,6 +18,8 @@ env_template_test: "{{ lookup('env', 'ENV_TEMPLATE_TEST') | default('false') }}"
 env_group_id: "{{ lookup('env', 'GROUP_ID') }}"
 env_artifact_id: "{{ lookup('env', 'ARTIFACT_ID') }}"
 
+prepare_vars_extension_path: /envgene_extends/env_build_prepare_vars.py
+
 ### configuration files
 envs_directory_path:   "{{ base_dir }}/environments"
 env_definition_conf_path: "{{ base_dir }}/configuration/env_definition.yml"
