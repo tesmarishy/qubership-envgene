@@ -5,4 +5,4 @@ COPY github_workflows/env_instance_builder/.github /opt/github
 
 #-----------Stage 2-----------
 FROM scratch
-COPY --from=builder /opt/github /opt/github
+COPY --from=initial /opt/github /opt/github
