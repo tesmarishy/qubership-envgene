@@ -1,18 +1,27 @@
+#Please enter the needed runner instead of 'ubuntu-latest'
+x-runner: &runner ubuntu-latest
+
 name: "EnvGene Execution"
 
-run-name: "Environments: ${{ inputs.ENV_NAMES }}"
+run-name: "Envs: ${{ inputs.ENV_NAMES }}"
 
 permissions:
+  actions: read
   contents: write
   pull-requests: write
 
 on:
   workflow_dispatch:
     inputs:
+      DEPLOYMENT_TICKET_ID:
+        description: 'Deployment Ticket ID'
+        required: true
+        default: ''
+        type: string
       ENV_NAMES:
         description: "Environment Names"
         required: true
-        default: "anru-test-01/e01"
+        default: ""
       ENV_INVENTORY_INIT:
         description: "Generate inventory"
         type: boolean
@@ -42,16 +51,24 @@ env:
   CI_COMMIT_REF_NAME: ${{ github.ref_name }}
   CI_PROJECT_DIR: ${{ github.workspace }}
   SECRET_KEY: ${{ secrets.SECRET_KEY }}
-  GITHUB_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
-  GITHUB_USER_NAME: ${{ secrets.GIT_USER_NAME }}
-  GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+  GITHUB_USER_EMAIL: 'fake@fake.com'
+  GITHUB_USER_NAME: 'envgene'
+  GITHUB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+  ENVGENE_IMAGE: ghcr.io/netcracker/qubership-envgene:latest
+  GCIP_IMAGE: ghcr.io/netcracker/qubership-gcip:latest
+  EFFECTIVE_SET_GENERATOR_IMAGE: ghcr.io/netcracker/qubership-effective-set-generator:latest
+  DEPLOY_TOOL_IMAGE: 'please put the value for deploy tool after merge of cmdb logic'
 
 jobs:
   show_environment_variables:
     name: "Input Parameters Processing"
-    runs-on: ubuntu-latest
+    runs-on: *runner
+    container:
+      image: ${{ env.GCIP_IMAGE }}
+      options: --user root
     outputs:
       env_matrix: ${{ steps.matrix-generator.outputs.env_matrix }}
+      DEPLOYMENT_TICKET_ID: ${{ env.DEPLOYMENT_TICKET_ID }}
       ENV_NAMES: ${{ env.ENV_NAMES }}
       ENV_BUILDER: ${{ env.ENV_BUILDER }}
       GET_PASSPORT: ${{ env.GET_PASSPORT }}
@@ -81,10 +98,12 @@ jobs:
           echo "GENERATE_EFFECTIVE_SET=${{ github.event.inputs.GENERATE_EFFECTIVE_SET }}" >> $GITHUB_ENV
           echo "ENV_TEMPLATE_VERSION=${{ github.event.inputs.ENV_TEMPLATE_VERSION }}" >> $GITHUB_ENV
           echo "COMMIT_MESSAGE=${{ github.event.inputs.commit_message }}" >> $GITHUB_ENV
+          echo "DEPLOYMENT_TICKET_ID=${{ github.event.inputs.DEPLOYMENT_TICKET_ID }}" >> $GITHUB_ENV
           python .github/scripts/load_env_variables.py .github/vars.yaml >> $GITHUB_ENV
 
       - name: Input Parameters
         run: |
+          echo "DEPLOYMENT_TICKET_ID = $DEPLOYMENT_TICKET_ID"
           echo "ENV_NAMES = $ENV_NAMES"
           echo "ENV_BUILDER = $ENV_BUILDER"
           echo "GET_PASSPORT = $GET_PASSPORT"
@@ -122,10 +141,10 @@ jobs:
 
   parameters_validation:
     name: "${{ matrix.environment }} - Parameters Validation"
-    runs-on: ubuntu-latest
+    runs-on: *runner
     needs: show_environment_variables
     container:
-      image: ghcr.io/netcracker/qubership-gcip:develop
+      image: ${{ env.GCIP_IMAGE }}
       options: --user root
     strategy:
       fail-fast: false
@@ -142,13 +161,13 @@ jobs:
 
   generate_inventory:
     name: "${{ matrix.environment }} - Generate Inventory"
-    runs-on: ubuntu-latest
+    runs-on: *runner
     if: always() && needs.show_environment_variables.outputs.ENV_INVENTORY_INIT == 'true'
     needs:
       - parameters_validation
       - show_environment_variables
     container:
-      image: ghcr.io/netcracker/qubership-envgene:latest
+      image: ${{ env.ENVGENE_IMAGE }}
       options: --user root
     strategy:
       fail-fast: false
@@ -213,13 +232,13 @@ jobs:
   env_build:
     name: "${{ matrix.environment }} - Env Build"
     if: always() && needs.show_environment_variables.outputs.ENV_BUILDER == 'true'
-    runs-on: ubuntu-latest
+    runs-on: *runner
     needs:
       - parameters_validation
       - show_environment_variables
       - generate_inventory
     container:
-      image: ghcr.io/netcracker/qubership-envgene:bugfix-ss_fix_issue_with_default
+      image: ${{ env.ENVGENE_IMAGE }}
     strategy:
       fail-fast: false
       matrix:
@@ -261,7 +280,6 @@ jobs:
           export ENV_TEMPLATE_VERSION=${{ needs.show_environment_variables.outputs.ENV_TEMPLATE_VERSION }}
           export GROUP_ID="$GROUP_ID"
           export ARTIFACT_ID="$ARTIFACT_ID"
-          export CI_PLATFORM="github"
           export INSTANCES_DIR="${CI_PROJECT_DIR}/environments"
           export module_ansible_dir="/module/ansible"
           export module_inventory="${CI_PROJECT_DIR}/configuration/inventory.yaml"
@@ -278,13 +296,10 @@ jobs:
           export GITHUB_USER_EMAIL="${GITHUB_USER_EMAIL}"
           export GITHUB_USER_NAME="${GITHUB_USER_NAME}" 
           export GITHUB_TOKEN="${GITHUB_TOKEN}"
-    
+          
           if [ -d "${CI_PROJECT_DIR}/configuration/certs" ]; then
-            cert_path=$(ls -A "${CI_PROJECT_DIR}/configuration/certs")
-            for path in $cert_path; do
-              . /module/scripts/update_ca_cert.sh "${CI_PROJECT_DIR}/configuration/certs/$path"
-            done
-          fi
+          env_path=$(ls -A "${CI_PROJECT_DIR}/configuration/certs");
+          for path in $env_path; do bash /module/scripts/update_ca_cert.sh ${CI_PROJECT_DIR}/configuration/certs/$path; done; fi
     
           if [ "$ENV_TEMPLATE_VERSION" != "" ] && [ "$ENV_TEMPLATE_TEST" == "false" ]; then
             /module/scripts/prepare.sh "set_template_version.yaml"
@@ -318,10 +333,10 @@ jobs:
   generate_effective_set:
     name: "${{ matrix.environment }} - Generate Effective Set"
     if: always() && needs.show_environment_variables.outputs.GENERATE_EFFECTIVE_SET == 'true'
-    runs-on: ubuntu-latest
+    runs-on: *runner
     needs: [parameters_validation,show_environment_variables,generate_inventory,env_build]
     container:
-      image: ghcr.io/netcracker/qubership-effective-set-generator:latest
+      image: ${{ env.EFFECTIVE_SET_GENERATOR_IMAGE }}
       options: --user root
     strategy:
       fail-fast: false
@@ -333,13 +348,11 @@ jobs:
       - name: Repository Checkout
         uses: actions/checkout@v4
 
-
       - name: Prepare variables to work with artifacts
         run: |
           echo "SANITIZED_NAME=$(echo "${{ matrix.environment }}" | sed 's|/|_|g')" >> $GITHUB_ENV
           echo "PROJECT_DIR=$(pwd)" >> $GITHUB_ENV
           
-
       - name: Create the naming for artifact
         run: |
           if [ "${{ needs.show_environment_variables.outputs.ENV_INVENTORY_INIT }}" = "true" ]; then
@@ -408,11 +421,12 @@ jobs:
 
   git_commit:
     name: "${{ matrix.environment }} - Git Commit"
-    runs-on: ubuntu-latest
+    runs-on: *runner
     needs: [parameters_validation,show_environment_variables,generate_inventory,env_build,generate_effective_set]
     if: always() && (needs.show_environment_variables.outputs.ENV_INVENTORY_INIT == 'true' || needs.show_environment_variables.outputs.ENV_BUILDER == 'true' || needs.show_environment_variables.outputs.GENERATE_EFFECTIVE_SET == 'true')
     container:
-      image: ghcr.io/netcracker/qubership-envgene:latest
+      image: ${{ env.ENVGENE_IMAGE }}
+      options: --user root
     strategy:
       fail-fast: false
       matrix:
@@ -483,12 +497,10 @@ jobs:
           echo 'Prepare git_commit job for ${ENVIRONMENT_NAME}...'
 
           echo 'Installing the certs if exist...'
+          echo 'Installing the certs if exist...'
           if [ -d "${CI_PROJECT_DIR}/configuration/certs" ]; then
-            cert_path=$(ls -A "${CI_PROJECT_DIR}/configuration/certs")
-            for path in $cert_path; do
-              . /module/scripts/update_ca_cert.sh "${CI_PROJECT_DIR}/configuration/certs/$path"
-            done
-          fi
+          env_path=$(ls -A "${CI_PROJECT_DIR}/configuration/certs");
+          for path in $env_path; do bash /module/scripts/update_ca_cert.sh ${CI_PROJECT_DIR}/configuration/certs/$path; done; fi
       
       
           /module/scripts/prepare.sh "git_commit.yaml"
