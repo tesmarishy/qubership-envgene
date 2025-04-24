@@ -261,7 +261,6 @@ jobs:
           export ENV_TEMPLATE_VERSION=${{ needs.show_environment_variables.outputs.ENV_TEMPLATE_VERSION }}
           export GROUP_ID="$GROUP_ID"
           export ARTIFACT_ID="$ARTIFACT_ID"
-          export CI_PLATFORM="github"
           export INSTANCES_DIR="${CI_PROJECT_DIR}/environments"
           export module_ansible_dir="/module/ansible"
           export module_inventory="${CI_PROJECT_DIR}/configuration/inventory.yaml"
