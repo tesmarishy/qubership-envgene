@@ -25,7 +25,7 @@
   register: custom_logic_script
 
 - name: Include custom logic
-  script: "{{ prepare_vars_extension_path }}"
+  script: "{{ prepare_vars_extension_path }} {{ env_definition_path }}"
   when: custom_logic_script.stat.exists
 
 - name: include old logic
