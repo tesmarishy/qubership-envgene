@@ -1,5 +1,5 @@
-#Please enter the needed runner instead of 'ubuntu-latest'
-x-runner: &runner ubuntu-latest
+#Important!
+#Please use your own runner and docker-images
 
 name: "EnvGene Execution"
 
@@ -30,16 +30,16 @@ on:
         description: "Build Environment"
         type: boolean
         default: false
-      GET_PASSPORT:
-        description: "Get cloud passport"
+      GENERATE_EFFECTIVE_SET:
+        description: "Generate effective set"
         type: boolean
         default: false
       CMDB_IMPORT:
         description: "Import to CMDB"
         type: boolean
         default: false
-      GENERATE_EFFECTIVE_SET:
-        description: "Generate effective set"
+      GET_PASSPORT:
+        description: "Get cloud passport"
         type: boolean
         default: false
       ENV_TEMPLATE_VERSION:
@@ -54,17 +54,13 @@ env:
   GITHUB_USER_EMAIL: 'fake@fake.com'
   GITHUB_USER_NAME: 'envgene'
   GITHUB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-  ENVGENE_IMAGE: ghcr.io/netcracker/qubership-envgene:latest
-  GCIP_IMAGE: ghcr.io/netcracker/qubership-gcip:latest
-  EFFECTIVE_SET_GENERATOR_IMAGE: ghcr.io/netcracker/qubership-effective-set-generator:latest
-  DEPLOY_TOOL_IMAGE: 'please put the value for deploy tool after merge of cmdb logic'
 
 jobs:
   show_environment_variables:
     name: "Input Parameters Processing"
-    runs-on: *runner
+    runs-on: ubuntu-latest
     container:
-      image: ${{ env.GCIP_IMAGE }}
+      image: ghcr.io/netcracker/qubership-gcip:1.1.2
       options: --user root
     outputs:
       env_matrix: ${{ steps.matrix-generator.outputs.env_matrix }}
@@ -120,7 +116,6 @@ jobs:
           echo "ENV_SPECIFIC_PARAMETERS = $ENV_SPECIFIC_PARAMETERS"\
           echo "COMMIT_MESSAGE = $COMMIT_MESSAGE"
           
-
       - name: Prepare Parameters
         id: matrix-generator
         shell: bash
@@ -141,10 +136,10 @@ jobs:
 
   parameters_validation:
     name: "${{ matrix.environment }} - Parameters Validation"
-    runs-on: *runner
+    runs-on: ubuntu-latest
     needs: show_environment_variables
     container:
-      image: ${{ env.GCIP_IMAGE }}
+      image: ghcr.io/netcracker/qubership-gcip:1.1.2
       options: --user root
     strategy:
       fail-fast: false
@@ -161,7 +156,7 @@ jobs:
 
   generate_inventory:
     name: "${{ matrix.environment }} - Generate Inventory"
-    runs-on: *runner
+    runs-on: ubuntu-latest
     if: always() && needs.show_environment_variables.outputs.ENV_INVENTORY_INIT == 'true'
     needs:
       - parameters_validation
@@ -228,17 +223,16 @@ jobs:
           name: generate_inventory_${{ env.SANITIZED_NAME }}
           path: ${{ github.workspace }}/environments/${{ env.FULL_ENV }}
 
-
   env_build:
     name: "${{ matrix.environment }} - Env Build"
     if: always() && needs.show_environment_variables.outputs.ENV_BUILDER == 'true'
-    runs-on: *runner
+    runs-on: ubuntu-latest
     needs:
       - parameters_validation
       - show_environment_variables
       - generate_inventory
     container:
-      image: ${{ env.ENVGENE_IMAGE }}
+      image: ghcr.io/netcracker/qubership-envgene:1.1.2
     strategy:
       fail-fast: false
       matrix:
@@ -328,15 +322,13 @@ jobs:
           name: env_build_${{ env.SANITIZED_NAME }}
           path: ${{ github.workspace }}/environments/${{ env.FULL_ENV }}
 
-
-
   generate_effective_set:
     name: "${{ matrix.environment }} - Generate Effective Set"
     if: always() && needs.show_environment_variables.outputs.GENERATE_EFFECTIVE_SET == 'true'
-    runs-on: *runner
+    runs-on: ubuntu-latest
     needs: [parameters_validation,show_environment_variables,generate_inventory,env_build]
     container:
-      image: ${{ env.EFFECTIVE_SET_GENERATOR_IMAGE }}
+      image: ghcr.io/netcracker/qubership-effective-set-generator:1.1.2
       options: --user root
     strategy:
       fail-fast: false
@@ -418,14 +410,13 @@ jobs:
           name: generate_effective_set_${{ env.SANITIZED_NAME }}
           path: ${{ github.workspace }}/environments/${{ env.FULL_ENV }}
 
-
   git_commit:
     name: "${{ matrix.environment }} - Git Commit"
-    runs-on: *runner
+    runs-on: ubuntu-latest
     needs: [parameters_validation,show_environment_variables,generate_inventory,env_build,generate_effective_set]
     if: always() && (needs.show_environment_variables.outputs.ENV_INVENTORY_INIT == 'true' || needs.show_environment_variables.outputs.ENV_BUILDER == 'true' || needs.show_environment_variables.outputs.GENERATE_EFFECTIVE_SET == 'true')
     container:
-      image: ${{ env.ENVGENE_IMAGE }}
+      image: ghcr.io/netcracker/qubership-envgene:1.1.2
       options: --user root
     strategy:
       fail-fast: false
@@ -442,7 +433,6 @@ jobs:
           echo "SANITIZED_NAME=$(echo "${{ matrix.environment }}" | sed 's|/|_|g')" >> $GITHUB_ENV
           echo "PROJECT_DIR=$(pwd)" >> $GITHUB_ENV
           
-
       - name: Create the naming for artifact
         run: |
           if [ "${{ needs.show_environment_variables.outputs.ENV_INVENTORY_INIT }}" = "true" ]; then
@@ -492,17 +482,14 @@ jobs:
           export GITHUB_USER_EMAIL="${GITHUB_USER_EMAIL}"
           export GITHUB_USER_NAME="${GITHUB_USER_NAME}" 
           export GITHUB_TOKEN="${GITHUB_TOKEN}"
-          
-          
+                    
           echo 'Prepare git_commit job for ${ENVIRONMENT_NAME}...'
 
-          echo 'Installing the certs if exist...'
           echo 'Installing the certs if exist...'
           if [ -d "${CI_PROJECT_DIR}/configuration/certs" ]; then
           env_path=$(ls -A "${CI_PROJECT_DIR}/configuration/certs");
           for path in $env_path; do bash /module/scripts/update_ca_cert.sh ${CI_PROJECT_DIR}/configuration/certs/$path; done; fi
-      
-      
+            
           /module/scripts/prepare.sh "git_commit.yaml"
           
           env_path=$(find "${CI_PROJECT_DIR}/environments" -type d -name "$env_name")
