@@ -37,6 +37,10 @@ cloud: "<path-to-the-cloud-template-file>"
 composite_structure: "<path-to-the-composite-structure-template-file>"
 namespaces:
   - template_path: "<path-to-the-namespace-template-file>"
+    # Optional
+    # See details https://github.com/Netcracker/qubership-envgene/blob/main/docs/template-override.md
+    template_override:
+      <yaml or jinja expression>
 ```
 
 [Template Descriptor JSON schema](/schemas/template-descriptor.schema.json)
