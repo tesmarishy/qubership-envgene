@@ -40,6 +40,9 @@
           },
           "template_path": {
             "type": "string"
+          },
+          "template_override": {
+            "type": "string"
           }
         },
         "required": [
@@ -53,7 +56,13 @@
         },
         {
           "name": "{{current_env.environmentName}}-bss",
-          "template_path": "{{ templates_dir }}/env_templates/dev/Namespaces/bss.yml.j2"
+          "template_path": "{{ templates_dir }}/env_templates/dev/Namespaces/bss.yml.j2",
+          "template_override": {
+            "profile": {
+              "name": "prod_bss_override",
+              "baseline": "prod"
+            }
+          }
         }
       ]
     },
