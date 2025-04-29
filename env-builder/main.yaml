@@ -105,6 +105,7 @@
         sd_output_dir: "{{ output_dir }}"
         sd_cluster_name: "{{ cluster_name }}"
         sd_env: "{{ env }}"
+        _tenant: "{{ tenant }}"
 
     - name: Gen namespaces
       ansible.builtin.include_role:
