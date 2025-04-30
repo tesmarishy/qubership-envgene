@@ -19,23 +19,10 @@
     cred_config: "{{ decrypt_creds.result | from_yaml }}"
   no_log: false
 
-- name: Check if custom logic for preparing vars exists
-  stat:
-    path: "{{ prepare_vars_extension_path }}"
-  register: custom_logic_script
-
-- name: Include custom logic
-  script: "{{ prepare_vars_extension_path }} {{ env_definition_path }}"
-  when: custom_logic_script.stat.exists
-
 - name: include old logic
   include_tasks: 02_prepare_vars_old.yaml
-  when: 
-    - skip_original_logic is undefined or not skip_original_logic 
-    - env_definition['envTemplate']['artifact'] is undefined
+  when: env_definition['envTemplate']['artifact'] is undefined
 
 - name: include new logic
   include_tasks: 02_prepare_vars_new.yaml
-  when:
-    - skip_original_logic is undefined or not skip_original_logic 
-    - env_definition['envTemplate']['artifact'] is defined
+  when: env_definition['envTemplate']['artifact'] is defined
