@@ -1,7 +1,7 @@
 ---
 - name: Tell the cloud attribute format
   set_fact:
-    is_old_format: "{{ _cloud | type_debug == 'dict' }}"
+    is_old_format: "{{ _template | type_debug != 'dict' }}"
 
 - name: Generate Cloud yaml for cloud {{ _cloud }}
   ansible.builtin.blockinfile:
@@ -13,13 +13,13 @@
 - name: Generate Cloud yaml for cloud {{ _cloud }} using cloud.template_path value
   ansible.builtin.blockinfile:
     path: "{{ current_env_dir }}/cloud.yml"
-    block: "{{ lookup('template', _cloud.template_path) }}"
+    block: "{{ lookup('template', _template.template_path) }}"
     create: yes
   when: not is_old_format
 
 - name: Set template_override
   set_fact:
-    template_override: "{{ _cloud.template_override | default('') }}"
+    template_override: "{{ _template.template_override | default('') }}"
   when: not is_old_format
 
 - name: Generate override Cloud yaml for {{ _cloud }}
