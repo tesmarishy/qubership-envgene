@@ -25,7 +25,7 @@
 - name: Generate override Cloud yaml for {{ _cloud }}
   ansible.builtin.blockinfile:
     path: "{{ _current_env_dir }}/cloud.yml_override"
-    block: "{{ template_override }}"
+    block: "{{ template_override | to_nice_yaml }}"
     create: yes
   when: 
     - template_override != ''
