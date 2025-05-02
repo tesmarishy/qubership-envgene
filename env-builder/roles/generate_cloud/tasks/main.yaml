@@ -17,17 +17,12 @@
     create: yes
   when: not is_old_format
 
-- name: Set template_override
-  set_fact:
-    template_override: "{{ _template.template_override | default('') }}"
-  when: not is_old_format
-
 - name: Generate override Cloud yaml for {{ _cloud }}
   ansible.builtin.blockinfile:
     path: "{{ _current_env_dir }}/cloud.yml_override"
-    block: "{{ template_override | to_nice_yaml }}"
+    block: "{{ _template.template_override | to_nice_yaml }}"
     create: yes
   when: 
-    - template_override != ''
+    - is _template.template_override and template_override != ''
     - not is_old_format
 
