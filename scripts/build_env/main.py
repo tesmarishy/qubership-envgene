@@ -13,6 +13,8 @@ import ansible_runner
 INVENTORY_DIR_NAME = "Inventory"
 ENV_DEFINITION_FILE_NAME = "env_definition.yml"
 PARAMSET_SCHEMA = "schemas/paramset.schema.json"
+CLOUD_SCHEMA = "schemas/cloud.schema.json"
+NAMESPACE_SCHEMA = "schemas/namespace.schema.json"
 ENV_SPECIFIC_RESOURCE_PROFILE_SCHEMA = "schemas/env-specific-resource-profile.schema.json"
 
 def clear_output_folder(dir) :
@@ -73,6 +75,13 @@ def handle_template_override(render_dir):
         src = openYaml(file)
         merge_yaml_into_target(yaml_to_override, '', src)
         writeYamlToFile(template_path, yaml_to_override)
+        template_path_stem = pathlib.Path(template_path).stem
+        schema_path = ""
+        if template_path_stem == 'cloud':
+            schema_path = CLOUD_SCHEMA
+        if template_path_stem == 'namespace':
+            schema_path = NAMESPACE_SCHEMA
+        beautifyYaml(template_path, schema_path)
         deleteFile(file)
 
 
