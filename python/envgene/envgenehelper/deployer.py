@@ -70,7 +70,7 @@ def find_deployer_definition(env_name, work_dir, instances_dir, failonerror=True
             raise ReferenceError(f"Deployer configuration not found in {work_dir}")
             return ""
 
-def get_deployer_config(env_name=None, work_dir=None, instances_dir=None, secret_key=None, is_test=None, failonerror=True, deployer_name=None):
+def get_deployer_config(env_name=None, work_dir=None, instances_dir=None, secret_key=None, is_test=None, failonerror=True, deployer_name=None, fallback_on_root_config=True):
     # finding necessary deployer
     base_dir = getenv_with_error('CI_PROJECT_DIR')
     basic_deployer_file_path = f"{base_dir}/configuration/deployer.yml"
@@ -86,7 +86,7 @@ def get_deployer_config(env_name=None, work_dir=None, instances_dir=None, secret
         deployer_file_path = basic_deployer_file_path
     deployer_dir = getDirName(deployer_file_path)
     data = openYaml(deployer_file_path)
-    if deployer_name not in data:
+    if deployer_name not in data and fallback_on_root_config:
         logger.info(f"Deployer with key {deployer_name} not found in: {deployer_file_path}. Going to root configuration: {basic_deployer_file_path}")
         deployer_dir = getDirName(basic_deployer_file_path)
         data = openYaml(basic_deployer_file_path)
@@ -113,6 +113,8 @@ def get_deployer_config(env_name=None, work_dir=None, instances_dir=None, secret
     return cmdb_url, cmdb_username, cmdb_api_token
 
 def get_sbom_generator_deployer_config():
-    sbom_gen_deployer = get_envgene_config_yaml()['sbom_generator_cmdb']
-    return get_deployer_config(deployer_name=sbom_gen_deployer)
+    work_dir = getenv_with_error('CI_PROJECT_DIR')
+    env_name = getenv_with_error("ENV_NAME")
+    instances_dir = work_dir + 'environments'
+    return get_deployer_config(env_name, work_dir, instances_dir, fallback_on_root_config=False)
 
