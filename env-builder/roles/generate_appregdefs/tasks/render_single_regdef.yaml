@@ -1,0 +1,59 @@
+---
+# roles/generate_appregdefs/tasks/render_single_regdef.yaml
+
+- name: Ensure tmp_render_dir fact is set
+  set_fact:
+    tmp_render_dir: "{{ tmp_render_dir | default('/tmp') }}"
+
+- name: Prepare regdefs dict for Jinja context
+  set_fact:
+    regdefs:
+      overrides: "{{ regdefs_overrides }}"
+
+- name: Load raw RegDef template as YAML
+  slurp:
+    src: "{{ item.path }}"
+  register: regdef_raw_slurp
+
+- name: Decode raw RegDef template
+  set_fact:
+    regdef_raw: "{{ regdef_raw_slurp.content | b64decode }}"
+
+- name: Extract template basename for Jinja context
+  set_fact:
+    template_name: "{{ item.path | basename | regex_replace('\\.j2$', '') }}"
+
+- name: Render RegDef to temp file
+  template:
+    src: "{{ item.path }}"
+    dest: "{{ tmp_render_dir }}/{{ template_name }}.{{ render_timestamp }}.rendered.regdef.yml"
+  vars:
+    regdefs: "{{ regdefs }}"
+
+- name: Set rendered RegDef path
+  set_fact:
+    regdef_rendered_path: "{{ tmp_render_dir }}/{{ template_name }}.{{ render_timestamp }}.rendered.regdef.yml"
+
+- name: Read rendered RegDef into raw string
+  slurp:
+    src: "{{ regdef_rendered_path }}"
+  register: regdef_rendered_slurp
+
+- name: Decode rendered RegDef
+  set_fact:
+    regdef_raw_rendered: "{{ regdef_rendered_slurp.content | b64decode }}"
+
+- name: Parse rendered RegDef YAML into a dict
+  set_fact:
+    regdef_content: "{{ regdef_raw_rendered | from_yaml }}"
+
+- name: Extract name field from RegDef
+  set_fact:
+    regdef_name: "{{ regdef_content.name }}"
+
+- name: Save rendered RegDef to final path
+  copy:
+    content: "{{ regdef_raw_rendered }}"
+    dest: "{{ current_env_dir }}/RegDefs/{{ regdef_name }}.regdef.yml"
+    mode: '0644'
+  when: regdef_name is defined and regdef_name | length > 0
