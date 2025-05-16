@@ -15,6 +15,10 @@
   - [`ENVGENE_AGE_PRIVATE_KEY`](#envgene_age_private_key)
   - [`ENVGENE_AGE_PUBLIC_KEY`](#envgene_age_public_key)
   - [`PUBLIC_AGE_KEYS`](#public_age_keys)
+  - [`SD_SOURCE_TYPE`](#sd_source_type)
+  - [`SD_VERSION`](#sd_version)
+  - [`SD_DATA`](#sd_data)
+  - [`SD_DELTA`](#sd_delta)
 
 The following are the launch parameters for the instance repository pipeline. These parameters influence, the execution of specific jobs within the pipeline.
 
@@ -173,3 +177,67 @@ Used by EnvGene at runtime, when using pre-commit hooks, the same value must be 
 > These are generally configured as GitLab CI/CD variables or GitHub environment variables.
 
 **Example**: "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p,age113z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmca32p"
+
+## `SD_SOURCE_TYPE`
+
+**Description**: Defines the method by which SD is passed in the `SD_DATA` or `SD_VERSION` attributes. Valid values ​​are `artifact` OR `json`.
+
+If `artifact`:  
+  An SD artifact is expected in `SD_VERSION` in `application:version` notation. The system should download the artifact, transform it into YAML format, and save it to the repository.
+
+If `json`:  
+  SD content is expected in `SD_DATA`. The system should transform it into YAML format, and save it to the repository.
+
+**Example**: `artifact`
+
+**Default Value**: None
+
+## `SD_VERSION`
+
+**Description**: Defines the SD artifact in `application:version` notation
+
+System downloads the artifact and overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in the artifact. If the file is absent, it will be generated.
+
+**Example**: "dft:release-2024-1-2.02.002-RELEASE"
+
+**Default Value**: None
+
+## `SD_DATA`
+
+**Description**: Defines the content of SD. **JSON in string** format.
+
+System overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in `SD_DATA`. If the file is absent, it will be generated.
+
+**Example**:
+
+```yaml
+version: 2.1
+type: "solutionDeploy"
+deployMode: "composite"
+applications:
+  - version: "MONITORING:0.64.1"
+    deployPostfix: "platform-monitoring"
+  - version: "postgres:1.32.6"
+    deployPostfix: "postgresql"
+  - version: "postgres-services:1.32.6"
+    deployPostfix: "postgresql"
+  - version: "postgres:1.32.6"
+    deployPostfix: "postgresql-dbaas"
+```
+
+**Default Value**: None
+
+## `SD_DELTA`
+
+**Description**: Defines if SD provided in `SD_DATA` is Delta SD. Valid values ​​are `true` or `false`.
+
+If `true`:  
+  System overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/delta_sd.yml` with the content provided in `SD_DATA`. If the file is absent, it will be generated.
+  System merges the content provided in `SD_DATA` into the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml`.
+
+If `false` or not provided:  
+  System overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in `SD_DATA`. If the file is absent, it will be generated.
+
+**Example**: `true`
+
+**Default Value**: None
