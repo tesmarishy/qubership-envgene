@@ -97,21 +97,24 @@
   debug:
     var: namespace_template_paths
 
+- name: Render template paths from variables
+  set_fact:
+    rendered_namespace_template_paths: "{{ namespace_template_paths | map('template') | list }}"    
+
 - name: Build template path map by deployPostfix
   set_fact:
     postfix_template_map: "{{ dict(_postfix_keys | zip(_postfix_paths)) }}"
   vars:
-    _postfix_paths: "{{ namespace_template_paths }}"
+    _postfix_paths: "{{ rendered_namespace_template_paths }}"
     _postfix_keys: >-
       {{
-        namespace_template_paths
+        rendered_namespace_template_paths
         | map('regex_replace', '.*/([^/]+)\\.ya?ml\\.j2$', '\\1')
         | list
       }}
   when:
-    - namespace_template_paths is defined
-    - namespace_template_paths | length > 0
-
+    - rendered_namespace_template_paths is defined
+    - rendered_namespace_template_paths | length > 0
 
 - name: Find all possible namespace templates
   no_log: True
