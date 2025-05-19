@@ -69,7 +69,7 @@
 
 - name: Set template descriptor file from found stat
   set_fact:
-    template_descriptore_file: "{{ item.stat.path }}"
+    template_descriptor_file: "{{ item.stat.path }}"
   loop: "{{ template_descriptor_stat.results }}"
   when: item.stat.exists
   register: template_descriptor_file_set
@@ -78,6 +78,25 @@
   fail:
     msg: "Template descriptor was not found in {{ templates_dir }}/env_templates"
   when: template_descriptor_file_set.results | selectattr('skipped', 'defined') | length == (template_descriptor_stat.results | length)
+
+- name: Read template descriptor file
+  slurp:
+    src: "{{ template_descriptor_file }}"
+  register: env_template_raw
+
+- name: Parse YAML content
+  set_fact:
+    env_template_data: "{{ env_template_raw['content'] | b64decode | from_yaml }}"
+
+- name: Extract namespace template paths
+  set_fact:
+    namespace_template_paths: "{{ env_template_data.namespaces | map(attribute='template_path') | list }}"
+  when: env_template_data.namespaces is defined
+
+- name: Debug list of found namespace templates
+  debug:
+    var: namespace_template_paths
+
 
 - name: Find all possible namespace templates
   no_log: True
