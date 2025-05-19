@@ -155,6 +155,13 @@
     - sd_files_check is defined
     - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
 
+- name: Render and display solution_structure
+  ansible.builtin.debug:
+    msg: "{{ (solution_structure | to_json) | ansible.builtin.template | from_json }}"
+  when:
+    - sd_files_check is defined
+    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0    
+
 - name: Merge solution_structure into current_env
   no_log: True
   set_fact:
