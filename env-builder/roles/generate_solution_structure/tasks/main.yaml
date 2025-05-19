@@ -156,12 +156,13 @@
     - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
 
 
-- name: Render and display solution_structure
+- name: Render solution_structure from string with template filter
+  set_fact:
+    raw_structure: "{{ solution_structure | template | from_json }}"
+
+- name: Debug rendered structure
   debug:
-    msg: "{{ (solution_structure | to_json) | template | from_json }}"
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0    
+    var: solution_structure
 
 - name: Merge solution_structure into current_env
   no_log: True
