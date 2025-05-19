@@ -97,9 +97,14 @@
   debug:
     var: namespace_template_paths
 
-- name: Render template paths from variables
+- name: Init rendered path list
   set_fact:
-    rendered_namespace_template_paths: "{{ namespace_template_paths | map('template') | list }}"    
+    rendered_namespace_template_paths: []
+
+- name: Render each path
+  set_fact:
+    rendered_namespace_template_paths: "{{ rendered_namespace_template_paths + [ item | template ] }}"
+  loop: "{{ namespace_template_paths }}"
 
 - name: Build template path map by deployPostfix
   set_fact:
