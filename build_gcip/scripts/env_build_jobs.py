@@ -23,16 +23,20 @@ def prepare_env_build_job(pipeline, is_template_test, env_template_version, full
   
   script.extend([
       'env_path=$(sudo find $CI_PROJECT_DIR/environments -type d -name "$env_name")',
-      'for path in $env_path; do if [ -d "$path/Credentials" ]; then sudo chmod ugo+rw $path/Credentials/*; fi;  done',
-      'mkdir -p "$CI_PROJECT_DIR/tmp"',
-      'cp -r /build_env/tmp/* $CI_PROJECT_DIR/tmp'
+      'for path in $env_path; do if [ -d "$path/Credentials" ]; then sudo chmod ugo+rw $path/Credentials/*; fi;  done'
   ])
+  # add after script
+  after_script = [
+    'mkdir -p "$CI_PROJECT_DIR/tmp"',
+    'cp -r /build_env/tmp/* $CI_PROJECT_DIR/tmp'
+  ]
   # 
   env_build_params = {
       "name":   f'env_builder.{full_env}', 
       "image":  '${envgen_image}',
       "stage":  'env_builder',
-      "script": script
+      "script": script,
+      "after_script": after_script
   } 
   
   env_build_vars = {
