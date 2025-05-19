@@ -101,9 +101,26 @@
   set_fact:
     rendered_namespace_template_paths: []
 
-- name: Render each path
-  set_fact:
-    rendered_namespace_template_paths: "{{ rendered_namespace_template_paths + [ item | template ] }}"
+- name: Render each path via temporary template file
+  block:
+    - name: Create temporary file for rendering path
+      tempfile:
+        suffix: .j2
+      register: temp_template_file
+
+    - name: Write template path to file
+      copy:
+        content: "{{ item }}"
+        dest: "{{ temp_template_file.path }}"
+
+    - name: Render template via lookup and add to list
+      set_fact:
+        rendered_namespace_template_paths: "{{ rendered_namespace_template_paths + [ lookup('template', temp_template_file.path) ] }}"
+
+    - name: Clean up temp template
+      file:
+        path: "{{ temp_template_file.path }}"
+        state: absent
   loop: "{{ namespace_template_paths }}"
 
 - name: Build template path map by deployPostfix
@@ -117,9 +134,6 @@
         | map('regex_replace', '.*/([^/]+)\\.ya?ml\\.j2$', '\\1')
         | list
       }}
-  when:
-    - rendered_namespace_template_paths is defined
-    - rendered_namespace_template_paths | length > 0
 
 - name: Find all possible namespace templates
   no_log: True
