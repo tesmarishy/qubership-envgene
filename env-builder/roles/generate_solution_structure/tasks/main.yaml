@@ -155,12 +155,13 @@
     - sd_files_check is defined
     - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
 
+
 - name: Render and display solution_structure
   debug:
-    msg: "{{ lookup('template', '{{ solution_structure | to_json }}') | from_json }}"
+    msg: "{{ (solution_structure | to_json) | template | from_json }}"
   when:
     - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
+    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0    
 
 - name: Merge solution_structure into current_env
   no_log: True
