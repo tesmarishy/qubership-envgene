@@ -156,13 +156,29 @@
     - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
 
 
-- name: Render solution_structure from string with template filter
-  set_fact:
-    raw_structure: "{{ solution_structure | template | from_json }}"
+- name: Create temporary template file to render solution_structure
+  tempfile:
+    state: file
+    suffix: .j2
+  register: temp_template
 
-- name: Debug rendered structure
+- name: Write solution_structure to temp template file
+  copy:
+    content: "{{ solution_structure }}"
+    dest: "{{ temp_template.path }}"  
+
+- name: Render template and parse JSON
+  set_fact:
+    solution_structure: "{{ lookup('template', temp_template.path) | from_json }}"
+
+- name: Delete temporary template file
+  file:
+    path: "{{ temp_template.path }}"
+    state: absent
+
+- name: Show rendered solution_structure
   debug:
-    var: solution_structure
+    var: solution_structure    
 
 - name: Merge solution_structure into current_env
   no_log: True
