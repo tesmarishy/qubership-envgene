@@ -169,7 +169,7 @@
 
 - name: Render template and parse JSON
   set_fact:
-    solution_structure: "{{ lookup('template', temp_template.path) | from_json }}"
+    solution_structure: "{{ lookup('template', temp_template.path) }}"
 
 - name: Delete temporary template file
   file:
