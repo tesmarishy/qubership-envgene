@@ -59,6 +59,26 @@
     - sd_files_check is defined
     - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
 
+- name: Checking the existence of template descriptor
+  stat:
+    path: "{{ templates_dir }}/env_templates/{{ env_template_name }}.{{ item }}"
+  loop:
+    - yml
+    - yaml
+  register: template_descriptor_stat
+
+- name: Set template descriptor file from found stat
+  set_fact:
+    template_descriptore_file: "{{ item.stat.path }}"
+  loop: "{{ template_descriptor_stat.results }}"
+  when: item.stat.exists
+  register: template_descriptor_file_set
+
+- name: Fail if no template descriptor was found
+  fail:
+    msg: "Template descriptor was not found in {{ templates_dir }}/env_templates"
+  when: template_descriptor_file_set.results | selectattr('skipped', 'defined') | length == (template_descriptor_stat.results | length)
+
 - name: Find all possible namespace templates
   no_log: True
   find:
