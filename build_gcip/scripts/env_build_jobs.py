@@ -23,7 +23,9 @@ def prepare_env_build_job(pipeline, is_template_test, env_template_version, full
   
   script.extend([
       'env_path=$(sudo find $CI_PROJECT_DIR/environments -type d -name "$env_name")',
-      'for path in $env_path; do if [ -d "$path/Credentials" ]; then sudo chmod ugo+rw $path/Credentials/*; fi;  done'
+      'for path in $env_path; do if [ -d "$path/Credentials" ]; then sudo chmod ugo+rw $path/Credentials/*; fi;  done',
+      'mkdir -p "$CI_PROJECT_DIR/tmp"',
+      'cp -r /build_env/tmp/* $CI_PROJECT_DIR/tmp'
   ])
   # 
   env_build_params = {
@@ -58,7 +60,7 @@ def prepare_env_build_job(pipeline, is_template_test, env_template_version, full
   else: 
     env_build_job.artifacts.add_paths("${CI_PROJECT_DIR}/environments/" + f"{full_env}")
     env_build_job.artifacts.add_paths("${CI_PROJECT_DIR}/configuration")
-    env_build_job.artifacts.add_paths("/build_env/tmp")
+    env_build_job.artifacts.add_paths("${CI_PROJECT_DIR}/tmp")
   env_build_job.artifacts.when = WhenStatement.ALWAYS
   pipeline.add_children(env_build_job)
   return env_build_job
