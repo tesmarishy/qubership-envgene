@@ -9,259 +9,191 @@
   register: sd_files_check
   ignore_errors: yes
 
-- name: Create a path for existing sd file
-  set_fact:
-    sd_file_path: "{{ sd_files_check.results | selectattr('stat.exists') | map(attribute='stat.path') | first }}"
+- name: "Create and fill solution_structure variable"
   when:
     - sd_files_check is defined
     - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
+  block:
+    - name: Create a path for existing SD file
+      set_fact:
+        sd_file_path: "{{ sd_files_check.results | selectattr('stat.exists') | map(attribute='stat.path') | first }}"
 
-- name: Load applications data from sd.yaml/yml
-  include_vars:
-    file: "{{ sd_file_path }}"
-    name: sd_config
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
+    - name: Load applications data from sd.yaml/yml
+      include_vars:
+        file: "{{ sd_file_path }}"
+        name: sd_config
 
-- name: Check that 'applications'-key exists
-  assert:
-    that:
-      - "'applications' in sd_config"
-      - "sd_config.applications is sequence"
-    success_msg: "Root 'applications' key exists and is a list"
-    fail_msg: "Missing or invalid 'applications' key in root"
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
+    - name: Check that 'applications'-key exists
+      assert:
+        that:
+          - "'applications' in sd_config"
+          - "sd_config.applications is sequence"
+        success_msg: "Root 'applications' key exists and is a list"
+        fail_msg: "Missing or invalid 'applications' key in root"
 
-- name: Validate each application entry
-  assert:
-    that:
-      - "'version' in item"
-      - "'deployPostfix' in item"
-      - "item.version is string"
-      - "item.deployPostfix is string"
-    success_msg: "Valid application entry: {{ item }}"
-    fail_msg: "Invalid application entry: {{ item | to_nice_json }}"
-    quiet: true
-  loop: "{{ sd_config.applications }}"
-  loop_control:
-    label: "Application {{ item.version | default('unknown') }}"
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
+    - name: Validate each application entry
+      assert:
+        that:
+          - "'version' in item"
+          - "'deployPostfix' in item"
+          - "item.version is string"
+          - "item.deployPostfix is string"
+        success_msg: "Valid application entry: {{ item }}"
+        fail_msg: "Invalid application entry: {{ item | to_nice_json }}"
+        quiet: true
+      loop: "{{ sd_config.applications }}"
+      loop_control:
+        label: "Application {{ item.version | default('unknown') }}"
+      
+    - name: All checks passed
+      debug:
+        msg: "All required fields are present and valid!"
+      
+    - name: Checking the existence of template descriptor
+      stat:
+        path: "{{ templates_dir }}/env_templates/{{ env_template_name }}.{{ item }}"
+      loop:
+        - yml
+        - yaml
+      register: template_descriptor_stat
 
-- name: All checks passed
-  debug:
-    msg: "All required fields are present and valid!"
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
+    - name: Set template descriptor file from found stat
+      set_fact:
+        template_descriptor_file: "{{ item.stat.path }}"
+      loop: "{{ template_descriptor_stat.results }}"
+      when: item.stat.exists
+      register: template_descriptor_file_set
 
-- name: Checking the existence of template descriptor
-  stat:
-    path: "{{ templates_dir }}/env_templates/{{ env_template_name }}.{{ item }}"
-  loop:
-    - yml
-    - yaml
-  register: template_descriptor_stat
+    - name: Fail if no template descriptor was found
+      fail:
+        msg: "Template descriptor was not found in {{ templates_dir }}/env_templates"
+      when: template_descriptor_file_set.results | selectattr('skipped', 'defined') | length == (template_descriptor_stat.results | length)
 
-- name: Set template descriptor file from found stat
-  set_fact:
-    template_descriptor_file: "{{ item.stat.path }}"
-  loop: "{{ template_descriptor_stat.results }}"
-  when: item.stat.exists
-  register: template_descriptor_file_set
+    - name: Read template descriptor file
+      slurp:
+        src: "{{ template_descriptor_file }}"
+      register: env_template_raw
 
-- name: Fail if no template descriptor was found
-  fail:
-    msg: "Template descriptor was not found in {{ templates_dir }}/env_templates"
-  when: template_descriptor_file_set.results | selectattr('skipped', 'defined') | length == (template_descriptor_stat.results | length)
+    - name: Parse YAML content in template descriptor
+      set_fact:
+        env_template_data: "{{ env_template_raw['content'] | b64decode | from_yaml }}"
 
-- name: Read template descriptor file
-  slurp:
-    src: "{{ template_descriptor_file }}"
-  register: env_template_raw
+    - name: Extract namespace template paths from template descriptor
+      set_fact:
+        namespace_template_paths: "{{ env_template_data.namespaces | map(attribute='template_path') | list }}"
+      when: env_template_data.namespaces is defined
 
-- name: Parse YAML content
-  set_fact:
-    env_template_data: "{{ env_template_raw['content'] | b64decode | from_yaml }}"
+    - name: "Namespace templates: Create temporary template file to render path"
+      tempfile:
+        state: file
+        suffix: .j2
+      register: temp_template
 
-- name: Extract namespace template paths
-  set_fact:
-    namespace_template_paths: "{{ env_template_data.namespaces | map(attribute='template_path') | list }}"
-  when: env_template_data.namespaces is defined
+    - name: "Namespace templates: Write path to temp file"
+      copy:
+        content: "{{ namespace_template_paths }}"
+        dest: "{{ temp_template.path }}"  
 
-- name: "Namespace templates: Create temporary template file to render path"
-  tempfile:
-    state: file
-    suffix: .j2
-  register: temp_template
+    - name: "Namespace templates: Render file and parse JSON"
+      set_fact:
+        namespace_template_paths: "{{ lookup('template', temp_template.path) }}"
 
-- name: "Namespace templates: Write path to temp file"
-  copy:
-    content: "{{ namespace_template_paths }}"
-    dest: "{{ temp_template.path }}"  
+    - name: "Namespace templates: Render file and parse JSONDelete temporary template file"
+      file:
+        path: "{{ temp_template.path }}"
+        state: absent    
 
-- name: "Namespace templates: Render file and parse JSON"
-  set_fact:
-    namespace_template_paths: "{{ lookup('template', temp_template.path) }}"
+    - name: "Namespace templates: list of found namespace templates"
+      debug:
+        var: namespace_template_paths
 
-- name: Delete temporary template file
-  file:
-    path: "{{ temp_template.path }}"
-    state: absent    
+    - name: "Namespace templates: Build template path map by deployPostfix"
+      set_fact:
+        postfix_template_map: "{{ dict(postfix_keys | zip(namespace_template_paths)) }}"
+      vars:
+        postfix_keys: >-
+          {{
+            namespace_template_paths
+            | map('basename')
+            | map('split', '.')
+            | map('first')
+            | list
+          }}
 
-- name: Debug list of found namespace templates
-  debug:
-    var: namespace_template_paths
+    - name: Initialize solution_structure
+      no_log: True
+      set_fact:
+        solution_structure: {}
+      
+    - name: Build solution_structure variable
+      no_log: True
+      set_fact:
+        solution_structure: "{{ solution_structure | combine(_entry | from_json, recursive=True) }}"
+      loop: "{{ sd_config.applications }}"
+      loop_control:
+        label: "{{ item.deployPostfix }}"
+      vars:
+        _entry: >-
+          {% set version_full = item.version -%}
+          {% set version = version_full.split(':')[1] -%}
+          {% set solution = version_full.split(':')[0] -%}
+          {% set postfix = item.deployPostfix -%}
+          {% set path = postfix_template_map.get(postfix, None) -%}
 
-- name: "Namespace templates: Build template path map by deployPostfix"
-  set_fact:
-    postfix_template_map: "{{ dict(postfix_keys | zip(namespace_template_paths)) }}"
-  vars:
-    postfix_keys: >-
-      {{
-        namespace_template_paths
-        | map('basename')
-        | map('split', '.')
-        | map('first')
-        | list
-      }}
+          {% if path %}
+            {% set content = lookup('file', path).split('\n') -%}
+            {% set ns_line = content | select('match', '^\\s*name:') | list | first -%}
+            {% if ns_line %}
+              {% set ns_val = ns_line.split(':', 1)[1] | trim | replace('"', '') -%}
+            {% else %}
+              {% set ns_val = None -%}
+            {% endif -%}
+          {% else %}
+            {% set ns_val = None -%}
+          {% endif -%}
 
-- name: Initialize solution_structure
-  no_log: True
-  set_fact:
-    solution_structure: {}
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
+          {% set small_dict = {
+            solution: {
+              postfix: {
+                "version": version,
+                "namespace": ns_val
+              }
+            }
+          } %}
 
-- name: Build solution_structure variable
-  no_log: True
-  set_fact:
-    solution_structure: "{{ solution_structure | combine(_entry | from_json, recursive=True) }}"
-  loop: "{{ sd_config.applications }}"
-  loop_control:
-    label: "{{ item.deployPostfix }}"
-  vars:
-    _entry: >-
-      {% set version_full = item.version -%}
-      {% set version = version_full.split(':')[1] -%}
-      {% set solution = version_full.split(':')[0] -%}
-      {% set postfix = item.deployPostfix -%}
-      {% set path = postfix_template_map.get(postfix, None) -%}
+          {{ small_dict | to_json }}
+      
+    - name: Update formatting in solution_structure variable
+      no_log: True
+      set_fact:
+        solution_structure: "{{ solution_structure | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
+      
+    - name: "Solution_structure: Create temporary template file to render the variable"
+      tempfile:
+        state: file
+        suffix: .j2
+      register: temp_template
+      
+    - name: "Solution_structure: Write solution_structure to temp template file"
+      copy:
+        content: "{{ solution_structure }}"
+        dest: "{{ temp_template.path }}"
+      
+    - name: "Solution_structure: Render template and parse JSON"
+      set_fact:
+        solution_structure: "{{ lookup('template', temp_template.path) }}"
+      
+    - name: "Solution_structure: Delete temporary template file"
+      file:
+        path: "{{ temp_template.path }}"
+        state: absent
 
-      {% if path %}
-        {% set content = lookup('file', path).split('\n') -%}
-        {% set ns_line = content | select('match', '^\\s*name:') | list | first -%}
-        {% if ns_line %}
-          {% set ns_val = ns_line.split(':', 1)[1] | trim | replace('"', '') -%}
-        {% else %}
-          {% set ns_val = None -%}
-        {% endif -%}
-      {% else %}
-        {% set ns_val = None -%}
-      {% endif -%}
-
-      {% set small_dict = {
-        solution: {
-          postfix: {
-            "version": version,
-            "namespace": ns_val
-          }
-        }
-      } %}
-
-      {{ small_dict | to_json }}
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
-
-- name: Update formatting in solution_structure variable
-  no_log: True
-  set_fact:
-    solution_structure: "{{ solution_structure | regex_replace('({{)\\s*([^}\\s]+)\\s*(}})', '\\1 \\2 \\3') }}"
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
-
-- name: Create temporary template file to render solution_structure
-  tempfile:
-    state: file
-    suffix: .j2
-  register: temp_template
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
-
-- name: Write solution_structure to temp template file
-  copy:
-    content: "{{ solution_structure }}"
-    dest: "{{ temp_template.path }}"
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0  
-
-- name: Render template and parse JSON
-  set_fact:
-    solution_structure: "{{ lookup('template', temp_template.path) }}"
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0  
-
-- name: Delete temporary template file
-  file:
-    path: "{{ temp_template.path }}"
-    state: absent
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0  
-
-- name: Show rendered solution_structure
-  debug:
-    var: solution_structure
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0   
-
-- name: Merge solution_structure into current_env
-  no_log: True
-  set_fact:
-    current_env: "{{ current_env | combine({'solution_structure': solution_structure}, recursive=True) }}"
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
-
-#- name: Pre-render the existing templates
-#  template:
-#    src: "{{ item.template_path }}"
-#    dest: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
-#  loop: "{{ env_template_path }}"
-#  when:
-#    - sd_files_check is defined
-#    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
-#    - current_env.solution_structure is defined and current_env.solution_structure != {}
-#
-#- name: Re-write existing templates
-#  copy:
-#    src: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
-#    dest: "{{ item.template_path }}"
-#    remote_src: yes
-#    force: yes
-#  loop: "{{ env_template_path }}"
-#  when:
-#    - sd_files_check is defined
-#    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
-#    - current_env.solution_structure is defined and current_env.solution_structure != {}
-#
-#- name: Remove temporary created pre-rendered ymls
-#  file:
-#    path: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
-#    state: absent
-#  loop: "{{ env_template_path }}"
-#  when:
-#    - sd_files_check is defined
-#    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
-#    - current_env.solution_structure is defined and current_env.solution_structure != {}
+    - name: Show rendered solution_structure
+      debug:
+        var: solution_structure
+      
+    - name: Merge solution_structure into current_env
+      no_log: True
+      set_fact:
+        current_env: "{{ current_env | combine({'solution_structure': solution_structure}, recursive=True) }}"
+      
