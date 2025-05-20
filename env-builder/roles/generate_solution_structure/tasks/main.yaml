@@ -97,46 +97,9 @@
   debug:
     var: namespace_template_paths
 
-- name: Init rendered path list
-  set_fact:
-    rendered_namespace_template_paths: []
-
-- name: Render each path via temporary template file
-  block:
-    - name: Create temporary file for rendering path
-      tempfile:
-        suffix: .j2
-      register: temp_template_file
-
-    - name: Write template path to file
-      copy:
-        content: "{{ item }}"
-        dest: "{{ temp_template_file.path }}"
-
-    - name: Render template via lookup and add to list
-      set_fact:
-        rendered_namespace_template_paths: "{{ rendered_namespace_template_paths + [ lookup('template', temp_template_file.path) ] }}"
-
-    - name: Clean up temp template
-      file:
-        path: "{{ temp_template_file.path }}"
-        state: absent
-  loop: "{{ namespace_template_paths }}"
-
-- name: Build template path map by deployPostfix
-  set_fact:
-    postfix_template_map: "{{ dict(_postfix_keys | zip(_postfix_paths)) }}"
-  vars:
-    _postfix_paths: "{{ rendered_namespace_template_paths }}"
-    _postfix_keys: >-
-      {{
-        rendered_namespace_template_paths
-        | map('regex_replace', '.*/([^/]+)\\.ya?ml\\.j2$', '\\1')
-        | list
-      }}
 
 - name: Find all possible namespace templates
-  no_log: True
+  no_log: false
   find:
     paths: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
     patterns:
@@ -148,6 +111,10 @@
   when:
     - sd_files_check is defined
     - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
+
+- name: Debug all_template_files
+  debug:
+    var: all_template_files    
 
 - name: Build template path map by deployPostfix
   set_fact:
