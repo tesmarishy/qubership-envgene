@@ -121,13 +121,13 @@
   set_fact:
     postfix_template_map: >-
       {{
-        namespace_template_paths
-        | map('regex_replace', '.*/([^/]+)\\.ya?ml\\.j2$', '\\1')
-        | zip(namespace_template_paths)
-        | list
-        | items2dict
+        dict(
+          namespace_template_paths
+          | map('regex_replace', '.*/([^/]+)\\.ya?ml\\.j2$', '\\1')
+          | zip(namespace_template_paths)
+        )
       }}
-
+      
 - name: Find all possible namespace templates
   no_log: false
   find:
