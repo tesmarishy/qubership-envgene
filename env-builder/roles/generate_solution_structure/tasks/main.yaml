@@ -93,10 +93,29 @@
     namespace_template_paths: "{{ env_template_data.namespaces | map(attribute='template_path') | list }}"
   when: env_template_data.namespaces is defined
 
+- name: "Namespace templates: Create temporary template file to render path"
+  tempfile:
+    state: file
+    suffix: .j2
+  register: temp_template
+
+- name: "Namespace templates: Write path to temp file"
+  copy:
+    content: "{{ namespace_template_paths }}"
+    dest: "{{ temp_template.path }}"  
+
+- name: "Namespace templates: Render file and parse JSON"
+  set_fact:
+    namespace_template_paths: "{{ lookup('template', temp_template.path) }}"
+
+- name: Delete temporary template file
+  file:
+    path: "{{ temp_template.path }}"
+    state: absent    
+
 - name: Debug list of found namespace templates
   debug:
     var: namespace_template_paths
-
 
 - name: Find all possible namespace templates
   no_log: false
