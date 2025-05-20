@@ -119,15 +119,15 @@
 
 - name: "Namespace templates: Build template path map by deployPostfix"
   set_fact:
-    postfix_template_map: >-
+    postfix_template_map: "{{ dict(postfix_keys | zip(namespace_template_paths)) }}"
+  vars:
+    postfix_keys: >-
       {{
-        dict(
-          namespace_template_paths
-          | map('regex_replace', '.*/([^/]+)\\.ya?ml\\.j2$', '\\1')
-          | zip(namespace_template_paths)
-        )
+        namespace_template_paths
+        | map('regex_replace', '.*/([^/]+)\\.ya?ml\\.j2$', '\\1')
+        | list
       }}
-      
+
 - name: Find all possible namespace templates
   no_log: false
   find:
