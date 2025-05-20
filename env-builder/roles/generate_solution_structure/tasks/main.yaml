@@ -235,14 +235,14 @@
     - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
 
 #- name: Pre-render the existing templates
-  template:
-    src: "{{ item.template_path }}"
-    dest: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
-  loop: "{{ env_template_path }}"
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
-    - current_env.solution_structure is defined and current_env.solution_structure != {}
+#  template:
+#    src: "{{ item.template_path }}"
+#    dest: "{{ item.template_path | regex_replace('\\.j2$', '') }}"
+#  loop: "{{ env_template_path }}"
+#  when:
+#    - sd_files_check is defined
+#    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
+#    - current_env.solution_structure is defined and current_env.solution_structure != {}
 #
 #- name: Re-write existing templates
 #  copy:
