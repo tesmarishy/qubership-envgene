@@ -129,42 +129,6 @@
         | map('first')
         | list
       }}
-      
-- name: Find all possible namespace templates
-  no_log: false
-  find:
-    paths: "{{ templates_dir }}/env_templates/{{ env_template_name }}/Namespaces"
-    patterns:
-      - "*.yaml.j2"
-      - "*.yml.j2"
-      - "*.j2"
-    use_regex: false
-  register: all_template_files
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
-
-- name: Debug all_template_files
-  debug:
-    var: all_template_files    
-
-- name: Build template path map by deployPostfix
-  set_fact:
-    postfix_template_map: "{{ dict(_postfix_keys | zip(_postfix_paths)) }}"
-  vars:
-    _postfix_paths: "{{ all_template_files.files | map(attribute='path') | list }}"
-    _postfix_keys: >-
-      {{
-        all_template_files.files
-        | map(attribute='path')
-        | map('basename')
-        | map('split', '.')
-        | map('first')
-        | list
-      }}
-  when:
-    - sd_files_check is defined
-    - (sd_files_check.results | selectattr('stat.exists') | list | length) > 0
 
 - name: Initialize solution_structure
   no_log: True
