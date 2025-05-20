@@ -124,10 +124,12 @@
     postfix_keys: >-
       {{
         namespace_template_paths
-        | map('regex_replace', '.*/([^/]+)\\.ya?ml\\.j2$', '\\1')
+        | map('basename')
+        | map('split', '.')
+        | map('first')
         | list
       }}
-
+      
 - name: Find all possible namespace templates
   no_log: false
   find:
