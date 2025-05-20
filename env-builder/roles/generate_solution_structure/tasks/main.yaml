@@ -180,6 +180,7 @@
         dest: "{{ temp_template.path }}"
       
     - name: "Solution_structure: Render template and parse JSON"
+      no_log: True
       set_fact:
         solution_structure: "{{ lookup('template', temp_template.path) }}"
       
