@@ -20,7 +20,7 @@ RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
     && chmod 540 /deployments/run-java.sh \
     && echo "securerandom.source=file:/dev/urandom" >> /etc/alternatives/jre/lib/security/java.security
 
-COPY effective-set-generator/target/*.jar /deployments/app.jar
+COPY build_effective_set_generator_java/target/build_effective_set_generator_java/effective-set-generator/target/*.jar /deployments/app.jar
 
 USER 1001
 
