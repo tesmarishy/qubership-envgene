@@ -1,6 +1,6 @@
 name: Dev build effective-set-generator dockerimage
 
-run-name: "Build effective-set-generator: commit ${{ github.sha }} by ${{ github.actor }}"
+run-name: "Build effective-set-generator: commit ${{ github.sha }}"
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ env:
   IMAGE_NAME: netcracker/qubership-effective-set-generator
 
 jobs:
-  jar-build:
+  build-jar:
     uses: netcracker/qubership-workflow-hub/.github/workflows/maven-publish.yml@main
     with:
       maven-command: "--batch-mode package -Dgpg.skip=true -f build_effective_set_generator_java/pom.xml"
@@ -20,8 +20,8 @@ jobs:
     secrets:
       maven-token: ${{ secrets.GITHUB_TOKEN }} 
 
-  build-and-push-image:
-    needs: jar-build
+  build-docker-image:
+    needs: build-jar
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,15 +36,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: effective_set_jar
-          path: ./build_effective_set_generator_java/target/
-
-      - name: List downloaded files
-        run: |
-          echo "=== Files in workspace ==="
-          ls -R
-          
-          echo "=== Files in target/ ==="
-          ls -la ./build_effective_set_generator_java/target/    
+          path: ./downloaded_artifact
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
