@@ -1,4 +1,6 @@
-name: Run Pytest
+name: "Tests: Perform Qubership Envgene tests"
+
+run-name: "Perform EnvGene tests for commit ${{ github.sha }}"
 
 on:
   workflow_dispatch:

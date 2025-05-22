@@ -1,4 +1,6 @@
-name: Build qubership-instance-repo-pipeline dockerimage
+name: "Dev: Build Qubership Instance Repo pipeline dockerimage"
+
+run-name: "Build Instance Repo pipeline for commit ${{ github.sha }}"
 
 on:
   workflow_dispatch:

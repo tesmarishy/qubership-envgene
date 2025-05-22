@@ -1,4 +1,6 @@
-name: Build qubership-envgene dockerimage
+name: "Dev: Build Qubership Envgene dockerimage"
+
+run-name: "Build Qubership Envgene for commit ${{ github.sha }}"
 
 on:
   workflow_dispatch:
