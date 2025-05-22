@@ -12,12 +12,13 @@ RUN microdnf install -y curl ca-certificates ${JAVA_PACKAGE} && \
 
 COPY downloaded_artifact/build_effective_set_generator_java/effective-set-generator/target/*.jar /deployments/app.jar
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.1
+FROM registry.access.redhat.com/ubi8/ubi-micro:8.1
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
 
 COPY --from=builder --chown=1001:root /deployments /deployments
 COPY --from=builder /etc/alternatives/jre/lib/security/java.security /etc/alternatives/jre/lib/security/java.security
+
 RUN chmod g+rwX /deployments
 
 USER 1001
