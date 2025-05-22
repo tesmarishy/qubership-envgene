@@ -246,6 +246,8 @@ If `artifact`:
 If `json`:  
   SD content is expected in `SD_DATA`. The system should transform it into YAML format, and save it to the repository.
 
+See details in [SD processing](/docs/sd-processing.md)
+
 **Default Value**: None
 
 **Mandatory**: No
@@ -256,7 +258,7 @@ If `json`:
 
 **Description**: Defines the SD artifact in `application:version` notation
 
-System downloads the artifact and overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in the artifact. If the file is absent, it will be generated.
+System downloads the artifact and overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in the artifact. If the file is absent, it will be generated. See details in [SD processing](/docs/sd-processing.md)
 
 **Default Value**: None
 
@@ -268,7 +270,7 @@ System downloads the artifact and overrides the file `/environments/<ENV_NAME>/I
 
 **Description**: Defines the content of SD. **JSON in string** format.
 
-System overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in `SD_DATA`. If the file is absent, it will be generated.
+System overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in `SD_DATA`. If the file is absent, it will be generated. See details in [SD processing](/docs/sd-processing.md)
 
 **Default Value**: None
 
@@ -307,7 +309,9 @@ If `true`:
   System merges the content provided in `SD_DATA` into the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml`.
 
 If `false` or not provided:  
-  System overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in `SD_DATA`. If the file is absent, it will be generated.
+  System overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in `SD_DATA`. If the file is absent, it will be generated
+
+See details in [SD processing](/docs/sd-processing.md)
 
 **Default Value**: None
 
