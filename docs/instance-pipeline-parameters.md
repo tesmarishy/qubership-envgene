@@ -26,9 +26,16 @@ All parameters are of the string data type
 
 ## `ENV_NAMES`
 
-**Description**: Environment or Environments for for which processing will be launched. In `<cluster-name>/<env-name>` notation.
+**Description**: Specifies the environment(s) for which processing will be triggered. Uses the `<cluster-name>/<env-name>` notation. If multiple environments are provided, they must be separated by a `\n` (newline) delimiter. In multi-environment case, each environment will trigger its own independent pipeline flow. All environments will use the same set of pipeline parameters (as documented in this spec)
 
-**Example**:  "ocp-01/platform"
+**Default Value**: None
+
+**Mandatory**: Yes
+
+**Example**:
+  
+- Single environment: `ocp-01/platform`
+- Multiple environments (separated by \n) `k8s-01/env-1\nk8s-01/env2`
 
 ## `ENV_BUILDER`
 
@@ -36,6 +43,10 @@ All parameters are of the string data type
 
 If `true`:  
 In the pipeline, Environment Instance generation job is executed. Environment Instance generation will be launched.
+
+**Default Value**: `false`
+
+**Mandatory**: No
 
 **Example**: `true`  
 
@@ -46,19 +57,31 @@ In the pipeline, Environment Instance generation job is executed. Environment In
 If `true`:  
   In the pipeline, Cloud Passport discovery job is executed. Cloud Passport discovery will be launched.
 
+**Default Value**: `false`
+
+**Mandatory**: No
+
 **Example**: `true`  
 
 ## `DEPLOYMENT_TICKET_ID`
 
 **Description**: Used as commit message prefix for commit into Instance repository.
 
-**Example**: "TICKET-ID-12345"
+**Default Value**: None
+
+**Mandatory**: No
+
+**Example**: `TICKET-ID-12345`
 
 ## `ENV_TEMPLATE_VERSION`
 
 **Description**: If provided system update Environment Template version in the Environment Inventory. System overrides `envTemplate.templateArtifact.artifact.version` OR `envTemplate.artifact` at `/environments/<ENV_NAME>/Inventory/env_definition.yml`
 
-**Example**: "env-template:v1.2.3"
+**Default Value**: None
+
+**Mandatory**: No
+
+**Example**: `env-template:v1.2.3`
 
 ## `ENV_INVENTORY_INIT`
 
@@ -66,6 +89,10 @@ If `true`:
 
 If `true`:  
   In the pipeline, a job for generating the environment inventory is executed. The new Environment Inventory will be generated in the path `/environments/<ENV_NAME>/Inventory/env_definition.yml`. See details in [Environment Inventory Generation](/docs/env-inventory-generation.md)
+
+**Default Value**: `false`
+
+**Mandatory**: No
 
 **Example**: `true`
 
@@ -82,13 +109,29 @@ envTemplate:
 ...
 ```
 
-**Example**: "env-template:v1.2.3"
+**Default Value**: None
+
+**Mandatory**: No
+
+**Example**: `env-template:v1.2.3`
 
 ## `ENV_SPECIFIC_PARAMS`
 
 **Description**: Specifies Environment Inventory and env-specific parameters. This is can used together with `ENV_INVENTORY_INIT`. **JSON in string** format. See details in [Environment Inventory Generation](/docs/env-inventory-generation.md)
 
+**Default Value**: None
+
+**Mandatory**: No
+
 **Example**:
+
+JSON in string:
+
+```text
+'{"clusterParams":{"clusterEndpoint":"<value>","clusterToken":"<value>"},"additionalTemplateVariables":{"<key>":"<value>"},"cloudName":"<value>","envSpecificParamsets":{"<ns-template-name>":["paramsetA"],"cloud":["paramsetB"]},"paramsets":{"paramsetA":{"version":"<paramset-version>","name":"<paramset-name>","parameters":{"<key>":"<value>"},"applications":[{"appName":"<app-name>","parameters":{"<key>":"<value>"}}]},"paramsetB":{"version":"<paramset-version>","name":"<paramset-name>","parameters":{"<key>":"<value>"},"applications":[]}},"credentials":{"credX":{"type":"<credential-type>","data":{"username":"<value>","password":"<value>"}},"credY":{"type":"<credential-type>","data":{"secret":"<value>"}}}}'
+```
+
+The same in YAML:
 
 ```yaml
 clusterParams:
@@ -128,7 +171,6 @@ credentials:
     type: <credential-type>
     data:
       secret: <value>
-
 ```
 
 ## `GENERATE_EFFECTIVE_SET`
@@ -137,6 +179,10 @@ credentials:
 
 If `true`:  
   In the pipeline, Effective Set generation job is executed. Effective Parameter set generation will be launched
+
+**Default Value**: `false`
+
+**Mandatory**: No
 
 **Example**: `true`
 
@@ -148,7 +194,11 @@ Used by EnvGene at runtime, when using pre-commit hooks, the same value must be 
 >[!Note]
 > These are generally configured as GitLab CI/CD variables or GitHub environment variables.
 
-**Example**: "PjYtYZ4WnZsH2F4AxjDf_-QOSaL1kVHIkPOH7bpTFMI="
+**Default Value**: None
+
+**Mandatory**: No
+
+**Example**: `PjYtYZ4WnZsH2F4AxjDf_-QOSaL1kVHIkPOH7bpTFMI=`
 
 ## `ENVGENE_AGE_PRIVATE_KEY`
 
@@ -158,13 +208,17 @@ Used by EnvGene at runtime, when using pre-commit hooks, the same value must be 
 >[!Note]
 > These are generally configured as GitLab CI/CD variables or GitHub environment variables.
 
-**Example**: "AGE-SECRET-KEY-1N9APQZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY6"
+**Default Value**: None
+
+**Mandatory**: No
+
+**Example**: `AGE-SECRET-KEY-1N9APQZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY5QZ3PZJQY6`
 
 ## `ENVGENE_AGE_PUBLIC_KEY`
 
 **Description**: Public key from EnvGene's AGE key pair. Added for logical completeness (not currently used in operations). For decryption, `PUBLIC_AGE_KEYS` is used instead.
 
-**Example**: "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p"
+**Example**: `age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p`
 
 ## `PUBLIC_AGE_KEYS`
 
@@ -176,7 +230,11 @@ Used by EnvGene at runtime, when using pre-commit hooks, the same value must be 
 >[!Note]
 > These are generally configured as GitLab CI/CD variables or GitHub environment variables.
 
-**Example**: "age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p,age113z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmca32p"
+**Default Value**: None
+
+**Mandatory**: No
+
+**Example**: `age1ql3z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmcac8p,age113z7hjy54pw3hyww5ayyfg7zqgvc7w3j2elw8zmrj2kg5sfn9aqmca32p`
 
 ## `SD_SOURCE_TYPE`
 
@@ -188,9 +246,11 @@ If `artifact`:
 If `json`:  
   SD content is expected in `SD_DATA`. The system should transform it into YAML format, and save it to the repository.
 
-**Example**: `artifact`
-
 **Default Value**: None
+
+**Mandatory**: No
+
+**Example**: `artifact`
 
 ## `SD_VERSION`
 
@@ -198,9 +258,11 @@ If `json`:
 
 System downloads the artifact and overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in the artifact. If the file is absent, it will be generated.
 
-**Example**: "dft:release-2024-1-2.02.002-RELEASE"
-
 **Default Value**: None
+
+**Mandatory**: No
+
+**Example**: `MONITORING:0.64.1`
 
 ## `SD_DATA`
 
@@ -208,7 +270,18 @@ System downloads the artifact and overrides the file `/environments/<ENV_NAME>/I
 
 System overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in `SD_DATA`. If the file is absent, it will be generated.
 
+**Default Value**: None
+
+**Mandatory**: No
+
 **Example**:
+JSON in string:
+
+```text
+'{"version":"2.1","type":"solutionDeploy","deployMode":"composite","applications":[{"version":"MONITORING:0.64.1","deployPostfix":"platform-monitoring"},{"version":"postgres:1.32.6","deployPostfix":"postgresql"},{"version":"postgres-services:1.32.6","deployPostfix":"postgresql"},{"version":"postgres:1.32.6","deployPostfix":"postgresql-dbaas"}]}'
+```
+
+The same in YAML:
 
 ```yaml
 version: 2.1
@@ -225,8 +298,6 @@ applications:
     deployPostfix: "postgresql-dbaas"
 ```
 
-**Default Value**: None
-
 ## `SD_DELTA`
 
 **Description**: Defines if SD provided in `SD_DATA` is Delta SD. Valid values ​​are `true` or `false`.
@@ -238,6 +309,8 @@ If `true`:
 If `false` or not provided:  
   System overrides the file `/environments/<ENV_NAME>/Inventory/solution-descriptor/sd.yml` with the content provided in `SD_DATA`. If the file is absent, it will be generated.
 
-**Example**: `true`
-
 **Default Value**: None
+
+**Mandatory**: No
+
+**Example**: `true`
