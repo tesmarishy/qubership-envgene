@@ -1,4 +1,6 @@
-name: Build qubership-gcip dockerimage
+name: "Dev: Build Qubership GCIP dockerimage"
+
+run-name: "Build Qubership GCIP for commit ${{ github.sha }}"
 
 on:
   workflow_dispatch:

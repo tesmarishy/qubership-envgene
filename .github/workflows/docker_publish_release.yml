@@ -1,4 +1,4 @@
-name: Release EnvGene
+name: "Release: EnvGene"
 
 run-name: "Release EnvGene: ${{ inputs.version }}"
 
