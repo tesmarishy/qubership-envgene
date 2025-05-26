@@ -38,7 +38,7 @@ deployParameters:
   GRAYLOG_UI_URL: "https://test-host.managed.tmp.cloud"
   POSTGRES_DBA_PASSWORD: "tmp_password"
   POSTGRES_DBA_USER: "tmp_username"
-  PRODUCTION_MODE: "false"
+  PRODUCTION_MODE: false
   TBAPI_URL: "http://test"
   TRACING_UI_URL: "https://test-host.managed.tmp.cloud"
   VALUE: "true"
