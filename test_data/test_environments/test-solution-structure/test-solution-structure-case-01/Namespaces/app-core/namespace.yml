@@ -25,4 +25,3 @@ deployParameterSets: []
 e2eParameterSets: []
 technicalConfigurationParameterSets: []
 tenantName: "test-solution-structure-template"
-
