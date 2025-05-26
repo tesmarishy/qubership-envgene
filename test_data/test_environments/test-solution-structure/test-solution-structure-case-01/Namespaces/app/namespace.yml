@@ -17,7 +17,8 @@ deployParameters:
   APP_NAMESPACE: "test-solution-structure-case-01-app"
   ENVGENE_CONFIG_REF_NAME: ""
   ENVGENE_CONFIG_TAG: ""
-  TEST_PARAM_1: 
+  TEST_SS_1: "test-solution-structure-case-01-app"
+  TEST_PARAM_1: "test-solution-structure-case-01-app"
 e2eParameters: {}
 technicalConfigurationParameters:
   APP_CORE_NAMESPACE: "test-solution-structure-case-01-app-core"
