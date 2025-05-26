@@ -20,8 +20,7 @@ envTemplate:
     bss: ["env-specific-app"]
   envSpecificTechnicalParamsets:
     bss: ["env-specific-tech"]
-  envSpecificE2EParamsets:
-    cloud: ["cloud-level-paramset"]
+  envSpecificE2EParamsets: []
   sharedMasterCredentialFiles:
     - prod-integration-creds
   templateArtifact:
