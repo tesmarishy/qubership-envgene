@@ -1,7 +1,7 @@
 # The contents of this file is generated from template artifact: test-solution-structure.
 # Contents will be overwritten by next generation.
 # Please modify this contents only for development purposes or as workaround.
-name: "test-solution-structure-core-app"
+name: "test-solution-structure-case-01-app-core"
 credentialsId: ""
 isServerSideMerge: false
 labels:
@@ -10,17 +10,17 @@ labels:
 cleanInstallApprovalRequired: false
 mergeDeployParametersAndE2EParameters: false
 profile:
-  name: "dev_core_app"
+  name: "dev_app_core"
   baseline: "dev"
 deployParameters:
-  APP_NAMESPACE: "test-solution-structure-case-01-app"
   APP_CORE_NAMESPACE: "test-solution-structure-case-01-app-core"
+  APP_NAMESPACE: "test-solution-structure-case-01-app"
   ENVGENE_CONFIG_REF_NAME: ""
   ENVGENE_CONFIG_TAG: ""
 e2eParameters: {}
 technicalConfigurationParameters:
-  APP_NAMESPACE: "test-solution-structure-case-01-app"
   APP_CORE_NAMESPACE: "test-solution-structure-case-01-app-core"
+  APP_NAMESPACE: "test-solution-structure-case-01-app"
 deployParameterSets: []
 e2eParameterSets: []
 technicalConfigurationParameterSets: []
