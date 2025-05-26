@@ -1,0 +1,29 @@
+# The contents of this file is generated from template artifact: qubership_envgene_templates.
+# Contents will be overwritten by next generation.
+# Please modify this contents only for development purposes or as workaround.
+name: "test-solution-structure-app"
+credentialsId: ""
+isServerSideMerge: false
+labels:
+  - "test-solution-structure"
+  - "test-solution-structure-tenant"
+cleanInstallApprovalRequired: false
+mergeDeployParametersAndE2EParameters: false
+profile:
+  name: "dev_app"
+  baseline: "dev"
+deployParameters:
+  BSS_NAMESPACE: "test-solution-structure-app"
+  CORE_NAMESPACE: "test-solution-structure-core-app"
+  ENVGENE_CONFIG_REF_NAME: "main"
+  ENVGENE_CONFIG_TAG: ""
+  test_parameter: "test-solution-structure-app"
+e2eParameters: {}
+technicalConfigurationParameters:
+  BSS_NAMESPACE: "test-solution-structure-app"
+  CORE_NAMESPACE: "test-solution-structure-core-app"
+deployParameterSets: []
+e2eParameterSets: []
+technicalConfigurationParameterSets: []
+tenantName: "dev"
+

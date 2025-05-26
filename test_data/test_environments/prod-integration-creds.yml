@@ -1,0 +1,10 @@
+service-activator-integration-cred:
+  type: usernamePassword
+  data:
+    username: 'tmp_username'
+    password: 'tmp_password'
+tibco-integration-cred:
+  type: usernamePassword
+  data:
+    username: 'tmp_username'
+    password: 'tmp_password'
