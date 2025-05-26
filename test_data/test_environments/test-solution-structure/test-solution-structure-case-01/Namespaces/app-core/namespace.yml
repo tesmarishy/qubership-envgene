@@ -13,14 +13,14 @@ profile:
   name: "dev_core_app"
   baseline: "dev"
 deployParameters:
-  BSS_NAMESPACE: "test-solution-structure-app"
-  CORE_NAMESPACE: test-solution-structure-core-app"
+  APP_NAMESPACE: "test-solution-structure-app"
+  APP_CORE_NAMESPACE: test-solution-structure-core-app"
   ENVGENE_CONFIG_REF_NAME: "main"
   ENVGENE_CONFIG_TAG: ""
 e2eParameters: {}
 technicalConfigurationParameters:
-  BSS_NAMESPACE: "test-solution-structure-app"
-  CORE_NAMESPACE: "test-solution-structure-core-app"
+  APP_NAMESPACE: "test-solution-structure-app"
+  APP_CORE_NAMESPACE: "test-solution-structure-core-app"
 deployParameterSets: []
 e2eParameterSets: []
 technicalConfigurationParameterSets: []
