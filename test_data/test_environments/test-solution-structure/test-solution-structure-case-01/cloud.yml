@@ -1,14 +1,14 @@
-# The contents of this file is generated from template artifact: qubership_envgene_templates.
+# The contents of this file is generated from template artifact: test-solution-structure.
 # Contents will be overwritten by next generation.
 # Please modify this contents only for development purposes or as workaround.
-name: "test-solution-structure"
-apiUrl: "tmp.cloud.com"
-apiPort: "000"
-privateUrl: "test-host.managed.tmp.cloud"
-publicUrl: "test-host.managed.tmp.cloud"
-dashboardUrl: "https://dashboard.test-host.managed.tmp.cloud"
+name: "test-solution-structure" # cloud passport: test-solution-structure version: 1.5
+apiUrl: "tmp.cloud.com" # cloud passport: test-solution-structure version: 1.5
+apiPort: "000" # cloud passport: test-solution-structure version: 1.5
+privateUrl: "test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
+publicUrl: "test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
+dashboardUrl: "https://dashboard.test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
 labels: []
-defaultCredentialsId: "cloud-deploy-sa-token"
+defaultCredentialsId: "cloud-deploy-sa-token" # cloud passport: test-solution-structure version: 1.5
 dbMode: "db"
 databases: []
 mergeDeployParametersAndE2EParameters: false
@@ -32,12 +32,12 @@ consulConfig:
   publicUrl: "https://consul.None"
   internalUrl: "http://consul.consul:8888"
 deployParameters:
-  CLOUD_DASHBOARD_URL: "https://dashboard.test-host.managed.tmp.cloud"
-  ENV_NAME: "e01"
-  GRAFANA_UI_URL: "https://test-host.managed.tmp.cloud"
-  GRAYLOG_UI_URL: "https://test-host.managed.tmp.cloud"
-  POSTGRES_DBA_PASSWORD: "tmp_password"
-  POSTGRES_DBA_USER: "tmp_username"
+  CLOUD_DASHBOARD_URL: "https://dashboard.test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
+  ENV_NAME: "e01" # cloud passport: test-solution-structure version: 1.5
+  GRAFANA_UI_URL: "https://test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
+  GRAYLOG_UI_URL: "https://test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
+  POSTGRES_DBA_PASSWORD: "tmp_password" # cloud passport: test-solution-structure version: 1.5
+  POSTGRES_DBA_USER: "tmp_username" # cloud passport: test-solution-structure version: 1.5
   PRODUCTION_MODE: false
   TBAPI_URL: "http://test"
   TRACING_UI_URL: "https://test-host.managed.tmp.cloud"
