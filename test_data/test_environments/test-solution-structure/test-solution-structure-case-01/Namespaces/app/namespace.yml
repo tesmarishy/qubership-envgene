@@ -1,29 +1,29 @@
 # The contents of this file is generated from template artifact: test-solution-structure.
 # Contents will be overwritten by next generation.
 # Please modify this contents only for development purposes or as workaround.
-name: "test-solution-structure-app"
+name: "test-solution-structure-case-01-app"
 credentialsId: ""
 isServerSideMerge: false
 labels:
-  - "test-solution-structure"
-  - "test-solution-structure-tenant"
+  - "solutionInstance-test-solution-structure-case-01"
+  - "solution-test-tenant"
 cleanInstallApprovalRequired: false
 mergeDeployParametersAndE2EParameters: false
 profile:
   name: "dev_app"
   baseline: "dev"
 deployParameters:
-  APP_NAMESPACE: "test-solution-structure-app"
-  APP_CORE_NAMESPACE: "test-solution-structure-core-app"
-  ENVGENE_CONFIG_REF_NAME: "main"
+  APP_NAMESPACE: "test-solution-structure-case-01-app"
+  APP_CORE_NAMESPACE: "test-solution-structure-case-01-app-core"
+  ENVGENE_CONFIG_REF_NAME: ""
   ENVGENE_CONFIG_TAG: ""
-  test_parameter: "test-solution-structure-app"
+  TEST_PARAM_1: 
 e2eParameters: {}
 technicalConfigurationParameters:
-  APP_NAMESPACE: "test-solution-structure-app"
-  APP_CORE_NAMESPACE: "test-solution-structure-core-app"
+  APP_NAMESPACE: "test-solution-structure-case-01-app"
+  APP_CORE_NAMESPACE: "test-solution-structure-case-01-app-core"
 deployParameterSets: []
 e2eParameterSets: []
 technicalConfigurationParameterSets: []
-tenantName: "dev"
+tenantName: "test-solution-structure-template"
 
