@@ -16,6 +16,7 @@
     - [Application](#application)
     - [Resource Profile Override (in Instance)](#resource-profile-override-in-instance)
     - [Composite Structure](#composite-structure)
+    - [Solution Descriptor](#solution-descriptor)
 
 ## Environment Template Objects
 
@@ -181,4 +182,43 @@ satellites:
     type: "namespace"
   - name: "env-1-oss"
     type: "namespace"
+```
+
+### Solution Descriptor
+
+The Solution Descriptor (SD) defines the application composition of a solution. In EnvGene it serves as the primary input for EnvGene's Effective Set calculations. The SD can also be used for template rendering through the [`current_env.solution_structure`](/docs/template-macros.md#current_envsolution_structure) variable.
+
+Other systems can use it for other reasons, for example as a deployment blueprint for external systems.
+
+Only SD versions 2.1 and 2.2 can be used by EnvGene for the purposes described above, as their `application` list elements contain the `deployPostfix` and `version` attributes.
+
+SD processing in EnvGene is described [here](/docs/sd-processing.md).
+
+SD in EnvGene can be introduced either through a manual commit to the repository or by running the Instance repository pipeline. The parameters of this [pipeline](/docs/instance-pipeline-parameters.md) that start with `SD_` relate to SD processing.
+
+In EnvGene, there are:
+
+**Full SD**: Defines the complete application composition of a solution. There can be only one Full SD per environment, located at the path `/environments/<cloud-name>/<env-name>/Inventory/solution-descriptor/sd.yml`
+
+**Delta SD**: A partial Solution Descriptor that contains incremental changes to be applied to the Full SD. Delta SDs enable selective updates to solution components without requiring a complete SD replacement. There can be only one Delta SD per environment, located at the path `/environments/<cloud-name>/<env-name>/Inventory/solution-descriptor/delta_sd.yml`
+
+Only Full SD is used for Effective Set calculation. The Delta SD is only needed for troubleshooting purposes.
+
+[Solution Descriptor JSON schema](/schemas/TBD)
+
+Example:
+
+```yaml
+version: 2.1
+type: "solutionDeploy"
+deployMode: "composite"
+applications:
+  - version: "MONITORING:0.64.1"
+    deployPostfix: "platform-monitoring"
+  - version: "postgres:1.32.6"
+    deployPostfix: "postgresql"
+  - version: "postgres-services:1.32.6"
+    deployPostfix: "postgresql"
+  - version: "postgres:1.32.6"
+    deployPostfix: "postgresql-dbaas"
 ```
