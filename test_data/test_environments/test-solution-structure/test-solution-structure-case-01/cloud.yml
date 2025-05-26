@@ -9,9 +9,9 @@ publicUrl: "test-host.managed.tmp.cloud" # cloud passport: test-solution-structu
 dashboardUrl: "https://dashboard.test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
 labels: []
 defaultCredentialsId: "cloud-deploy-sa-token" # cloud passport: test-solution-structure version: 1.5
-protocol: "https"
+protocol: "https" # cloud passport: test-solution-structure version: 1.5
 dbMode: "db"
-productionMode: false
+productionMode: false # cloud passport: test-solution-structure version: 1.5
 databases: []
 mergeDeployParametersAndE2EParameters: false
 maasConfig:
@@ -35,6 +35,7 @@ consulConfig:
   internalUrl: "http://consul.consul:8888"
 deployParameters:
   CLOUD_DASHBOARD_URL: "https://dashboard.test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
+  CMDB_URL: "https://test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
   ENV_NAME: "test-solution-structure-case-01"
   GRAFANA_UI_URL: "https://test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
   GRAYLOG_UI_URL: "https://test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
