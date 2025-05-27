@@ -1,8 +1,8 @@
 ---
 
-- name: Check if sd file exists in {{ sd_output_dir }}/{{ sd_cluster_name }}/{{ sd_env }}/Inventory/solution-descriptor
+- name: Check if sd file exists in {{ _current_env_dir }}/Inventory/solution-descriptor
   stat:
-    path: "{{ sd_output_dir }}/{{ sd_cluster_name }}/{{ sd_env }}/Inventory/solution-descriptor/sd.{{ item }}"
+    path: "{{ _current_env_dir }}/Inventory/solution-descriptor/sd.{{ item }}"
   loop:
     - yaml
     - yml
