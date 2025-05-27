@@ -18,6 +18,7 @@ deployParameters:
   ENVGENE_CONFIG_REF_NAME: ""
   ENVGENE_CONFIG_TAG: ""
   TEST_PARAM_1: "test-solution-structure-case-01-app-core" # paramset: app-common version: n/a source: template
+  TEST_PARAM_IF_ENDIF_2: "TEST_PARAM_IF_ENDIF_2_value"
 e2eParameters: {}
 technicalConfigurationParameters:
   APP_CORE_NAMESPACE: "test-solution-structure-case-01-app-core"
