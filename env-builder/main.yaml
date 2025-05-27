@@ -106,16 +106,6 @@
         
         _template: "{{ current_env_template.cloud }}"
 
-    - name: Generate solution_structure variable
-      ansible.builtin.include_role:
-        name: generate_solution_structure
-      vars:
-        _template_name: "{{ current_env.env_template }}"
-        _tenant: "{{ tenant }}"
-        _env: "{{ env }}"
-        _cloud: "{{ current_env.cloud }}"
-        _current_env_dir: "{{ current_env_dir }}"
-
     - name: Gen namespaces
       ansible.builtin.include_role:
         name: generate_namespaces
