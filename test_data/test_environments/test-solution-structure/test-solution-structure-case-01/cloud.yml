@@ -39,6 +39,7 @@ deployParameters:
   ENV_NAME: "test-solution-structure-case-01"
   GRAFANA_UI_URL: "https://test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
   GRAYLOG_UI_URL: "https://test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
+  TEST_VALUE_SS_cloud_yml: "test-solution-structure-case-01-app"
   TRACING_UI_URL: "https://test-host.managed.tmp.cloud" # cloud passport: test-solution-structure version: 1.5
   VALUE: "true" # cloud passport: test-solution-structure version: 1.5
 e2eParameters:
