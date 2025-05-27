@@ -32,6 +32,7 @@ consulConfig:
   internalUrl: 'http://consul.consul:8888'
 deployParameters:
   ENV_NAME: "{{current_env.name}}"
+  TEST_VALUE_SS_cloud_yml: "{{ current_env.solution_structure["Test-App-Name"]["app"].namespace }}"
 e2eParameters: 
 {% if current_env.cloud_passport.cloud.CLOUD_PUBLIC_HOST is defined %}
     url: "https://toolset.{{ current_env.cloud_passport.cloud.CLOUD_PUBLIC_HOST }}"
