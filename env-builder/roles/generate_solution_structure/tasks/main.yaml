@@ -51,7 +51,7 @@
       
     - name: Checking the existence of template descriptor
       stat:
-        path: "{{ templates_dir }}/env_templates/{{ env_template_name }}.{{ item }}"
+        path: "{{ templates_dir }}/env_templates/{{ _template_name }}.{{ item }}"
       loop:
         - yml
         - yaml
