@@ -216,29 +216,38 @@ The `affected-sensitive-parameters.yaml` is created using the reverse logic desc
 
 ```yaml
 - # Mandatory
-  # Environment id (in cluster-name/env-name notation) where affected parameter is located
-  environment: string
-  # Mandatory
-  # Namespace where affected parameter is located
-  namespace: string
-  # Mandatory. Default `None`
-  # Application where affected parameter is located
-  application: string
-  # Mandatory
-  # Effective Set context where the parameter is located.
-  context: enum[`pipeline`,`deployment`,`runtime`]
-  # Mandatory
-  # Affected parameter key
-  parameter_key: string
-  # Mandatory
-  # Path to Credential file
-  cred-filepath: string
-  # Mandatory. Default `None`
-  # Path to Shared credential file
-  shared-cred-filepath: credX
-  # Mandatory
-  # Common Credential ID. Located in `cred-filepath`
-  cred-id: credX
+  # Taken from `CRED_ROTATION_PAYLOAD`
+  target_parameter:
+    environment: string
+    namespace: string  
+    application: string
+    context: enum[`pipeline`,`deployment`,`runtime`]
+    parameter_key: string
+  affected_parameters:
+    # Mandatory
+    # Environment id (in cluster-name/env-name notation) where affected parameter is located
+    environment: string
+    # Mandatory
+    # Namespace where affected parameter is located
+    namespace: string
+    # Mandatory. Default `None`
+    # Application where affected parameter is located
+    application: string
+    # Mandatory
+    # Effective Set context where the parameter is located.
+    context: enum[`pipeline`,`deployment`,`runtime`]
+    # Mandatory
+    # Affected parameter key
+    parameter_key: string
+    # Mandatory
+    # Path to Credential file
+    cred-filepath: string
+    # Mandatory. Default `None`
+    # Path to Shared credential file
+    shared-cred-filepath: credX
+    # Mandatory
+    # Common Credential ID. Located in `cred-filepath`
+    cred-id: credX
 - ...
 ```
 
