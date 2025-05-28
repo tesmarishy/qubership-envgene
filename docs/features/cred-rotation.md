@@ -200,7 +200,7 @@ The diagram below illustrates three scenarios:
 - Linkage through a Environment Credentials file
 - Linkage through a Shared Credentials file
 
-![effective-set-calculation.png](./images/effective-set-calculation.png)
+![cred-affection.png(./images/cred-affection.png)
 
 ### Force mode
 
