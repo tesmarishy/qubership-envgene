@@ -19,6 +19,8 @@
   - [`SD_VERSION`](#sd_version)
   - [`SD_DATA`](#sd_data)
   - [`SD_DELTA`](#sd_delta)
+  - [`CRED_ROTATION_PAYLOAD`](#cred_rotation_payload)
+  - [`CRED_ROTATION_FORCE`](#cred_rotation_force)
 
 The following are the launch parameters for the instance repository pipeline. These parameters influence, the execution of specific jobs within the pipeline.
 
@@ -314,6 +316,57 @@ If `false` or not provided:
 See details in [SD processing](/docs/sd-processing.md)
 
 **Default Value**: None
+
+**Mandatory**: No
+
+**Example**: `true`
+
+## `CRED_ROTATION_PAYLOAD`
+
+**Description**: A parameter used to dynamically update sensitive parameters (those defined via the EnvGene cred macro). It modifies values across different contexts within a specified namespace and optional application. **JSON in string** format. See details in [Credential Rotation](/docs/cred-rotation.md)
+The value can be provided as plain text or encrypted.
+
+```yaml
+- namespace: <namespace>
+  application: <application-name>
+  context: enum[`pipeline`,`deployment`, `runtime`]
+  parameter_key: <parameter-key>
+  parameter_value: <new-parameter-value>
+- ...
+```
+
+| Attribute | Mandatory | Description | Default | Example |
+|---|---|---|---|---|
+| `namespace` | Mandatory | The name of the namespace where the parameter to be modified is defined | None | `env-1-platform-monitoring` |
+| `application` | Optional | The name of the application (sub-resource under `namespace`) where the parameter to be modified is defined. Cannot be used with `pipeline` context | None | `MONITORING` |
+| `context` | Mandatory | The context of the parameter being modified. Valid values: `pipeline`, `deployment`, `runtime` | None | `deployment` |
+| `parameter_key` | Mandatory | The name (key) of the parameter to be modified | None | `login` |
+| `parameter_value` | Mandatory | New value (plaintext or encrypted). Envgene, depending on the value of the [`crypt`](/docs/envgene-configs.md#configyml) attribute, will either decrypt, encrypt, or leave the value unchanged. If an encrypted value is passed, it must be encrypted with a key that Envgene can decrypt. | None | `admin`|
+
+**Default Value**: None
+
+**Mandatory**: No
+
+**Example**:
+
+```yaml
+- namespace: env-1-platform-monitoring
+  application: MONITORING
+  context: deployment
+  parameter_key: db_login
+  parameter_value: s3cr3tN3wLogin
+- namespace: env-1-platform-monitoring
+  application: MONITORING
+  context: deployment
+  parameter_key: db_password
+  parameter_value: s3cr3tN3wP@ss
+```
+
+## `CRED_ROTATION_FORCE`
+
+**Description**: Enables force mode for updating sensitive parameter values. In force mode, the sensitive parameter value will be changed even if it affects other sensitive parameters that may be linked through the same credential. See details in [Credential Rotation](/docs/cred-rotation.md)
+
+**Default Value**: `false`
 
 **Mandatory**: No
 
