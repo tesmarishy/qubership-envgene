@@ -1,7 +1,5 @@
 name: "Tests: Perform Qubership Envgene tests"
 
-run-name: "Perform EnvGene tests for commit ${{ github.sha }}"
-
 run-name: "Perform smoke tests on commit ${{ github.sha }}"
 
 on:
