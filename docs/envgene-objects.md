@@ -93,12 +93,12 @@ Example:
 ```yaml
 name: "{{ current_env.cloudNameWithCluster }}-composite-structure"
 baseline:
-  name: "{{ current_env.environmentName }}-core"
+  name: "{{ current_env.name }}-core"
   type: "namespace"
 satellites:
-  - name: "{{ current_env.environmentName }}-bss"
+  - name: "{{ current_env.name }}-bss"
     type: "namespace"
-  - name: "{{ current_env.environmentName }}-oss"
+  - name: "{{ current_env.name }}-oss"
     type: "namespace"
 ```
 
