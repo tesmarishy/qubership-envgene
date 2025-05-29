@@ -64,9 +64,11 @@ Results:
 - Cloud and Namespace objects of the resulting Environment Instance contain:
 
 ```yaml
+...
 deployParameterSets: []
 e2eParameterSets: []
 technicalConfigurationParameterSets: []
+...
 ```
 
 - Cloud and Namespace objects of the resulting env instance don't contain `# comment line`
