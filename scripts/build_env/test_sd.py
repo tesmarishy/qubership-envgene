@@ -38,7 +38,12 @@ def test_sd(cluster_name, env_name, test_sd_name):
     # Load test data
     test_file, _ = find_yaml_file(g_test_sd_dir, test_sd_name)
     test_data = load_yaml_file(test_file)
-    sd_data = json.loads(test_data["SD_DATA"])
+    
+    # Extract all required parameters
+    sd_data = json.loads(test_data.get("SD_DATA", "{}"))
+    sd_source_type = test_data.get("SD_SOURCE_TYPE", "")
+    sd_version = test_data.get("SD_VERSION", "")
+    sd_delta = test_data.get("SD_DELTA", "")
     
     # Ensure output directory exists
     os.makedirs(g_output_dir, exist_ok=True)
@@ -48,12 +53,11 @@ def test_sd(cluster_name, env_name, test_sd_name):
     
     # Call the function with test data
     env = env_name
-    sd_delta = None
     result = handle_sd(env, sd_source_type, sd_version, sd_data, sd_delta)
     
     # Write result to file
     with open(output_file, 'w') as f:
-        yaml.dump(result, f, default_flow_style=False)
+        yaml.dump(result, f)
     
     # Compare files
     expected_dir = os.path.join(g_sd_dir, cluster_name, env_name, "Inventory", "solution-descriptor")
