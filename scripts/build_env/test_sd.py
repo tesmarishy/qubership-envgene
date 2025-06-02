@@ -62,13 +62,25 @@ def test_sd(cluster_name, env_name, test_sd_name):
     files_to_compare = [sd_filename]
     
     sd_output_dir = os.path.join(g_output_dir, "Inventory", "solution-descriptor")
+    
+    # Check if directories and files exist
+    logger.info(f"Expected directory: {expected_dir}")
+    logger.info(f"Output directory: {sd_output_dir}")
+    logger.info(f"Expected file: {expected_file}")
+    logger.info(f"Output file: {os.path.join(sd_output_dir, sd_filename)}")
+    
+    # Ensure output directory exists
+    os.makedirs(sd_output_dir, exist_ok=True)
+    
+    # List contents of both directories
+    logger.info(f"Contents of expected directory: {os.listdir(expected_dir)}")
+    logger.info(f"Contents of output directory: {os.listdir(sd_output_dir)}")
+    
     match, mismatch, errors = filecmp.cmpfiles(expected_dir, sd_output_dir, files_to_compare, shallow=False)
     
     logger.info(f"Match: {dump_as_yaml_format(match)}")
     if len(mismatch) > 0:
         logger.error(f"Mismatch: {dump_as_yaml_format(mismatch)}")
-        logger.info(f"Etalon_dir: {expected_dir}")
-        logger.info(f"SD_dir: {sd_output_dir}")
         for file in mismatch:
             file1 = os.path.join(expected_dir, file)
             file2 = os.path.join(sd_output_dir, file)
@@ -90,6 +102,18 @@ def test_sd(cluster_name, env_name, test_sd_name):
     
     if len(errors) > 0:
         logger.fatal(f"Errors: {dump_as_yaml_format(errors)}")
+        # Print file contents if they exist
+        for file in errors:
+            file1 = os.path.join(expected_dir, file)
+            file2 = os.path.join(sd_output_dir, file)
+            logger.info(f"Expected file exists: {os.path.exists(file1)}")
+            logger.info(f"Output file exists: {os.path.exists(file2)}")
+            if os.path.exists(file1):
+                with open(file1, 'r') as f:
+                    logger.info(f"Expected file contents:\n{f.read()}")
+            if os.path.exists(file2):
+                with open(file2, 'r') as f:
+                    logger.info(f"Output file contents:\n{f.read()}")
     else:
         logger.info(f"Errors: {dump_as_yaml_format(errors)}")
     
