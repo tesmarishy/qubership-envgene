@@ -26,20 +26,8 @@ TEST_SD_DIR = getAbsPath("../../test_data/test_sd")               # Directory wi
 ETALON_ENV_DIR = getAbsPath("../../test_data/test_environments")  # Directory with etalon environments
 OUTPUT_DIR = getAbsPath("../../tmp/test_sd")                      # Directory for test output
 
+
 def find_yaml_file(directory, base_name):
-    """
-    Find a YAML file with either .yaml or .yml extension.
-    
-    Args:
-        directory (str): Directory to search in
-        base_name (str): Base name of the file without extension
-        
-    Returns:
-        tuple: (full_path, filename) of the found file
-        
-    Raises:
-        FileNotFoundError: If no matching file is found
-    """
     logger.debug(f"Searching for YAML file:"
                 f"\n\tDirectory: {directory}"
                 f"\n\tBase name: {base_name}")
@@ -54,30 +42,14 @@ def find_yaml_file(directory, base_name):
     logger.error(error_msg)
     raise FileNotFoundError(error_msg)
 
+
 def load_yaml_file(file_path):
-    """
-    Load and parse YAML file.
-    
-    Args:
-        file_path (str): Path to the YAML file
-        
-    Returns:
-        dict: Parsed YAML content
-    """
     logger.debug(f"Loading YAML file: {file_path}")
     with open(file_path, 'r') as f:
         return yaml.load(f)
 
+
 def load_test_sd_data(test_case_name):
-    """
-    Load and parse test SD data from YAML file.
-    
-    Args:
-        test_case_name (str): Name of the test case file (without extension)
-        
-    Returns:
-        tuple: SD data parameters (sd_data, sd_source_type, sd_version, sd_delta)
-    """
     logger.info(f"Loading test data for case: {test_case_name}")
     test_file, _ = find_yaml_file(TEST_SD_DIR, test_case_name)
     test_data = load_yaml_file(test_file)
@@ -89,27 +61,17 @@ def load_test_sd_data(test_case_name):
     sd_delta = test_data.get("SD_DELTA", "")
     
     logger.info(f"Loaded SD parameters:"
-               f"\n\tSource type: {sd_source_type}"
-               f"\n\tVersion: {sd_version}"
-               f"\n\tDelta mode: {sd_delta}")
+               f"\n\tSD_SOURCE_TYPE: {sd_source_type}"
+               f"\n\SD_VERSION: {sd_version}"
+               f"\n\tSD_DELTA: {sd_delta}")
     
     return sd_data, sd_source_type, sd_version, sd_delta
 
+
 def compare_sd_files(expected_dir, actual_dir, sd_filename):
-    """
-    Compare SD files between expected and actual directories.
-    
-    Args:
-        expected_dir (str): Path to directory with expected SD file
-        actual_dir (str): Path to directory with actual SD file
-        sd_filename (str): Name of the SD file to compare
-        
-    Returns:
-        bool: True if files match, False otherwise
-    """
     logger.info(f"Comparing SD files:"
-               f"\n\tExpected dir: {expected_dir}"
-               f"\n\tActual dir: {actual_dir}"
+               f"\n\tEtalon SD dir: {expected_dir}"
+               f"\n\tRendered test SD dir: {actual_dir}"
                f"\n\tFilename: {sd_filename}")
     
     files_to_compare = [sd_filename]
@@ -157,6 +119,7 @@ def compare_sd_files(expected_dir, actual_dir, sd_filename):
                     logger.info(f"Actual file contents:\n{f.read()}")
     
     return len(mismatch) == 0 and len(errors) == 0
+
 
 @pytest.mark.parametrize("cluster_name, env_name, test_case_name", TEST_CASES)
 def test_sd(cluster_name, env_name, test_case_name):
