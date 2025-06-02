@@ -8,11 +8,11 @@ from main import handle_sd
 from envgenehelper import *
 
 test_data = [
-    ("test_001", "2.1", "deploy")  # test_name, sd_version, sd_source_type
+    ("test-solution-structure", "test-solution-structure-case-01", "test_001")
 ]
 
-g_test_data_dir = getAbsPath("../../test_data/test_sd")
-g_expected_dir = getAbsPath("../../test_data/test_environments/test-solution-structure/test-solution-structure-case-01/Inventory/solution-descriptor")
+g_test_sd_dir = getAbsPath("../../test_data/test_sd")
+g_sd_dir = getAbsPath("../../test_data/test_environments")
 g_output_dir = getAbsPath("../../tmp/test_sd")
 
 @pytest.fixture(autouse=True)
@@ -23,10 +23,18 @@ def load_yaml_file(file_path):
     with open(file_path, 'r') as f:
         return yaml.safe_load(f)
 
-@pytest.mark.parametrize("test_name, sd_version, sd_source_type", test_data)
-def test_sd(test_name, sd_version, sd_source_type):
+def find_yaml_file(directory, base_name):
+    """Find yaml file with either .yaml or .yml extension"""
+    for ext in ['yaml', 'yml']:
+        file_path = os.path.join(directory, f"{base_name}.{ext}")
+        if os.path.exists(file_path):
+            return file_path, f"{base_name}.{ext}"
+    raise FileNotFoundError(f"YAML file {base_name} not found in {directory}")
+
+@pytest.mark.parametrize("cluster_name, env_name, test_sd_name", test_data)
+def test_sd(cluster_name, env_name, test_sd_name):
     # Load test data
-    test_file = os.path.join(g_test_data_dir, f"{test_name}.yaml")
+    test_file, _ = find_yaml_file(g_test_sd_dir, test_sd_name)
     test_data = load_yaml_file(test_file)
     sd_data = json.loads(test_data["SD_DATA"])
     
@@ -37,7 +45,7 @@ def test_sd(test_name, sd_version, sd_source_type):
     output_file = os.path.join(g_output_dir, "sd.yaml")
     
     # Call the function with test data
-    env = "test-env"
+    env = env_name
     sd_delta = None
     result = handle_sd(env, sd_source_type, sd_version, sd_data, sd_delta)
     
@@ -46,16 +54,17 @@ def test_sd(test_name, sd_version, sd_source_type):
         yaml.dump(result, f, default_flow_style=False)
     
     # Compare files
-    expected_file = os.path.join(g_expected_dir, "sd.yaml")
-    files_to_compare = ["sd.yaml"]
+    expected_dir = os.path.join(g_sd_dir, cluster_name, env_name, "Inventory", "solution-descriptor")
+    expected_file, sd_filename = find_yaml_file(expected_dir, "sd")
+    files_to_compare = [sd_filename]
     
-    match, mismatch, errors = filecmp.cmpfiles(g_expected_dir, g_output_dir, files_to_compare, shallow=False)
+    match, mismatch, errors = filecmp.cmpfiles(expected_dir, g_output_dir, files_to_compare, shallow=False)
     
     logger.info(f"Match: {dump_as_yaml_format(match)}")
     if len(mismatch) > 0:
         logger.error(f"Mismatch: {dump_as_yaml_format(mismatch)}")
         for file in mismatch:
-            file1 = os.path.join(g_expected_dir, file)
+            file1 = os.path.join(expected_dir, file)
             file2 = os.path.join(g_output_dir, file)
             try:
                 with open(file1, 'r') as f1, open(file2, 'r') as f2:
