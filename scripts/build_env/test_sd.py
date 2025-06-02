@@ -19,6 +19,7 @@ yaml = YAML()
 TEST_CASES = [
     # (cluster_name, environment_name, test_case_name)
     ("test-solution-structure", "env02", "test_001")
+]
 
 # Directory paths configuration
 TEST_SD_DIR = getAbsPath("../../test_data/test_sd")               # Directory with test SD files
