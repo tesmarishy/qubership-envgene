@@ -108,33 +108,39 @@ def compare_sd_files(expected_dir, actual_dir, sd_filename):
         with open(actual_file, 'r') as f2:
             actual_lines = f2.readlines()
             
-        # First show the content difference using unified diff
-        diff = difflib.unified_diff(
-            expected_lines,
-            actual_lines,
-            fromfile="Etalon SD",
-            tofile="Rendered SD",
-            lineterm=''
-        )
-        diff_text = '\n'.join(diff)
-        if diff_text:
-            logger.error(f"Files differ. Unified diff:\n{diff_text}")
+        # Compare contents
+        if expected_lines != actual_lines:
+            # Prepare error message
+            error_msg = [
+                "\nSD files differ:",
+                "\n=== Unified diff ===\n"
+            ]
             
-            # Also show exact content of both files for better visibility
-            logger.error("\nFull content comparison:")
-            logger.error("Etalon SD content:")
-            logger.error("```")
-            logger.error(''.join(expected_lines).rstrip())
-            logger.error("```")
-            logger.error("\nRendered SD content:")
-            logger.error("```")
-            logger.error(''.join(actual_lines).rstrip())
-            logger.error("```")
+            # Add unified diff
+            diff = difflib.unified_diff(
+                expected_lines,
+                actual_lines,
+                fromfile="Etalon SD",
+                tofile="Rendered SD",
+                lineterm=''
+            )
+            error_msg.append('\n'.join(diff))
             
-            # Show line count difference if exists
+            # Add full content comparison
+            error_msg.extend([
+                "\n\n=== Full content comparison ===",
+                "\n--- Etalon SD content ---\n",
+                ''.join(expected_lines).rstrip(),
+                "\n\n+++ Rendered SD content +++\n",
+                ''.join(actual_lines).rstrip()
+            ])
+            
+            # Add line count info if different
             if len(expected_lines) != len(actual_lines):
-                logger.error(f"\nLine count differs: expected {len(expected_lines)}, got {len(actual_lines)} lines")
+                error_msg.append(f"\n\nLine count differs: expected {len(expected_lines)}, got {len(actual_lines)} lines")
             
+            # Log the complete error message
+            logger.error('\n'.join(error_msg))
             return False
             
         # If we got here, files match exactly including trailing whitespace
