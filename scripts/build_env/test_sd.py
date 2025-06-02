@@ -45,12 +45,9 @@ def test_sd(cluster_name, env_name, test_sd_name):
     sd_version = test_data.get("SD_VERSION", "")
     sd_delta = test_data.get("SD_DELTA", "")
     
-    # Ensure output directory exists
-    os.makedirs(g_output_dir, exist_ok=True)
-    
-    # Create Environment object with the correct base path
-    base_dir = os.path.dirname(os.path.dirname(g_output_dir))  # Go up two levels from tmp/test_sd
-    env = Environment(base_dir, "tmp", "test_sd")
+    # Create Environment object with test_sd_name in the path
+    base_dir = g_output_dir  # base_dir = tmp/test_sd
+    env = Environment(base_dir, test_sd_name, "")  # cluster = test_001, name = ""
     
     # Call the function with test data
     handle_sd(env, sd_source_type, sd_version, sd_data, sd_delta)
