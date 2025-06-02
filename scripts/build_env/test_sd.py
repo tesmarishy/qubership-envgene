@@ -26,6 +26,48 @@ TEST_SD_DIR = getAbsPath("../../test_data/test_sd")               # Directory wi
 ETALON_ENV_DIR = getAbsPath("../../test_data/test_environments")  # Directory with etalon environments
 OUTPUT_DIR = getAbsPath("../../tmp/test_sd")                      # Directory for test output
 
+def find_yaml_file(directory, base_name):
+    """
+    Find a YAML file with either .yaml or .yml extension.
+    
+    Args:
+        directory (str): Directory to search in
+        base_name (str): Base name of the file without extension
+        
+    Returns:
+        tuple: (full_path, filename) of the found file
+        
+    Raises:
+        FileNotFoundError: If no matching file is found
+    """
+    logger.debug(f"Searching for YAML file:"
+                f"\n\tDirectory: {directory}"
+                f"\n\tBase name: {base_name}")
+    
+    for ext in ['yaml', 'yml']:
+        file_path = os.path.join(directory, f"{base_name}.{ext}")
+        if os.path.exists(file_path):
+            logger.debug(f"Found YAML file: {file_path}")
+            return file_path, f"{base_name}.{ext}"
+    
+    error_msg = f"YAML file '{base_name}' not found in directory: {directory}"
+    logger.error(error_msg)
+    raise FileNotFoundError(error_msg)
+
+def load_yaml_file(file_path):
+    """
+    Load and parse YAML file.
+    
+    Args:
+        file_path (str): Path to the YAML file
+        
+    Returns:
+        dict: Parsed YAML content
+    """
+    logger.debug(f"Loading YAML file: {file_path}")
+    with open(file_path, 'r') as f:
+        return yaml.load(f)
+
 def load_test_sd_data(test_case_name):
     """
     Load and parse test SD data from YAML file.
