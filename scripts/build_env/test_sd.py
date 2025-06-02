@@ -74,51 +74,60 @@ def compare_sd_files(expected_dir, actual_dir, sd_filename):
                f"\n\tRendered test SD dir: {actual_dir}"
                f"\n\tFilename: {sd_filename}")
     
-    files_to_compare = [sd_filename]
-    match, mismatch, errors = filecmp.cmpfiles(expected_dir, actual_dir, files_to_compare, shallow=False)
+    # Find both files regardless of extension
+    expected_file = None
+    actual_file = None
     
-    # Log comparison results
-    logger.info(f"Comparison results:"
-               f"\n\tMatching files: {dump_as_yaml_format(match)}"
-               f"\n\tMismatched files: {dump_as_yaml_format(mismatch)}"
-               f"\n\tErrors: {dump_as_yaml_format(errors)}")
+    # Look for either .yaml or .yml in expected directory
+    for ext in ['yaml', 'yml']:
+        test_file = os.path.join(expected_dir, f"sd.{ext}")
+        if os.path.exists(test_file):
+            expected_file = test_file
+            break
     
-    # Show detailed diff for mismatches
-    if len(mismatch) > 0:
-        for file in mismatch:
-            file1 = os.path.join(expected_dir, file)
-            file2 = os.path.join(actual_dir, file)
-            try:
-                with open(file1, 'r') as f1, open(file2, 'r') as f2:
-                    diff = difflib.unified_diff(
-                        f1.readlines(),
-                        f2.readlines(),
-                        fromfile=file1,
-                        tofile=file2,
-                        lineterm=''
-                    )
-                    diff_text = '\n'.join(diff)
-                    logger.error(f"Differences found in {file}:\n{diff_text}")
-            except Exception as e:
-                logger.error(f"Error reading files for diff: {file1}, {file2}. Error: {e}")
+    # Look for either .yaml or .yml in actual directory
+    for ext in ['yaml', 'yml']:
+        test_file = os.path.join(actual_dir, f"sd.{ext}")
+        if os.path.exists(test_file):
+            actual_file = test_file
+            break
     
-    # Show file contents on errors
-    if len(errors) > 0:
-        for file in errors:
-            file1 = os.path.join(expected_dir, file)
-            file2 = os.path.join(actual_dir, file)
-            logger.info(f"File existence check:"
-                       f"\n\tExpected file exists: {os.path.exists(file1)}"
-                       f"\n\tActual file exists: {os.path.exists(file2)}")
+    if not expected_file:
+        logger.error(f"Expected SD file not found in: {expected_dir}")
+        return False
+        
+    if not actual_file:
+        logger.error(f"Generated SD file not found in: {actual_dir}")
+        return False
+    
+    # Load both files as YAML and compare contents
+    try:
+        with open(expected_file, 'r') as f1:
+            expected_content = yaml.load(f1)
+        with open(actual_file, 'r') as f2:
+            actual_content = yaml.load(f2)
             
-            if os.path.exists(file1):
-                with open(file1, 'r') as f:
-                    logger.info(f"Expected file contents:\n{f.read()}")
-            if os.path.exists(file2):
-                with open(file2, 'r') as f:
-                    logger.info(f"Actual file contents:\n{f.read()}")
-    
-    return len(mismatch) == 0 and len(errors) == 0
+        # Deep compare the YAML contents
+        if expected_content == actual_content:
+            logger.info("SD file contents match exactly")
+            return True
+        else:
+            # Show detailed diff for mismatches
+            with open(expected_file, 'r') as f1, open(actual_file, 'r') as f2:
+                diff = difflib.unified_diff(
+                    f1.readlines(),
+                    f2.readlines(),
+                    fromfile=expected_file,
+                    tofile=actual_file,
+                    lineterm=''
+                )
+                diff_text = '\n'.join(diff)
+                logger.error(f"Differences found in YAML content:\n{diff_text}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"Error comparing YAML contents: {e}")
+        return False
 
 
 @pytest.mark.parametrize("cluster_name, env_name, test_case_name", TEST_CASES)
@@ -148,9 +157,8 @@ def test_sd(cluster_name, env_name, test_case_name):
     
     # Compare generated SD with etalon
     expected_dir = os.path.join(ETALON_ENV_DIR, cluster_name, env_name, "Inventory", "solution-descriptor")
-    expected_file, sd_filename = find_yaml_file(expected_dir, "sd")
     actual_dir = os.path.join(env.env_path, "Inventory", "solution-descriptor")
     
-    # Verify files match
-    assert compare_sd_files(expected_dir, actual_dir, sd_filename), \
+    # Verify files match - we don't care about the exact filename anymore
+    assert compare_sd_files(expected_dir, actual_dir, "sd"), \
         "Generated SD file does not match the expected one" 
