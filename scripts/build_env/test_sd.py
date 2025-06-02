@@ -108,38 +108,33 @@ def compare_sd_files(expected_dir, actual_dir, sd_filename):
         with open(actual_file, 'r') as f2:
             actual_lines = f2.readlines()
             
-        # Compare line by line to catch trailing whitespace
-        if len(expected_lines) != len(actual_lines):
-            logger.error(f"Files have different number of lines: expected {len(expected_lines)}, got {len(actual_lines)}")
-            return False
+        # First show the content difference using unified diff
+        diff = difflib.unified_diff(
+            expected_lines,
+            actual_lines,
+            fromfile="Etalon SD",
+            tofile="Rendered SD",
+            lineterm=''
+        )
+        diff_text = '\n'.join(diff)
+        if diff_text:
+            logger.error(f"Files differ. Unified diff:\n{diff_text}")
             
-        differences = []
-        for i, (expected_line, actual_line) in enumerate(zip(expected_lines, actual_lines), 1):
-            if expected_line != actual_line:
-                # Check if the difference is only in trailing whitespace
-                expected_content = expected_line.rstrip('\n')  # Keep trailing spaces but remove newline
-                actual_content = actual_line.rstrip('\n')      # Keep trailing spaces but remove newline
-                
-                if expected_content != actual_content:
-                    # Show exact characters including whitespace using repr()
-                    differences.append(f"Line {i}:")
-                    differences.append(f"  Etalon SD content: {repr(expected_content)}")
-                    differences.append(f"  Rendered SD content: {repr(actual_content)}")
-                    differences.append("")
-        
-        if differences:
-            logger.error("Found differences (including trailing whitespace):\n" + "\n".join(differences))
+            # Also show exact content of both files for better visibility
+            logger.error("\nFull content comparison:")
+            logger.error("Etalon SD content:")
+            logger.error("```")
+            logger.error(''.join(expected_lines).rstrip())
+            logger.error("```")
+            logger.error("\nRendered SD content:")
+            logger.error("```")
+            logger.error(''.join(actual_lines).rstrip())
+            logger.error("```")
             
-            # Also show standard diff for context
-            diff = difflib.unified_diff(
-                expected_lines,
-                actual_lines,
-                fromfile=expected_file,
-                tofile=actual_file,
-                lineterm=''
-            )
-            diff_text = '\n'.join(diff)
-            logger.error(f"Standard diff view:\n{diff_text}")
+            # Show line count difference if exists
+            if len(expected_lines) != len(actual_lines):
+                logger.error(f"\nLine count differs: expected {len(expected_lines)}, got {len(actual_lines)} lines")
+            
             return False
             
         # If we got here, files match exactly including trailing whitespace
