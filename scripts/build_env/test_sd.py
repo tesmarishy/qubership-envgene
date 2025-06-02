@@ -4,7 +4,7 @@ import difflib
 import os
 import yaml
 import json
-from main import handle_sd
+from env_inventory_generation import handle_sd
 from envgenehelper import *
 
 test_data = [
