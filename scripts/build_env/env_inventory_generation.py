@@ -16,7 +16,7 @@ PARAMSETS_DIR_PATH = "Inventory/parameters/"
 INV_GEN_CREDS_PATH = "Inventory/credentials/inventory_generation_creds.yml"
 CLUSTER_TOKEN_CRED_ID = "cloud-deploy-sa-token"
 
-with open("/build_env/schemas/paramset.schema.json", 'r') as f:
+with open("/schemas/paramset.schema.json", 'r') as f:
     PARAMSET_SCHEMA = json.load(f)
 
 @dataclass
