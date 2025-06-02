@@ -48,8 +48,12 @@ def test_sd(cluster_name, env_name, test_sd_name):
     # Ensure output directory exists
     os.makedirs(g_output_dir, exist_ok=True)
     
+    # Create Environment object with the correct base path
+    base_dir = os.path.dirname(os.path.dirname(g_output_dir))  # Go up two levels from tmp/test_sd
+    env = Environment(base_dir, "tmp", "test_sd")
+    
     # Call the function with test data
-    handle_sd(g_output_dir, sd_source_type, sd_version, sd_data, sd_delta)
+    handle_sd(env, sd_source_type, sd_version, sd_data, sd_delta)
     
     # Compare files
     expected_dir = os.path.join(g_sd_dir, cluster_name, env_name, "Inventory", "solution-descriptor")
@@ -64,7 +68,7 @@ def test_sd(cluster_name, env_name, test_sd_name):
         logger.error(f"Mismatch: {dump_as_yaml_format(mismatch)}")
         for file in mismatch:
             file1 = os.path.join(expected_dir, file)
-            file2 = os.path.join(g_output_dir, file)
+            file2 = os.path.join(sd_output_dir, file)
             try:
                 with open(file1, 'r') as f1, open(file2, 'r') as f2:
                     diff = difflib.unified_diff(
