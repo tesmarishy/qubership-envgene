@@ -18,7 +18,7 @@ yaml = YAML()
 # Test data configuration
 TEST_CASES = [
     # (cluster_name, environment_name, test_case_name)
-    ("test-solution-structure", "test-solution-structure-case-01", "test_001")
+    ("test-solution-structure", "env02", "test_001")
 ]
 
 # Directory paths configuration
@@ -62,7 +62,7 @@ def load_test_sd_data(test_case_name):
     
     logger.info(f"Loaded SD parameters:"
                f"\n\tSD_SOURCE_TYPE: {sd_source_type}"
-               f"\n\SD_VERSION: {sd_version}"
+               f"\n\tSD_VERSION: {sd_version}"
                f"\n\tSD_DELTA: {sd_delta}")
     
     return sd_data, sd_source_type, sd_version, sd_delta
