@@ -12,7 +12,7 @@ import json
 from env_inventory_generation import handle_sd, Environment
 from envgenehelper import *
 
-# Initialize YAML parser
+# Initialize YAML parser with whitespace preservation
 yaml = YAML()
 
 # Test data configuration
@@ -100,33 +100,53 @@ def compare_sd_files(expected_dir, actual_dir, sd_filename):
         logger.error(f"Generated SD file not found in: {actual_dir}")
         return False
     
-    # Load both files as YAML and compare contents
     try:
+        # Read files line by line to preserve trailing whitespace
         with open(expected_file, 'r') as f1:
-            expected_content = yaml.load(f1)
+            expected_lines = f1.readlines()
         with open(actual_file, 'r') as f2:
-            actual_content = yaml.load(f2)
+            actual_lines = f2.readlines()
             
-        # Deep compare the YAML contents
-        if expected_content == actual_content:
-            logger.info("SD file contents match exactly")
-            return True
-        else:
-            # Show detailed diff for mismatches
-            with open(expected_file, 'r') as f1, open(actual_file, 'r') as f2:
-                diff = difflib.unified_diff(
-                    f1.readlines(),
-                    f2.readlines(),
-                    fromfile=expected_file,
-                    tofile=actual_file,
-                    lineterm=''
-                )
-                diff_text = '\n'.join(diff)
-                logger.error(f"Differences found in YAML content:\n{diff_text}")
+        # Compare line by line to catch trailing whitespace
+        if len(expected_lines) != len(actual_lines):
+            logger.error(f"Files have different number of lines: expected {len(expected_lines)}, got {len(actual_lines)}")
             return False
             
+        differences = []
+        for i, (expected_line, actual_line) in enumerate(zip(expected_lines, actual_lines), 1):
+            if expected_line != actual_line:
+                # Check if the difference is only in trailing whitespace
+                expected_content = expected_line.rstrip('\n')  # Keep trailing spaces but remove newline
+                actual_content = actual_line.rstrip('\n')      # Keep trailing spaces but remove newline
+                
+                if expected_content != actual_content:
+                    # Show exact characters including whitespace using repr()
+                    differences.append(f"Line {i}:")
+                    differences.append(f"  Expected: {repr(expected_content)}")
+                    differences.append(f"  Actual  : {repr(actual_content)}")
+                    differences.append("")
+        
+        if differences:
+            logger.error("Found differences (including trailing whitespace):\n" + "\n".join(differences))
+            
+            # Also show standard diff for context
+            diff = difflib.unified_diff(
+                expected_lines,
+                actual_lines,
+                fromfile=expected_file,
+                tofile=actual_file,
+                lineterm=''
+            )
+            diff_text = '\n'.join(diff)
+            logger.error(f"Standard diff view:\n{diff_text}")
+            return False
+            
+        # If we got here, files match exactly including trailing whitespace
+        logger.info("SD files match exactly (including trailing whitespace)")
+        return True
+            
     except Exception as e:
-        logger.error(f"Error comparing YAML contents: {e}")
+        logger.error(f"Error comparing files: {e}")
         return False
 
 
