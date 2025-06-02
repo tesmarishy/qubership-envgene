@@ -122,8 +122,8 @@ def compare_sd_files(expected_dir, actual_dir, sd_filename):
                 if expected_content != actual_content:
                     # Show exact characters including whitespace using repr()
                     differences.append(f"Line {i}:")
-                    differences.append(f"  Expected: {repr(expected_content)}")
-                    differences.append(f"  Actual  : {repr(actual_content)}")
+                    differences.append(f"  Etalon SD content: {repr(expected_content)}")
+                    differences.append(f"  Rendered SD content: {repr(actual_content)}")
                     differences.append("")
         
         if differences:
