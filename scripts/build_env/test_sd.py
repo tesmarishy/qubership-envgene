@@ -61,12 +61,14 @@ def test_sd(cluster_name, env_name, test_sd_name):
     expected_file, sd_filename = find_yaml_file(expected_dir, "sd")
     files_to_compare = [sd_filename]
     
-    #sd_output_dir = os.path.join(g_output_dir, "Inventory", "solution-descriptor")
-    match, mismatch, errors = filecmp.cmpfiles(expected_dir, g_output_dir, files_to_compare, shallow=False)
+    sd_output_dir = os.path.join(g_output_dir, "Inventory", "solution-descriptor")
+    match, mismatch, errors = filecmp.cmpfiles(expected_dir, sd_output_dir, files_to_compare, shallow=False)
     
     logger.info(f"Match: {dump_as_yaml_format(match)}")
     if len(mismatch) > 0:
         logger.error(f"Mismatch: {dump_as_yaml_format(mismatch)}")
+        logger.info(f"Etalon_dir: {expected_dir}")
+        logger.info(f"SD_dir: {sd_output_dir}")
         for file in mismatch:
             file1 = os.path.join(expected_dir, file)
             file2 = os.path.join(sd_output_dir, file)
