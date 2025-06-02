@@ -2,10 +2,12 @@ import filecmp
 import pytest
 import difflib
 import os
-import yaml
+from ruamel.yaml import YAML
 import json
 from env_inventory_generation import handle_sd
 from envgenehelper import *
+
+yaml = YAML()
 
 test_data = [
     ("test-solution-structure", "test-solution-structure-case-01", "test_001")
@@ -21,7 +23,7 @@ def change_test_dir(request, monkeypatch):
 
 def load_yaml_file(file_path):
     with open(file_path, 'r') as f:
-        return yaml.safe_load(f)
+        return yaml.load(f)
 
 def find_yaml_file(directory, base_name):
     """Find yaml file with either .yaml or .yml extension"""
