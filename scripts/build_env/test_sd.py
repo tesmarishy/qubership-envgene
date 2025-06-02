@@ -4,7 +4,7 @@ import difflib
 import os
 from ruamel.yaml import YAML
 import json
-from env_inventory_generation import handle_sd
+from env_inventory_generation import handle_sd, Environment
 from envgenehelper import *
 
 yaml = YAML()
@@ -48,23 +48,16 @@ def test_sd(cluster_name, env_name, test_sd_name):
     # Ensure output directory exists
     os.makedirs(g_output_dir, exist_ok=True)
     
-    # Generate output file path
-    output_file = os.path.join(g_output_dir, "sd.yaml")
-    
     # Call the function with test data
-    env = env_name
-    result = handle_sd(env, sd_source_type, sd_version, sd_data, sd_delta)
-    
-    # Write result to file
-    with open(output_file, 'w') as f:
-        yaml.dump(result, f)
+    handle_sd(g_output_dir, sd_source_type, sd_version, sd_data, sd_delta)
     
     # Compare files
     expected_dir = os.path.join(g_sd_dir, cluster_name, env_name, "Inventory", "solution-descriptor")
     expected_file, sd_filename = find_yaml_file(expected_dir, "sd")
     files_to_compare = [sd_filename]
     
-    match, mismatch, errors = filecmp.cmpfiles(expected_dir, g_output_dir, files_to_compare, shallow=False)
+    sd_output_dir = os.path.join(g_output_dir, "Inventory", "solution-descriptor")
+    match, mismatch, errors = filecmp.cmpfiles(expected_dir, sd_output_dir, files_to_compare, shallow=False)
     
     logger.info(f"Match: {dump_as_yaml_format(match)}")
     if len(mismatch) > 0:
