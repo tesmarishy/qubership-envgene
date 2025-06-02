@@ -61,7 +61,8 @@ def test_sd(cluster_name, env_name, test_sd_name):
     expected_file, sd_filename = find_yaml_file(expected_dir, "sd")
     files_to_compare = [sd_filename]
     
-    sd_output_dir = os.path.join(g_output_dir, "Inventory", "solution-descriptor")
+    # Get the actual output directory from env.env_path
+    sd_output_dir = os.path.join(env.env_path, "Inventory", "solution-descriptor")
     
     # Check if directories and files exist
     logger.info(f"Expected directory: {expected_dir}")
