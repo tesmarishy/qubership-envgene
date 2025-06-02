@@ -56,12 +56,13 @@ def test_sd(cluster_name, env_name, test_sd_name):
     handle_sd(env, sd_source_type, sd_version, sd_data, sd_delta)
     
     # Compare files
+    #ETALON SD FROM ENV
     expected_dir = os.path.join(g_sd_dir, cluster_name, env_name, "Inventory", "solution-descriptor")
     expected_file, sd_filename = find_yaml_file(expected_dir, "sd")
     files_to_compare = [sd_filename]
     
-    sd_output_dir = os.path.join(g_output_dir, "Inventory", "solution-descriptor")
-    match, mismatch, errors = filecmp.cmpfiles(expected_dir, sd_output_dir, files_to_compare, shallow=False)
+    #sd_output_dir = os.path.join(g_output_dir, "Inventory", "solution-descriptor")
+    match, mismatch, errors = filecmp.cmpfiles(expected_dir, g_output_dir, files_to_compare, shallow=False)
     
     logger.info(f"Match: {dump_as_yaml_format(match)}")
     if len(mismatch) > 0:

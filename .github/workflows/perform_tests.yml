@@ -4,6 +4,12 @@ run-name: "Perform smoke tests on commit ${{ github.sha }}"
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
 
 jobs:
   pytest:
