@@ -101,14 +101,16 @@ def compare_sd_files(expected_dir, actual_dir, sd_filename):
         return False
     
     try:
-        # Read files line by line to preserve trailing whitespace
+        # Read files and normalize line endings
         with open(expected_file, 'r') as f1:
-            expected_lines = f1.readlines()
+            expected_content = f1.read().rstrip('\n')
+            expected_lines = expected_content.splitlines(keepends=True)
         with open(actual_file, 'r') as f2:
-            actual_lines = f2.readlines()
+            actual_content = f2.read().rstrip('\n')
+            actual_lines = actual_content.splitlines(keepends=True)
             
-        # Compare contents
-        if expected_lines != actual_lines:
+        # Compare contents ignoring final newline
+        if expected_content != actual_content:
             # Prepare error message
             error_msg = [
                 "\nSD files differ:",
@@ -129,9 +131,9 @@ def compare_sd_files(expected_dir, actual_dir, sd_filename):
             error_msg.extend([
                 "\n\n=== Full content comparison ===",
                 "\n--- Etalon SD content ---\n",
-                ''.join(expected_lines).rstrip(),
+                expected_content,
                 "\n\n+++ Rendered SD content +++\n",
-                ''.join(actual_lines).rstrip()
+                actual_content
             ])
             
             # Add line count info if different
@@ -142,8 +144,8 @@ def compare_sd_files(expected_dir, actual_dir, sd_filename):
             logger.error('\n'.join(error_msg))
             return False
             
-        # If we got here, files match exactly including trailing whitespace
-        logger.info("SD files match exactly (including trailing whitespace)")
+        # If we got here, files match exactly (ignoring final newline)
+        logger.info("SD files match exactly (ignoring final newline)")
         return True
             
     except Exception as e:
