@@ -156,6 +156,8 @@ EnvGene adds the following header to all auto-generated objects (all Environment
 
 EnvGene sorts every Environment Instance object according to its JSON schema. This ensures that when objects are modified (e.g., when applying a new template version), the repository commits remain human-readable.
 
+EnvGene validates each Environment Instance object against the corresponding [JSON schema](/schemas/).
+
 #### Tenant
 
 TBD
