@@ -18,13 +18,14 @@ yaml = YAML()
 # Test data configuration
 TEST_CASES = [
     # (cluster_name, environment_name, test_case_name)
-    ("test-solution-structure", "env02", "test_001")
+    ("cluster01", "env02", "TC-001-002"),
+    ("cluster01", "env03", "TC-001-006")
 ]
 
 # Directory paths configuration
-TEST_SD_DIR = getAbsPath("../../test_data/test_sd")               # Directory with test SD files
+TEST_SD_DIR = getAbsPath("../../test_data/test_handle_sd")               # Directory with test SD files
 ETALON_ENV_DIR = getAbsPath("../../test_data/test_environments")  # Directory with etalon environments
-OUTPUT_DIR = getAbsPath("../../tmp/test_sd")                      # Directory for test output
+OUTPUT_DIR = getAbsPath("../../tmp/test_handle_sd")                      # Directory for test output
 
 
 def find_yaml_file(directory, base_name):
