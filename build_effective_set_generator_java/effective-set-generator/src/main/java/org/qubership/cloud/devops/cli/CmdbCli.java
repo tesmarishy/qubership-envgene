@@ -52,6 +52,7 @@ public class CmdbCli implements Callable<Integer> {
     public Integer call() {
         initializeParams();
         try {
+            logInfo("Checking if this is latest image");
             Instant start = Instant.now();
             logInfo("Starting effective set generation");
             fileDataRepository.prepareProcessingEnv();
