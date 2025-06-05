@@ -2,6 +2,7 @@
 import filecmp
 import difflib
 import os
+import shutil
 
 # Third party imports
 import pytest
@@ -19,7 +20,7 @@ yaml = YAML()
 TEST_CASES = [
     # (cluster_name, environment_name, test_case_name)
     ("cluster01", "env02", "TC-001-002"),
-    ("cluster01", "env03", "TC-001-006")
+    ("cluster01", "env02", "TC-001-006")
 ]
 
 # Directory paths configuration
@@ -155,6 +156,7 @@ def compare_sd_files(expected_dir, actual_dir, sd_filename):
 
 
 @pytest.mark.parametrize("cluster_name, env_name, test_case_name", TEST_CASES)
+
 def test_sd(cluster_name, env_name, test_case_name):
     """
     Test SD file generation and comparison.
@@ -172,8 +174,26 @@ def test_sd(cluster_name, env_name, test_case_name):
     # Load test data
     sd_data, sd_source_type, sd_version, sd_delta = load_test_sd_data(test_case_name)
     
+    # Create base output directory with new structure
+    base_output_path = os.path.join(OUTPUT_DIR, test_case_name, cluster_name, env_name)
+    
     # Create Environment object for output
-    env = Environment(OUTPUT_DIR, test_case_name, "")
+    env = Environment(base_output_path, cluster_name, env_name)
+    
+    # Source and target paths for Inventory/solution-descriptor
+    source_sd_dir = os.path.join(TEST_SD_DIR, test_case_name, "Inventory", "solution-descriptor")
+    target_sd_dir = os.path.join(env.env_path, "Inventory", "solution-descriptor")
+    
+    # Copy Inventory/solution-descriptor directory if it exists
+    if os.path.exists(source_sd_dir):
+        logger.info(f"Copying Inventory/solution-descriptor from {source_sd_dir} to {target_sd_dir}")
+        # Create parent directory if it doesn't exist
+        os.makedirs(os.path.dirname(target_sd_dir), exist_ok=True)
+        # Copy the entire directory
+        shutil.copytree(source_sd_dir, target_sd_dir)
+    else:
+        # If source doesn't exist, just create the target directory
+        os.makedirs(target_sd_dir, exist_ok=True)
     
     # Generate SD file
     logger.info("Generating SD file...")
