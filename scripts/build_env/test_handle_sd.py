@@ -188,7 +188,7 @@ def test_sd(cluster_name, env_name, test_case_name):
     sd_data, sd_source_type, sd_version, sd_delta = load_test_sd_data(test_case_name)
     
     # Create base output directory with new structure
-    base_output_path = os.path.join(OUTPUT_DIR, test_case_name, cluster_name, env_name)
+    base_output_path = os.path.join(OUTPUT_DIR, test_case_name)
     
     # Create Environment object for output
     env = Environment(base_output_path, cluster_name, env_name)
