@@ -179,6 +179,8 @@ def test_sd(cluster_name, env_name, test_case_name):
         env_name (str): Name of the environment
         test_case_name (str): Name of the test case
     """
+    logger.info(f"======TEST HANDLE_SD: {test_case_name}======")
+    
     logger.info(f"Starting SD test:"
                f"\n\tCluster: {cluster_name}"
                f"\n\tEnvironment: {env_name}"
@@ -218,4 +220,6 @@ def test_sd(cluster_name, env_name, test_case_name):
     
     # Verify files match - we don't care about the exact filename anymore
     assert compare_sd_files(expected_dir, actual_dir, "sd"), \
-        "Generated SD file does not match the expected one" 
+        "Generated SD file does not match the expected one"
+        
+    logger.info(f"=====SUCCESS - {test_case_name}======") 
