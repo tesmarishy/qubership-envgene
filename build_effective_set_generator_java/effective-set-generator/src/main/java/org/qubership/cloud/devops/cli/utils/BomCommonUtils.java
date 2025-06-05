@@ -30,6 +30,7 @@ import org.qubership.cloud.devops.commons.repository.interfaces.FileDataConverte
 import org.qubership.cloud.devops.commons.service.interfaces.ProfileService;
 import org.qubership.cloud.devops.commons.service.interfaces.RegistryConfigurationService;
 import org.qubership.cloud.parameters.processor.dto.DeploymentConfig;
+import org.qubership.cloud.parameters.processor.dto.DeployOptions;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.qubership.cloud.devops.cli.exceptions.constants.ExceptionMessage.REGISTRY_EXTRACT_FAILED;
 import static org.qubership.cloud.devops.commons.utils.ConsoleLogger.logError;
