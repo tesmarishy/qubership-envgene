@@ -14,6 +14,7 @@ jobs:
     uses: ./.github/workflows/perform_tests.yml
   
   build-jar:
+    needs: [tests]
     uses: netcracker/qubership-workflow-hub/.github/workflows/maven-publish.yml@main
     with:
       maven-command: "--batch-mode package -Dgpg.skip=true -f build_effective_set_generator_java/pom.xml"
