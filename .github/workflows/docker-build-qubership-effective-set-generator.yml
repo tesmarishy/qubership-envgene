@@ -10,6 +10,9 @@ env:
   IMAGE_NAME: netcracker/qubership-effective-set-generator
 
 jobs:
+  tests:
+    uses: ./.github/workflows/perform_tests.yml
+  
   build-jar:
     uses: netcracker/qubership-workflow-hub/.github/workflows/maven-publish.yml@main
     with:
