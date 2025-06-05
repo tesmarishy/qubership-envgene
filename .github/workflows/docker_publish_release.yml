@@ -26,6 +26,9 @@ on:
         required: true
 
 jobs:
+  tests:
+    uses: ./.github/workflows/perform_tests.yml
+  
   check-tag:
     runs-on: ubuntu-latest
     steps:

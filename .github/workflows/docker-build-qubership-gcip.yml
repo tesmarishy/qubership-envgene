@@ -10,6 +10,9 @@ env:
   IMAGE_NAME: netcracker/qubership-gcip
 
 jobs:
+  tests:
+    uses: ./.github/workflows/perform_tests.yml
+  
   build-and-push-image:
     runs-on: ubuntu-latest
     permissions:

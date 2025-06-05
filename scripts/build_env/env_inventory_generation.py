@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from os import path
+from os import path, getenv
 import re
 
 import ansible_runner
@@ -16,7 +16,11 @@ PARAMSETS_DIR_PATH = "Inventory/parameters/"
 INV_GEN_CREDS_PATH = "Inventory/credentials/inventory_generation_creds.yml"
 CLUSTER_TOKEN_CRED_ID = "cloud-deploy-sa-token"
 
-with open("/build_env/schemas/paramset.schema.json", 'r') as f:
+# Get schema path from environment variable or use default path
+SCHEMAS_DIR = getenv("JSON_SCHEMAS_DIR", path.join(path.dirname(path.dirname(path.dirname(__file__))), "schemas"))
+PARAMSET_SCHEMA_PATH = path.join(SCHEMAS_DIR, "paramset.schema.json")
+
+with open(PARAMSET_SCHEMA_PATH, 'r') as f:
     PARAMSET_SCHEMA = json.load(f)
 
 @dataclass
