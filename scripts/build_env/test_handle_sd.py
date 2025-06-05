@@ -53,7 +53,20 @@ def load_yaml_file(file_path):
 
 def load_test_sd_data(test_case_name):
     logger.info(f"Loading test data for case: {test_case_name}")
-    test_file, _ = find_yaml_file(TEST_SD_DIR, test_case_name)
+    
+    # Try both yaml and yml extensions
+    test_file = None
+    for ext in ['yaml', 'yml']:
+        file_path = os.path.join(TEST_SD_DIR, test_case_name, f"{test_case_name}.{ext}")
+        if os.path.exists(file_path):
+            test_file = file_path
+            break
+    
+    if test_file is None:
+        error_msg = f"Test case file not found for {test_case_name} in {TEST_SD_DIR}/{test_case_name}/ (tried both .yaml and .yml)"
+        logger.error(error_msg)
+        raise FileNotFoundError(error_msg)
+    
     test_data = load_yaml_file(test_file)
     
     # Extract SD parameters with defaults
