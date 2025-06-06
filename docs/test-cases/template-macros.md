@@ -22,8 +22,8 @@
   - [TC-003-019: Using `current_env.additionalTemplateVariables`. `envTemplate.additionalTemplateVariables` NOT set in Environment Inventory](#tc-003-019-using-current_envadditionaltemplatevariables-envtemplateadditionaltemplatevariables-not-set-in-environment-inventory)
   - [TC-003-020: Using `current_env.cloud_passport`. `inventory.cloudPassport` set in Environment Inventory](#tc-003-020-using-current_envcloud_passport-inventorycloudpassport-set-in-environment-inventory)
   - [TC-003-021: Using `current_env.cloud_passport`. `inventory.cloudPassport` NOT set in Environment Inventory](#tc-003-021-using-current_envcloud_passport-inventorycloudpassport-not-set-in-environment-inventory)
-  - [TC-003-022: Using `current_env.solution_structure`. `inventory.cloudPassport` set in Environment Inventory](#tc-003-022-using-current_envsolution_structure-inventorycloudpassport-set-in-environment-inventory)
-  - [TC-003-023: Using `current_env.solution_structure`. `inventory.cloudPassport` NOT set in Environment Inventory](#tc-003-023-using-current_envsolution_structure-inventorycloudpassport-not-set-in-environment-inventory)
+  - [TC-003-022: Using `current_env.solution_structure`. SD exist in Instance repo](#tc-003-022-using-current_envsolution_structure-sd-exist-in-instance-repo)
+  - [TC-003-023: Using `current_env.solution_structure`. SD NOT in Instance repo](#tc-003-023-using-current_envsolution_structure-sd-not-in-instance-repo)
 
 Test Cases for [Template Macros](/docs/template-macros.md)
 
