@@ -451,7 +451,7 @@ Results:
 
 - Namespace in Environment Instance contains values where `current_env.cloud_passport` was substituted with value `{}`
 
-## TC-003-022: Using `current_env.solution_structure`. `inventory.cloudPassport` set in Environment Inventory
+## TC-003-022: Using `current_env.solution_structure`. SD exist in Instance repo
 
 Status: Not Implemented
 
@@ -477,7 +477,7 @@ Results:
 
 - Namespace in Environment Instance contains values where `current_env.solution_structure` was substituted with value obtained according to principles described [here](/docs/template-macros.md#current_envsolution_structure)
 
-## TC-003-023: Using `current_env.solution_structure`. `inventory.cloudPassport` NOT set in Environment Inventory
+## TC-003-023: Using `current_env.solution_structure`. SD NOT in Instance repo
 
 Status: Not Implemented
 
@@ -492,7 +492,7 @@ Pre-requisites:
   - `deployParameterSets`
   - `e2eParameterSets`
   - `technicalConfigurationParameterSets`
-- Environment Inventory does NOT have `inventory.cloudPassport` attribute set
+- Instance repo doesnn't contain SD for this environment
 
 Inputs:
 
