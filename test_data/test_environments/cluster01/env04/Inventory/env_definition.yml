@@ -4,3 +4,5 @@ inventory:
   #cloudName: "test-cloud" #TC-003-005
   cloudPassport: "test-cloudPassport" #TC-003-007
   deployer: "test-deployer" #TC-003-011
+envTemplate:
+  name: "test-template-2" #TC-003-017  

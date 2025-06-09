@@ -6,3 +6,5 @@ inventory:
   deployer: "test-deployer-without-url" #TC-003-009
   description: "TEST-DESCRIPTION" #TC-003-013 
   owners: "Qubership.org" #TC-003-015
+envTemplate:
+  name: "test-template-1" #TC-003-017
