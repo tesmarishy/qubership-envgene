@@ -126,15 +126,6 @@ sequenceDiagram
 
 3. The certificate will be automatically added to the trusted root store during pipeline execution
 
-```mermaid
-sequenceDiagram
-    participant EnvGene
-    participant InternalService
-    
-    EnvGene->>InternalService: Request with custom CA trust
-    InternalService->>EnvGene: Response
-```
-
 ## Technical Implementation
 
 Under the hood, EnvGene uses a certificate handling script that:
