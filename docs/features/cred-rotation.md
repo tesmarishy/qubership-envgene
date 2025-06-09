@@ -52,6 +52,7 @@ Supports working with SOPS encryption.
 4. An external system is responsible for triggering Effective Set generation
 5. An external system is responsible for triggering Cloud Passport rediscovery
 6. Credential rotation can only be run for a single Environment at a time
+7. Credential rotation in a single operation for multiple Environments is not supported. `ENV_NAMES` can only contain a single Environment ID.
 
 ### Requirements
 
@@ -224,30 +225,30 @@ The `affected-sensitive-parameters.yaml` is created using the reverse logic desc
     context: enum[`pipeline`,`deployment`,`runtime`]
     parameter_key: string
   affected_parameters:
-    # Mandatory
-    # Environment id (in cluster-name/env-name notation) where affected parameter is located
-    environment: string
-    # Mandatory
-    # Namespace where affected parameter is located
-    namespace: string
-    # Mandatory. Default `None`
-    # Application where affected parameter is located
-    application: string
-    # Mandatory
-    # Effective Set context where the parameter is located.
-    context: enum[`pipeline`,`deployment`,`runtime`]
-    # Mandatory
-    # Affected parameter key
-    parameter_key: string
-    # Mandatory
-    # Path to Credential file
-    cred-filepath: string
-    # Mandatory. Default `None`
-    # Path to Shared credential file
-    shared-cred-filepath: credX
-    # Mandatory
-    # Common Credential ID. Located in `cred-filepath`
-    cred-id: credX
+    - # Mandatory
+      # Environment id (in cluster-name/env-name notation) where affected parameter is located
+      environment: string
+      # Mandatory
+      # Namespace where affected parameter is located
+      namespace: string
+      # Mandatory. Default `None`
+      # Application where affected parameter is located
+      application: string
+      # Mandatory
+      # Effective Set context where the parameter is located.
+      context: enum[`pipeline`,`deployment`,`runtime`]
+      # Mandatory
+      # Affected parameter key
+      parameter_key: string
+      # Mandatory
+      # Path to Credential file
+      cred-filepath: string
+      # Mandatory. Default `None`
+      # Path to Shared credential file
+      shared-cred-filepath: credX
+      # Mandatory
+      # Common Credential ID. Located in `cred-filepath`
+      cred-id: credX
 - ...
 ```
 
