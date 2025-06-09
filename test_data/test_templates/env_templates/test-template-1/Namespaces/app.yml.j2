@@ -1,0 +1,16 @@
+---
+name: "{{current_env.name}}-app" #TC-003-002
+labels:
+- "Instance-{{current_env.name}}" #TC-003-002
+deployParameters:
+  APP_NAMESPACE: "{{current_env.name}}-app" #TC-003-002
+e2eParameters:
+  APP_NAMESPACE: "{{current_env.name}}-app" #TC-003-002
+technicalConfigurationParameters:
+  APP_NAMESPACE: "{{current_env.name}}-app" #TC-003-002
+deployParameterSets:
+  - "test-parameters-1" #TC-003-002
+e2eParameterSets:
+  - "test-parameters-1" #TC-003-002
+technicalConfigurationParameterSets:
+  - "test-parameters-1" #TC-003-002

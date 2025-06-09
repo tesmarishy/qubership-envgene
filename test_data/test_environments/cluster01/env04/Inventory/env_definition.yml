@@ -1,0 +1,6 @@
+inventory:
+  environmentName: "test-environment" #TC-003-002
+  tenantName: "test-tenant" #TC-003-003
+  #cloudName: "test-cloud" #TC-003-005
+  cloudPassport: "test-cloudPassport" #TC-003-007
+  deployer: "test-deployer" #TC-003-011
