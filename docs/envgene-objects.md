@@ -289,11 +289,11 @@ The between Shared Credentials and Environment is established through:
 Credentials can be defined at three scopes with different precedence:
 
 1. **Environment-level**  
-   Location: `/environments/<cluster-name>/<env-name>/Inventory/parameters/`
+   Location: `/environments/<cluster-name>/<env-name>/Inventory/credentials/`
 2. **Cluster-level**  
-   Location: `/environments/<cluster-name>/parameters/`
+   Location: `/environments/<cluster-name>/credentials/`
 3. **Site-level**  
-   Location: `/environments/parameters/`
+   Location: `/environments/credentials/`
 
 EnvGene checks these locations in order (environment → cluster → site) and uses the first matching file found.
 
