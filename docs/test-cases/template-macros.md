@@ -31,6 +31,11 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 
 Status: Not Implemented
 
+Files that implement test case:
+
+- path/to/file1
+- path/fo/file2
+
 Pre-requisites:
 
 - Template Descriptor uses `templates_dir` in attributes:
