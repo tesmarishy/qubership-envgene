@@ -7,9 +7,9 @@ This describes test cases for the [Template Override](/docs/features/template-ov
 
 ## TC-002-001: Template override on Cloud and Namespace level. Override includes paramsets with comments
 
-Status: Implemented
+**Status:** Active
 
-Files that implement test case:
+**Test Data:**
 
 - test_templates/env_templates/test-solution-structure-template.yaml
 - test_templates/env_templates/test-solution-structure-template/cloud.yml.j2
@@ -20,7 +20,7 @@ Files that implement test case:
 - test_environments/cluster01/env01/Namespaces/app-core/namespace.yml
 - test_environments/cluster01/env01/cloud.yml
 
-Pre-requisites:
+**Pre-requisites:**
 
 - `template_override` is used in Template Descriptor for override xParameterSets for Cloud and Namespace:
 
@@ -65,12 +65,12 @@ technicalConfigurationParameterSets:
 
 - Parameter sets `paramset-A`, `paramset-B` are created in the Template repository
 
-Inputs:
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
 
-Results:
+**Expected Results:**
 
 - Cloud and Namespace objects of the resulting Environment Instance contain:
 
