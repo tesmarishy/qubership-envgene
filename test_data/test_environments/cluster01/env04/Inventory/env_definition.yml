@@ -5,4 +5,7 @@ inventory:
   cloudPassport: "test-cloudPassport" #TC-003-007
   deployer: "test-deployer" #TC-003-011
 envTemplate:
-  name: "test-template-2" #TC-003-017  
+  name: "test-template-2" #TC-003-017
+  additionalTemplateVariables: {} #TC-003-019
+generatedVersions:
+  generateEnvironmentLatestVersion: "test-template-2"  

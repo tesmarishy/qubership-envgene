@@ -2,3 +2,18 @@
 name: "test-parameters-1"
 parameters:
   APP_NAMESPACE: "{{ current_env.name }}-app" #TC-001-002
+  {% if current_env.inventory.envTemplate.additionalTemplateVariables.Variable_1 is defined %} 
+  PARAMETERS_Variable_1: "{{ current_env.inventory.envTemplate.additionalTemplateVariables.Variable_1 }}" #TC-003-018 TC-003-019
+  {% endif %}
+  {% if current_env.inventory.envTemplate.additionalTemplateVariables.Variable_2 is defined %} 
+  PARAMETERS_Variable_2: "{{ current_env.inventory.envTemplate.additionalTemplateVariables.Variable_2 }}" #TC-003-018 TC-003-019
+  {% endif %}
+  {% if current_env.inventory.envTemplate.additionalTemplateVariables.Variable_3 is defined %} 
+  PARAMETERS_Variable_3: "{{ current_env.inventory.envTemplate.additionalTemplateVariables.Variable_3 }}" #TC-003-018 TC-003-019
+  {% endif %}
+  {% if current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST is defined %}
+  PARAMETERS_CLOUD_PUBLIC_HOST: "{{current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST}}" #TC-003-021
+  {% endif %}
+  {% if "Test-App-Name" in current_env.solution_structure %}
+    PARAMETERS_SD_VALUE: "TPARAMETERS_SD_VALUE"
+  {% endif %}
