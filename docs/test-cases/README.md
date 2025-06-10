@@ -1,9 +1,11 @@
-# Testing
+# Testing Approach
 
-## Definition
+## Terms
 
 **User**: Human or system interacting with the solution
+
 **Feature**: Discrete business function delivering value
+
 **Use Case**: Scenario delivering user outcome. Sequence of interactions between a user and a system to achieve a specific goal
 
 ## Testing Policy
@@ -40,8 +42,6 @@
 
 **Note:**  
 Test case listing in failure logs indicates data mapping, not necessarily all cases failed. This represents our current optimal solution.
-
-Test data is function-specific.
 
 ## Test Cases
 
@@ -90,9 +90,9 @@ Follows pattern TC-[Feature-ID]-[SEQ]
 
 **Status**:
 
-New: Case created but not automated
-Active: In suite
-Archived: Historical reference only
+New: Case created but not automated  
+Active: In suite  
+Archived: Historical reference only  
 
 **Test Data:**
 
