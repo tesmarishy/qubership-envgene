@@ -2,7 +2,7 @@ inventory:
   environmentName: "test-environment" #TC-003-002
   tenantName: "test-tenant" #TC-003-003
   cloudName: "test-cloud" #TC-003-004
-  deployer: "test-deployer-without-url" #TC-003-009
+  deployer: "test-deployer" #TC-003-009
   description: "TEST-DESCRIPTION" #TC-003-013 
   owners: "Qubership.org" #TC-003-015
   cloudPassport: "test-cloud-passport" #TC-003-020
