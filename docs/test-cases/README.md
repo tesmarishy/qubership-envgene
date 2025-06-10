@@ -1,5 +1,15 @@
 # Testing Approach
 
+- [Testing Approach](#testing-approach)
+  - [Terms](#terms)
+  - [Testing Policy](#testing-policy)
+  - [Test Types](#test-types)
+    - [Smoke Tests](#smoke-tests)
+  - [Test Cases](#test-cases)
+    - [Creation Guidelines](#creation-guidelines)
+    - [Test Case Template](#test-case-template)
+    - [Template Description](#template-description)
+
 ## Terms
 
 **User**: Human or system interacting with the solution
