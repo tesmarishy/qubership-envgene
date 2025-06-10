@@ -12,5 +12,12 @@ envTemplate:
     Variable_1: "Value 1"
     Variable_2: "Value 2"
     Variable_3: "Value 3"
+  templateArtifact:
+    registry: "artifactory"
+    repository: "snapshotRepository"
+    artifact:
+      group_id: "org.qubership.deploy.product"
+      artifact_id: "test-template-1"
+      version: "0.0.1"  
 generatedVersions:
   generateEnvironmentLatestVersion: "test-template-1"
