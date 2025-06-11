@@ -33,7 +33,7 @@ def processFileList(mask, dict, dirPointer):
 def createParamsetsMap(dir):
     result = {}
     dirPointer = pathlib.Path(dir)
-    masks = ["*.json", "*.yml", "*.yaml"]
+    masks = ["*.json", "*.yml", "*.yaml", "*.j2"]
     for mask in masks:
         result = processFileList(mask, result, dirPointer)
     logger.debug(f'List of {dir} paramsets: \n %s', dump_as_yaml_format(result))
@@ -46,10 +46,17 @@ def sortParameters(params) :
             result[k] = params[k]
     return result
 
-def openParamset(path) :
+def openParamset(path, template_context=None) :
     if path.endswith(".json"):
         return openJson(path)
     # using safe load to load without comments
+    if path.endswith(".j2"):
+        # First render the template
+        from jinja2 import Environment, FileSystemLoader
+        env = Environment(loader=FileSystemLoader(os.path.dirname(path)))
+        template = env.get_template(os.path.basename(path))
+        rendered = template.render(**(template_context or {}))
+        return yaml.safe_load(rendered)
     paramsetYaml = openYaml(path, safe_load=True)
     return paramsetYaml
 
@@ -68,7 +75,17 @@ def convertParameterSetsToParameters(templatePath, paramsTemplate, paramsetsTag,
             paramSetFile = entry["filePath"]
             logger.info(f"Processing paramset {pset} in file {paramSetFile}")
             isEnvSpecificParamset = entry["envSpecific"]
-            paramSetValues = openParamset(paramSetFile)
+            # Get template context from environment definition
+            env_definition = getEnvDefinition(os.path.dirname(os.path.dirname(templatePath)))
+            current_env = {
+                "name": env_definition["inventory"]["environmentName"],
+                "solution_structure": env_definition.get("solutionStructure", {})
+            }
+            template_context = {
+                "env_definition": env_definition,
+                "current_env": current_env
+            }
+            paramSetValues = openParamset(paramSetFile, template_context)
             #
             paramSetName = paramSetValues["name"]
             paramSetVersion = paramSetValues["version"] if "version" in paramSetValues else "n/a"
