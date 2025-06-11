@@ -2,6 +2,16 @@
 # Contents will be overwritten by next generation.
 # Please modify this contents only for development purposes or as workaround.
 name: "test-tenant"
+registryName: "default"
 description: "TEST-DESCRIPTION"
 owners: "Qubership.org"
+gitRepository: ""
+defaultBranch: ""
+credential: ""
+labels: []
+globalE2EParameters:
+  pipelineDefaultRecipients: ""
+  recipientsStrategy: "merge"
+  mergeTenantsAndE2EParameters: false
+  environmentParameters: {}
 deployParameters: {}
