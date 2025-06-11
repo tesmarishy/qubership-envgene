@@ -18,6 +18,6 @@ envTemplate:
     artifact:
       group_id: "org.qubership.deploy.product"
       artifact_id: "test-template-1"
-      version: "0.0.1"  
+      version: "0.0.1"
 generatedVersions:
-  generateEnvironmentLatestVersion: "test-template-1"
+  generateEnvironmentLatestVersion: "test-template-1" # This value is automatically generated during job run.
