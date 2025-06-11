@@ -20,4 +20,4 @@ envTemplate:
       artifact_id: "test-template-1"
       version: "0.0.1"
 generatedVersions:
-  generateEnvironmentLatestVersion: "test-template-1" # This value is automatically generated during job run.
+  generateEnvironmentLatestVersion: "test-template-1"  # This value is automatically generated during job run.

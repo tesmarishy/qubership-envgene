@@ -9,9 +9,10 @@ gitRepository: ""
 defaultBranch: ""
 credential: ""
 labels: []
-deployParameters: {}
 globalE2EParameters:
   pipelineDefaultRecipients: ""
   recipientsStrategy: "merge"
   mergeTenantsAndE2EParameters: false
   environmentParameters: {}
+deployParameters: {}
+
