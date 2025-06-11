@@ -191,6 +191,7 @@ Pre-requisites:
 
 - Cloud template uses `current_env.cmdb_name` in `e2eParameters` attribute
 - Environment Inventory has `inventory.deployer` attribute set
+- Instance repository has configured deployer specified in `inventory.deployer` attribute
 
 Inputs:
 
