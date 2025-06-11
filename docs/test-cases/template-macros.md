@@ -73,7 +73,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
   - `technicalConfigurationParameterSets`
 - Environment Inventory has `inventory.environmentName` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -93,7 +93,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Tenant template uses `current_env.tenant` in `name` attribute
 - Environment Inventory has `inventory.tenantName` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -113,7 +113,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Cloud template uses `current_env.cloud` in `name` attribute
 - Environment Inventory has `inventory.cloudName` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -133,7 +133,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Cloud template uses `current_env.cloud` in `name` attribute
 - Environment Inventory does NOT have `inventory.cloudName` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -153,7 +153,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Cloud template uses `current_env.cloudNameWithCluster` in `name` attribute
 - Environment Inventory has `inventory.cloudName` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -173,7 +173,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Cloud template uses `current_env.cloudNameWithCluster` in `name` attribute
 - Environment Inventory has `inventory.cloudPassport` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -193,7 +193,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Cloud template uses `current_env.cloudNameWithCluster` in `name` attribute
 - Environment Inventory has `inventory.cloudName` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -213,7 +213,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Cloud template uses `current_env.cmdb_name` in `e2eParameters` attribute
 - Environment Inventory has `inventory.deployer` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -233,7 +233,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Cloud template uses `current_env.cmdb_name` in `e2eParameters` attribute
 - Environment Inventory does NOT have `inventory.deployer` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -254,7 +254,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Environment Inventory has `inventory.deployer` attribute set
 - Instance repository has configured deployer specified in `inventory.deployer` attribute
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -274,7 +274,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Cloud template uses `current_env.cmdb_url` in `e2eParameters` attribute
 - Environment Inventory does NOT have `inventory.deployer` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -294,7 +294,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Tenant template uses `current_env.description` in `description` attribute
 - Environment Inventory has `inventory.description` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -314,7 +314,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Tenant template uses `current_env.description` in `description` attribute
 - Environment Inventory does NOT have `inventory.description` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -334,7 +334,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Tenant template uses `current_env.owners` in `description` attribute
 - Environment Inventory has `inventory.owners` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -354,7 +354,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Tenant template uses `current_env.owners` in `description` attribute
 - Environment Inventory does NOT have `inventory.owners` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -374,7 +374,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Cloud template uses `current_env.env_template` in `e2eParameters` attribute
 - Environment Inventory has `envTemplate.name` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -402,7 +402,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
   - `technicalConfigurationParameterSets`
 - Environment Inventory has `envTemplate.additionalTemplateVariables` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -430,7 +430,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
   - `technicalConfigurationParameterSets`
 - Environment Inventory does NOT have `envTemplate.additionalTemplateVariables` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -459,7 +459,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - Environment Inventory has `inventory.cloudPassport` attribute set
 - Instance repo contains valid Cloud Passport
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -487,7 +487,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
   - `technicalConfigurationParameterSets`
 - Environment Inventory does NOT have `inventory.cloudPassport` attribute set
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -515,7 +515,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
   - `technicalConfigurationParameterSets`
 - Instance repo contains valid SD for this environment
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`
@@ -543,7 +543,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
   - `technicalConfigurationParameterSets`
 - Instance repo doesnn't contain SD for this environment
 
-**Steps**
+**Steps:**
 
 - `ENV_NAMES`: `<env-id>` # Single env-id
 - `ENV_BUILDER`: `true`

@@ -113,7 +113,7 @@ Paths to test data files used in test case implementation. Used by automation to
 
 System conditions required before execution. Configuration requirements. Dependencies that must be in place
 
-**Steps**:
+**Steps:**
 
 Actions required from the user to utilize the functionality, for example:
 
@@ -121,6 +121,6 @@ Actions required from the user to utilize the functionality, for example:
 - Commit events
 - Other triggers
 
-**Expected Results**:
+**Expected Results:**
 
 Expected outcome. Expected system behavior. State change
