@@ -522,7 +522,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 
 **Expected Results:**
 
-- Namespace in Environment Instance contains values where `current_env.solution_structure` was substituted with value obtained according to principles described [here](/docs/template-macros.md#current_envsolution_structure)
+- Namespace in Environment Instance contains values where `current_env.solution_structure` was substituted with value obtained according to principles described in [Solution Structure](/docs/template-macros.md#current_envsolution_structure)
 
 ## TC-003-023: Using `current_env.solution_structure`. SD NOT in Instance repo
 
