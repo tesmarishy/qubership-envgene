@@ -1,0 +1,7 @@
+# The contents of this file is generated from template artifact: test-template-1.
+# Contents will be overwritten by next generation.
+# Please modify this contents only for development purposes or as workaround.
+name: "test-tenant"
+description: "TEST-DESCRIPTION"
+owners: "Qubership.org"
+deployParameters: {}

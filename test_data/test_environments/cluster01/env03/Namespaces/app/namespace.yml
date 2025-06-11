@@ -1,0 +1,22 @@
+
+name: "test-environment-app" #TC-003-002
+labels:
+- "Instance-test-environment" #TC-003-002
+deployParameters:
+  APP_NAMESPACE: "test-environment-app" #TC-003-002
+  Variable_1: "Value 1" #TC-003-018
+  TEST_SD_VALUE_1: "TEST_SD_VALUE_1"
+e2eParameters:
+  APP_NAMESPACE: "test-environment-app" #TC-003-002
+  Variable_2: "Value 2" #TC-003-018
+  TEST_SD_VALUE_2: "TEST_SD_VALUE_2"
+technicalConfigurationParameters:
+  APP_NAMESPACE: "test-environment-app" #TC-003-002
+  Variable_3: "Value 3" #TC-003-018
+  TEST_SD_VALUE_3: "TEST_SD_VALUE_3"
+deployParameterSets:
+  - "test-parameters-1" #TC-003-002
+e2eParameterSets:
+  - "test-parameters-1" #TC-003-002
+technicalConfigurationParameterSets:
+  - "test-parameters-1" #TC-003-002
