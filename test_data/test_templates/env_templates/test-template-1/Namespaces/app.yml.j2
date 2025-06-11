@@ -2,6 +2,9 @@
 name: "{{current_env.name}}-app" #TC-003-002
 labels:
 - "Instance-{{current_env.name}}" #TC-003-002
+isServerSideMerge: false
+cleanInstallApprovalRequired: false
+mergeDeployParametersAndE2EParameters: false
 deployParameters:
   ENVGENE_CONFIG_REF_NAME: "{{ lookup('ansible.builtin.env', 'CI_COMMIT_REF_NAME')| default('No Ref Name') }}"
   ENVGENE_CONFIG_TAG: "{{ lookup('ansible.builtin.env', 'CI_COMMIT_TAG')| default('No Ref tag') }}"
