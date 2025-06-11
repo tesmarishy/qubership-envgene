@@ -5,21 +5,21 @@ labels:
 deployParameters:
   APP_NAMESPACE: "{{current_env.name}}-app" #TC-003-002
   Variable_1: "{{env_definition.envTemplate.additionalTemplateVariables.Variable_1}}" #TC-003-018
-  {% if "Test-App-Name" in current_env.solution_structure %}
+{% if "Test-App-Name" in current_env.solution_structure %}
   TEST_SD_VALUE_1: "TEST_SD_VALUE_1"
-  {% endif %}
+{% endif %}
 e2eParameters:
   APP_NAMESPACE: "{{current_env.name}}-app" #TC-003-002
   Variable_2: "{{env_definition.envTemplate.additionalTemplateVariables.Variable_2}}" #TC-003-018
-  {% if "Test-App-Name" in current_env.solution_structure %}
+{% if "Test-App-Name" in current_env.solution_structure %}
   TEST_SD_VALUE_2: "TEST_SD_VALUE_2"
-  {% endif %}
+{% endif %}
 technicalConfigurationParameters:
   APP_NAMESPACE: "{{current_env.name}}-app" #TC-003-002
   Variable_3: "{{env_definition.envTemplate.additionalTemplateVariables.Variable_3}}" #TC-003-018
-  {% if "Test-App-Name" in current_env.solution_structure %}
+{% if "Test-App-Name" in current_env.solution_structure %}
   TEST_SD_VALUE_3: "TEST_SD_VALUE_3"
-  {% endif %}
+{% endif %}
 deployParameterSets:
   - "test-parameters-1" #TC-003-002
 e2eParameterSets:
