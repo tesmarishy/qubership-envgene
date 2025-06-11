@@ -4,7 +4,7 @@
   - [Terms](#terms)
   - [Testing Policy](#testing-policy)
   - [Test Types](#test-types)
-    - [Smoke Tests](#smoke-tests)
+    - [Smoke Testing](#smoke-testing)
   - [Test Cases](#test-cases)
     - [Creation Guidelines](#creation-guidelines)
     - [Test Case Template](#test-case-template)
@@ -26,10 +26,11 @@
 2. Each bug must undergo root cause analysis to determine:
    - Why existing test cases didn't catch it
    - If test coverage is possible, the bugfix should include new tests before release
+3. All tests must be automated. During automation, each test must first be executed manually
 
 ## Test Types
 
-### Smoke Tests
+### Smoke Testing
 
 - **Execution Time**: Complete suite must run in ≤10 minutes
 - **Triggers**:
@@ -42,16 +43,16 @@
 
 **Smoke Tests Testing Approach:**
 
-- Individual functions are tested
-- For each tested function, a test function:
-  1. Executes the tested function with test data
-  2. Compares results with reference data (file-by-file, character-by-character)
-  3. If mismatches occur, the test fails and logs show:
-     - List of test cases implemented in that test data file
-     - Specific discrepancies found
+- **Scope:** Tests target individual functions in isolation
+- **Process:** For each function under test:
+  1. Execute the function with predefined test data
+  2. Validate outputs against reference data (file-by-file, character-by-character)
+- **Failure Handling:** On mismatch, logs provide:
+  - Test cases implemented in the failed data file.
+  - Exact discrepancies detected (diff-style reporting)
 
 **Note:**  
-Test case listing in failure logs indicates data mapping, not necessarily all cases failed. This represents our current optimal solution.
+Test case listing in failure logs indicates data mapping, not necessarily all cases failed
 
 ## Test Cases
 
