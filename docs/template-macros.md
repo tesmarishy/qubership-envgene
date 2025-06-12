@@ -15,8 +15,16 @@
     - [`current_env.additionalTemplateVariables`](#current_envadditionaltemplatevariables)
     - [`current_env.cloud_passport`](#current_envcloud_passport)
     - [`current_env.solution_structure`](#current_envsolution_structure)
-  - [Envgene macros](#envgene-macros)
-    - [Credential macros](#credential-macros)
+    - [`current_env.cluster.cloud_api_protocol`](#current_envclustercloud_api_protocol)
+    - [`current_env.cluster.cloud_api_url`](#current_envclustercloud_api_url)
+    - [`current_env.cluster.cloud_api_port`](#current_envclustercloud_api_port)
+    - [`current_env.cluster.cloud_public_url`](#current_envclustercloud_public_url)
+  - [Credential macro](#credential-macro)
+  - [Deprecated macros](#deprecated-macros)
+    - [`environment.environmentName`](#environmentenvironmentname)
+    - [`tenant`](#tenant)
+    - [`cloud`](#cloud)
+    - [`deployer`](#deployer)
 
 This documentation provides a list of macros that can be used during template generation
 
@@ -33,9 +41,9 @@ These Jinja macros that can be used during template generation
 
 **Basic usage:**
 
-```yaml
+`yaml
 tenant: "{{ templates_dir }}/env_templates/composite-dev/tenant.yml.j2"  
-```
+`
 
 **Usage in sample:** [Sample](samples/templates/env_templates/simple.yaml)  
 
@@ -48,9 +56,9 @@ tenant: "{{ templates_dir }}/env_templates/composite-dev/tenant.yml.j2"
 
 **Basic usage:**
 
-```yaml
+`yaml
 name: "{{current_env.name }}-oss" 
-```
+`
 
 **Usage in sample:** [Sample](samples/templates/env_templates/composite-dev/Namespaces/oss.yml.j2)  
 
@@ -63,9 +71,9 @@ name: "{{current_env.name }}-oss"
 
 **Basic usage:**
 
-```yaml
+`yaml
 name: "{{ current_env.tenant }}"
-```
+`
 
 **Usage in sample:** [Sample](samples/templates/env_templates/composite-dev/tenant.yml.j2)  
 
@@ -78,9 +86,9 @@ name: "{{ current_env.tenant }}"
 
 **Basic usage:**
 
-```yaml
+`yaml
 name: "{{ current_env.cloud }}"
-```
+`
 
 **Usage in sample:** [Sample](samples/templates/env_templates/simple/cloud.yml.j2)  
 
@@ -102,9 +110,9 @@ Else:
 
 **Basic usage:**
 
-```yaml
+`yaml
 name: "{{ current_env.cloudNameWithCluster }}"
-```
+`
 
 **Usage in sample:** [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)  
 
@@ -117,8 +125,8 @@ name: "{{ current_env.cloudNameWithCluster }}"
 
 **Basic usage:**
 
-```yaml
-```
+`yaml
+`
 
 **Usage in sample:**  
 
@@ -131,8 +139,8 @@ name: "{{ current_env.cloudNameWithCluster }}"
 
 **Basic usage:**
 
-```yaml
-```
+`yaml
+`
 
 **Usage in sample:**  
 
@@ -145,8 +153,8 @@ name: "{{ current_env.cloudNameWithCluster }}"
 
 **Basic usage:** `description: "{{ current_env.description }}"`  
 
-```yaml
-```
+`yaml
+`
 
 **Usage in sample:** [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)  
 
@@ -159,8 +167,8 @@ name: "{{ current_env.cloudNameWithCluster }}"
 
 **Basic usage:** `owners: "{{ current_env.owners }}"`
 
-```yaml
-```
+`yaml
+`
 
 **Usage in sample:** [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)  
 
@@ -173,8 +181,8 @@ name: "{{ current_env.cloudNameWithCluster }}"
 
 **Basic usage:** `TEMPLATE_NAME: "{{ current_env.env_template }}"`
 
-```yaml
-```
+`yaml
+`
 
 **Usage in sample:**  
 
@@ -187,11 +195,11 @@ name: "{{ current_env.cloudNameWithCluster }}"
 
 **Basic usage:**
 
-```yaml
+`yaml
 deployParameters:
   INSTANCES_LEVEL_VAR_GLOBAL: "{{ current_env.additionalTemplateVariables.GLOBAL_LEVEL_PARAM1 }}"
   INSTANCES_LEVEL_VAR_CLOUD: "{{ current_env.additionalTemplateVariables.CLOUD_LEVEL_PARAM1 }}"
-```
+`
 
 **Usage in sample:** [Sample](samples/templates/env_templates/composite-prod/cloud.yml.j2)
 
@@ -204,14 +212,14 @@ deployParameters:
 
 **Basic usage:**
 
-```yaml
+`yaml
 {% if current_env.cloud_passport.cloud.CLOUD_PUBLIC_HOST is defined %}
   e2eParameters:
     CLOUD_PUBLIC_HOST_E2E: "{{ current_env.cloud_passport.cloud.CLOUD_PUBLIC_HOST}}"
 {% else %}
   e2eParameters: {}
 {% endif %}
-```
+`
 
 **Usage in sample:** [Sample](test_data/test_templates/env_templates/composite-dev/cloud.yml.j2)
 
@@ -220,7 +228,7 @@ deployParameters:
 ---
 **Description:** A hashable with values describing the structure of the solution - its composition by applications and the mapping of these applications to namespaces. The variable has the following structure:
 
-```yaml
+`yaml
 <application-name-A>:
   <deploy-postfix-A>:
     version: <application-version-A>
@@ -232,7 +240,7 @@ deployParameters:
   <deploy-postfix-C>:
     version: <application-version-C>
     namespace: <namespace-C>
-```
+`
 
 The variable is obtained by transforming the file defined in the path `/configuration/environments/<CLUSTER-NAME>/<ENV-NAME>/solution-descriptor/sd.yml`.
 
@@ -244,35 +252,109 @@ Default value is `{}`
 
 **Basic usage:**
 
-```yaml
+`yaml
   deployParameters:
 {% if 'billing-app' in current_env.solution_structure %}
     param: value-1
 {% else %}
     param: value-2
 {% endif %}
-```
+`
 
-```yaml
+`yaml
   deployParameters:
     oss_ns: "{{ current_env.solution_structure['oss-app]['oss'].namespace }}"
-```
+`
 
 **Usage in sample:**
 
 - [Sample template](/samples/templates/env_templates/composite-dev/Namespaces/bss.yml.j2)
 - [Sample inventory](/samples/environments/sample-cloud-name/composite-with-creds/)
 
-## Envgene macros
+### `current_env.cluster.cloud_api_protocol`
 
-### Credential macros
+---
+**Description:** HTTP/HTTPS protocol for cluster connection URL
+
+Values is parsed from `env_definition.inventory.clusterUrl`. If Cloud Passport is used for Environment generation, than value will be overwritten from cloud passport file
+
+Default value is `""`
+
+**Type:** HashMap  
+
+**Basic usage:**
+
+`protocol: "{{current_env.cluster.cloud_api_protocol}}"`
+
+**Usage in sample:**
+
+- [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)
+
+### `current_env.cluster.cloud_api_url`
+
+---
+**Description:** API URL of a cluster
+
+Values is parsed from `env_definition.inventory.clusterUrl`. If Cloud Passport is used for Environment generation, than value will be overwritten from cloud passport file
+
+Default value is `""`
+
+**Type:** HashMap  
+
+**Basic usage:**
+
+`apiUrl: "{{current_env.cluster.cloud_api_url}}"`
+
+**Usage in sample:**
+
+- [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)
+
+### `current_env.cluster.cloud_api_port`
+
+---
+**Description:** Port of a cluster API server
+
+Values is parsed from `env_definition.inventory.clusterUrl`. If Cloud Passport is used for Environment generation, than value will be overwritten from cloud passport file
+
+Default value is `""`
+
+**Type:** HashMap  
+
+**Basic usage:**
+
+`apiPort: "{{current_env.cluster.cloud_api_port}}"`
+
+**Usage in sample:**
+
+- [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)
+
+### `current_env.cluster.cloud_public_url`
+
+---
+**Description:** Public URL of a cluster.
+
+Values is parsed from `env_definition.inventory.clusterUrl`. If Cloud Passport is used for Environment generation, than value will be overwritten from cloud passport file
+
+Default value is `""`
+
+**Type:** HashMap  
+
+**Basic usage:**
+
+`apiPort: "{{current_env.cluster.cloud_api_port}}"`
+
+**Usage in sample:**
+
+- [Sample](samples/templates/env_templates/composite-dev/cloud.yml.j2)
+
+## Credential macro
 
 ---
 **Description:** This macro marks parameters as sensitive, triggering special processing that differs from regular parameters.
 
-```text
+`text
 ${envgen.creds.get('<cred-id>').username|password|secret}
-```
+`
 
 For each `<cred-id>` during Environment Instance generation a [Credential](/docs/envgene-objects.md#credential) object is created in the [Environment Credential File](/docs/envgene-objects.md#environment-credential-file)
 
@@ -283,10 +365,28 @@ Type assignment:
 
 **Basic usage:**
 
-```yaml
+`yaml
 kafka_username: ${envgen.creds.get('kafka-cred').username}
 kafka_password: ${envgen.creds.get('kafka-cred').password}
 k8s_token: ${envgen.creds.get('k8s-cred').secret}
-```
+`
 
 **Usage in sample:** [Sample](/samples/templates/parameters/composite-sample/test-deploy-creds.yml)
+
+## Deprecated macros
+
+### `environment.environmentName`
+
+**Description:** Name of environment
+
+### `tenant`
+
+**Description:** Name of tenant for environment
+
+### `cloud`
+
+**Description:** Name of cloud for environment
+
+### `deployer`
+
+**Description:** Name of deployer used for environment
