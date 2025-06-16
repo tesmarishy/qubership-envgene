@@ -95,6 +95,8 @@ Supports working with SOPS encryption.
 | `parameter_key` | Mandatory | The name (key) of the parameter to be modified | None | `login` |
 | `parameter_value` | Mandatory | New value (plaintext or encrypted). Envgene, depending on the value of the [`crypt`](/docs/envgene-configs.md#configyml) attribute, will either decrypt, encrypt, or leave the value unchanged. If an encrypted value is passed, it must be encrypted with a key that Envgene can decrypt. | None | `admin`|
 
+A sensitive parameter can be defined within a complex parameter structure. In such cases during rotation, the `parameter_key` should use dot notation (e.g., `key1.key2.username`)
+
 ##### `CRED_ROTATION_PAYLOAD` example
 
 ```yaml
@@ -112,6 +114,10 @@ Supports working with SOPS encryption.
   context: deployment
   parameter_key: db_password
   parameter_value: "s3cr3tN3wP@ss"
+- namespace: env-1-platform-monitoring
+  context: deployment
+  parameter_key: global.secrets.password
+  parameter_value: "user"
 ```
 
 ### `credential_rotation` Job Workflow Principle
@@ -188,7 +194,13 @@ Credential rotation is only compatible with `SOPS` `crypt_backend`. Key characte
 
 ### Affected parameters
 
-Sensitive parameters defined across one or more objects in one or more Environment Instances can be linked. This linkage occurs when multiple parameters reference the same credential ID (`cred-id`). Changing a credential's value for one parameter will update all linked parameters.
+Sensitive parameters defined across one or more objects in one or more Environment Instances can be linked. Changing a Credential's value for one parameter will update all linked parameters.
+
+This linkage occurs when multiple parameters reference the same:
+
+1. Credential ID (`cred-id`)  
+AND
+2. Credential field (`username`, `password`, or `secret`)
 
 Parameters can be linked through common credential in:
 
@@ -242,13 +254,16 @@ The `affected-sensitive-parameters.yaml` is created using the reverse logic desc
       parameter_key: string
       # Mandatory
       # Path to Credential file
-      cred-filepath: string
+      cred_filepath: string
       # Mandatory. Default `None`
       # Path to Shared credential file
-      shared-cred-filepath: credX
+      shared_cred_filepath: credX
       # Mandatory
       # Common Credential ID. Located in `cred-filepath`
-      cred-id: credX
+      cred_id: credX
+      # Mandatory
+      # Credential field name (e.g., `username`, `password`, or `secret`)
+      cred_field: string
 - ...
 ```
 

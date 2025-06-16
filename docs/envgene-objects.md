@@ -232,9 +232,11 @@ applications:
 
 This object is used by EnvGene to manage sensitive parameters. It is generated during environment instance creation for each `<cred-id>` specified in [Credential macros](/docs/template-macros.md#credential-macros)
 
-There are two Credential types with different structures:
+Credentials support two distinct types, each with specific fields:
 
 #### `usernamePassword`
+
+Used for credentials requiring username/password pairs. Contains two mandatory credentials fields(`username` and `password`):
 
 ```yaml
 <cred-id>:
@@ -246,9 +248,11 @@ There are two Credential types with different structures:
 
 #### `secret`
 
+Used for single-secret credentials. Contains one mandatory credentials field(`secret`):
+
 ```yaml
 <cred-id>:
-  type: "secret"
+  type: secret
   data:
     secret: <value>
 ```
