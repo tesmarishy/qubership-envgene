@@ -150,7 +150,7 @@ Per-Item Processing (for each item in `CRED_ROTATION_PAYLOAD`):
 6. Perform [force mode](#force-mode) check
 7. Replace the Credential with cred-id from step 3 value with item's `parameter_value` (taking into account [encryption](#encryption)) in:
    1. [Environment Credentials file](/docs/envgene-objects.md#environment-credentials-file)
-   2. [Shared Credentials file](/docs/envgene-objects.md#shared-credentials-file)
+   2. All [Shared Credentials file](/docs/envgene-objects.md#shared-credentials-file)
 
 > [!NOTE]
 > The above description represents a high-level abstraction of the workflow logic, not an exact algorithmic specification
@@ -257,17 +257,29 @@ The `affected-sensitive-parameters.yaml` is created using the reverse logic desc
       # Affected parameter key
       parameter_key: string
       # Mandatory
-      # Path to Credential file
-      cred_filepath: string
-      # Mandatory. Default `None`
-      # Path to Shared credential file
-      shared_cred_filepath: credX
-      # Mandatory
-      # Common Credential ID. Located in `cred-filepath`
-      cred_id: credX
-      # Mandatory
-      # Credential field name (e.g., `username`, `password`, or `secret`)
-      cred_field: string
+      # Contains affected creds in Environment Credentials File
+      environment_creds:
+        # Mandatory
+        # Path to Environment Credentials File with affected creds
+        cred_filepath: string
+        # Mandatory
+        # Affected Credential ID. Located in `cred_filepath`
+        cred_id: string
+        # Mandatory
+        # Affected Credential field name of cred_id
+        cred_field: enum[`username`,`password`,`secret`]
+      # Mandatory. Default `[]`
+      # Contains all affected creds in Shared Credentials Files
+      shared_creds:
+          # Optional
+          # Path to Shared Credentials Files with affected creds
+        - cred_filepath: string
+          # Optional
+          # Affected Credential ID. Located in `cred_filepath`
+          cred_id: string
+          # Optional
+          # Affected Credential field name of cred_id
+          cred_field: enum[`username`,`password`,`secret`]
 - ...
 ```
 
