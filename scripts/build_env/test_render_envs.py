@@ -8,7 +8,8 @@ from envgenehelper import *
 test_data = [
       # (cluster_name, environment_name, template)
       ("cluster01", "env01", "test-01"),
-      ("cluster01", "env03", "test-template-1")
+      ("cluster01", "env03", "test-template-1"),
+      ("cluster01", "env04", "test-template-2")
 ]
 g_templates_dir = getAbsPath("../../test_data/test_templates")
 g_inventory_dir = getAbsPath("../../test_data/test_environments")

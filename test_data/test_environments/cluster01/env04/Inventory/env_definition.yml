@@ -2,10 +2,17 @@ inventory:
   environmentName: "test-environment" #TC-003-002
   tenantName: "test-tenant" #TC-003-003
   #cloudName: "test-cloud" #TC-003-005
-  cloudPassport: "test-cloudPassport" #TC-003-007
   deployer: "test-deployer" #TC-003-011
+  cloudPassport: "test-cloud-passport" #TC-003-020
 envTemplate:
   name: "test-template-2" #TC-003-017
-  additionalTemplateVariables: {} #TC-003-019
+  additionalTemplateVariables: {}
+  templateArtifact:
+    registry: "artifactory"
+    repository: "snapshotRepository"
+    artifact:
+      group_id: "org.qubership.deploy.product"
+      artifact_id: "test-template-1"
+      version: "0.0.1"
 generatedVersions:
-  generateEnvironmentLatestVersion: "test-template-2"  
+  generateEnvironmentLatestVersion: "test-template-2"  # This value is automatically generated during job run.
