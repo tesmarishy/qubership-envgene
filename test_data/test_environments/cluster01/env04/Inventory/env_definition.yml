@@ -3,7 +3,7 @@ inventory:
   tenantName: "test-tenant" #TC-003-003
   #cloudName: "test-cloud" #TC-003-005
   deployer: "test-deployer" #TC-003-011
-  cloudPassport: "test-cloud-passport" #TC-003-020
+  #cloudPassport: "test-cloud-passport" #TC-003-020
 envTemplate:
   name: "test-template-2" #TC-003-017
   additionalTemplateVariables: {}

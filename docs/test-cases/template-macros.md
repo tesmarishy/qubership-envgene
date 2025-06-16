@@ -516,6 +516,9 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 **Status:** Not Implemented
 
 **Test Data:**
+- test_data/test_templates/env_templates/test-template-1/Namespaces/app.yml.j2
+- test_data/test_templates/parameters/app/test-parameters-1.yml.j2
+- test_data/test_environments/cluster01/env03/Inventory/solution-descriptor/sd.yaml
 
 **Pre-requisites:**
 
@@ -544,6 +547,10 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 **Status:** Not Implemented
 
 **Test Data:**
+- test_data/test_templates/env_templates/test-template-2/Namespaces/app.yml.j2
+- test_data/test_templates/parameters/app/test-parameters-1.yml.j2
+- test_data/test_environments/cluster01/env04/Inventory
+
 
 **Pre-requisites:**
 
