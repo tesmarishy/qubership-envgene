@@ -82,12 +82,18 @@ Supports working with SOPS encryption.
 
 #### `CRED_ROTATION_PAYLOAD`
 
-```yaml
-- namespace: <namespace>
-  application: <application-name>
-  context: enum[`pipeline`,`deployment`, `runtime`]
-  parameter_key: <parameter-key>
-  parameter_value: <new-parameter-value>
+```json
+{
+  "rotation_items": [
+    {
+      "namespace": "<namespace>",
+      "application": "<application-name>",
+      "context": "enum[`pipeline`,`deployment`, `runtime`]",
+      "parameter_key": "<parameter-key>",
+      "parameter_value": "<new-parameter-value>"
+    }
+  ]
+}
 - ...
 ```
 
@@ -104,24 +110,36 @@ A sensitive parameter can be defined within a complex parameter structure. In su
 ##### `CRED_ROTATION_PAYLOAD` example
 
 ```yaml
-- namespace: env-1-platform-monitoring
-  application: MONITORING
-  context: deployment
-  parameter_key: db_login
-  parameter_value: "s3cr3tN3wLogin"
-- namespace: env-1-platform-monitoring
-  application: MONITORING
-  context: deployment
-  parameter_key: db_password
-  parameter_value: "s3cr3tN3wP@ss"
-- namespace: env-1-platform-monitoring
-  context: deployment
-  parameter_key: db_password
-  parameter_value: "s3cr3tN3wP@ss"
-- namespace: env-1-platform-monitoring
-  context: deployment
-  parameter_key: global.secrets.password
-  parameter_value: "user"
+{
+  "rotation_items": [
+    {
+      "namespace": "env-1-platform-monitoring",
+      "application": "MONITORING",
+      "context": "deployment",
+      "parameter_key": "db_login",
+      "parameter_value": "s3cr3tN3wLogin"
+    },
+    {
+      "namespace": "env-1-platform-monitoring",
+      "application": "MONITORING",
+      "context": "deployment",
+      "parameter_key": "db_password",
+      "parameter_value": "s3cr3tN3wP@ss"
+    },
+    {
+      "namespace": "env-1-platform-monitoring",
+      "context": "deployment",
+      "parameter_key": "db_password",
+      "parameter_value": "s3cr3tN3wP@ss"
+    },
+    {
+      "namespace": "env-1-platform-monitoring",
+      "context": "deployment",
+      "parameter_key": "global.secrets.password",
+      "parameter_value": "user"
+    }
+  ]
+}
 ```
 
 ### `credential_rotation` Job Workflow Principle
@@ -233,7 +251,7 @@ The `affected-sensitive-parameters.yaml` is created using the reverse logic desc
 
 ```yaml
 - # Mandatory
-  # Taken from `CRED_ROTATION_PAYLOAD`
+  # Taken from `CRED_ROTATION_PAYLOAD` item
   target_parameter:
     environment: string
     namespace: string  

@@ -326,12 +326,18 @@ See details in [SD processing](/docs/sd-processing.md)
 **Description**: A parameter used to dynamically update sensitive parameters (those defined via the EnvGene cred macro). It modifies values across different contexts within a specified namespace and optional application. **JSON in string** format. See details in [Credential Rotation](/docs/cred-rotation.md)
 The value can be provided as plain text or encrypted.
 
-```yaml
-- namespace: <namespace>
-  application: <application-name>
-  context: enum[`pipeline`,`deployment`, `runtime`]
-  parameter_key: <parameter-key>
-  parameter_value: <new-parameter-value>
+```json
+{
+  "rotation_items": [
+    {
+      "namespace": "<namespace>",
+      "application": "<application-name>",
+      "context": "enum[`pipeline`,`deployment`, `runtime`]",
+      "parameter_key": "<parameter-key>",
+      "parameter_value": "<new-parameter-value>"
+    }
+  ]
+}
 - ...
 ```
 
