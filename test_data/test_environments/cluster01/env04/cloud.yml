@@ -1,7 +1,7 @@
 # The contents of this file is generated from template artifact: test-template-1.
 # Contents will be overwritten by next generation.
 # Please modify this contents only for development purposes or as workaround.
-name: "test-cloud"
+name: "test_cloud_passport_test_environment"
 apiUrl: "tmp.cloud.com" # cloud passport: test-cloud-passport version: 1.5
 apiPort: "0000" # cloud passport: test-cloud-passport version: 1.5
 privateUrl: "test-host.managed.tmp.cloud" # cloud passport: test-cloud-passport version: 1.5
@@ -40,7 +40,7 @@ deployParameters:
   VALUE: "true" # cloud passport: test-cloud-passport version: 1.5
 e2eParameters:
   CMDB_NAME: "test-deployer"
-  TEMPLATE_NAME: "test-template-1"
+  TEMPLATE_NAME: "test-template-2"
 technicalConfigurationParameters: {}
 deployParameterSets: []
 e2eParameterSets: []

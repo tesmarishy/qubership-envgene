@@ -3,8 +3,8 @@
 # Please modify this contents only for development purposes or as workaround.
 name: "test-tenant"
 registryName: "default"
-description: "TEST-DESCRIPTION"
-owners: "Qubership.org"
+description: ""
+owners: ""
 gitRepository: ""
 defaultBranch: ""
 credential: ""
