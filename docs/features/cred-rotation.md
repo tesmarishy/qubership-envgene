@@ -59,7 +59,7 @@ Supports working with SOPS encryption.
 1. Credential rotation operation is performed in a separate `credential_rotation` job
    1. The job must be launched after the `env_inventory_generation_job` and before the `env_build_job`
    2. The job must run on a Docker image smaller than 100MB
-2. Credential rotation operation must complete within 1 second (excluding GitLab/GitHub runner span time)
+2. Credential rotation operation must complete within 1 second (excluding GitLab/GitHub runner span time) for `CRED_ROTATION_PAYLOAD` with 10 elements
 3. Job logs must clearly show how long the job took to execute
 4. The operation must fail if there are [affected parameters](#affected-parameters) and `CRED_ROTATION_FORCE` is `false` or not specified
 5. Job artifacts must include a file containing [affected parameters](#affected-parameters)
