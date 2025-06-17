@@ -1,11 +1,11 @@
 inventory:
-  environmentName: "test-environment" #TC-003-002
-  tenantName: "test-tenant" #TC-003-003
-  #cloudName: "test-cloud" #TC-003-005
-  deployer: "test-deployer" #TC-003-011
-  cloudPassport: "" #TC-003-020
+  environmentName: "test-environment"
+  tenantName: "test-tenant"
+  #cloudName: "test-cloud"
+  deployer: "test-deployer"
+  cloudPassport: ""
 envTemplate:
-  name: "test-template-2" #TC-003-017
+  name: "test-template-2"
   additionalTemplateVariables: {}
   templateArtifact:
     registry: "artifactory"

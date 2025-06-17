@@ -1,38 +1,38 @@
 ---
-name: "{{current_env.name}}-app" #TC-003-002
+name: "{{current_env.name}}-app"
 labels:
-- "Instance-{{current_env.name}}" #TC-003-002
+- "Instance-{{current_env.name}}"
 credentialsId: ""
 isServerSideMerge: false
 cleanInstallApprovalRequired: false
 mergeDeployParametersAndE2EParameters: false
 deployParameters:
-  APP_NAMESPACE: "{{current_env.name}}-app" #TC-003-002
+  APP_NAMESPACE: "{{current_env.name}}-app"
 {% if current_env.inventory.envTemplate.additionalTemplateVariables.Variable_1 is defined %} 
-  Variable_1: "{{current_env.inventory.envTemplate.additionalTemplateVariables.Variable_1}}" #TC-003-019
+  Variable_1: "{{current_env.inventory.envTemplate.additionalTemplateVariables.Variable_1}}"
 {% endif %}
 {% if current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST is defined %}
-  CLOUD_PUBLIC_HOST_1: "{{current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST}}" #TC-003-021
+  CLOUD_PUBLIC_HOST_1: "{{current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST}}"
 {% endif %}
 e2eParameters:
-  APP_NAMESPACE: "{{current_env.name}}-app" #TC-003-002
+  APP_NAMESPACE: "{{current_env.name}}-app"
 {% if current_env.inventory.envTemplate.additionalTemplateVariables.Variable_2 is defined %} 
-  Variable_2: "{{current_env.inventory.envTemplate.additionalTemplateVariables.Variable_2}}" #TC-003-019
+  Variable_2: "{{current_env.inventory.envTemplate.additionalTemplateVariables.Variable_2}}"
 {% endif %}
 {% if current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST is defined %}
-  CLOUD_PUBLIC_HOST_2: "{{current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST}}" #TC-003-021
+  CLOUD_PUBLIC_HOST_2: "{{current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST}}"
 {% endif %}
 technicalConfigurationParameters:
-  APP_NAMESPACE: "{{current_env.name}}-app" #TC-003-002
+  APP_NAMESPACE: "{{current_env.name}}-app"
 {% if current_env.inventory.envTemplate.additionalTemplateVariables.Variable_3 is defined %} 
-  Variable_3: "{{current_env.inventory.envTemplate.additionalTemplateVariables.Variable_3}}" #TC-003-019
+  Variable_3: "{{current_env.inventory.envTemplate.additionalTemplateVariables.Variable_3}}"
 {% endif %}
 {% if current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST is defined %}
-  CLOUD_PUBLIC_HOST_3: "{{current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST}}" #TC-003-021
+  CLOUD_PUBLIC_HOST_3: "{{current_env.cloudPassport.cloud.CLOUD_PUBLIC_HOST}}"
 {% endif %}
 deployParameterSets:
-  - "test-parameters-1" #TC-003-002
+  - "test-parameters-1"
 e2eParameterSets:
-  - "test-parameters-1" #TC-003-002
+  - "test-parameters-1"
 technicalConfigurationParameterSets:
-  - "test-parameters-1" #TC-003-002
+  - "test-parameters-1"

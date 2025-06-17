@@ -1,13 +1,13 @@
 inventory:
-  environmentName: "test-environment" #TC-003-002
-  tenantName: "test-tenant" #TC-003-003
-  cloudName: "test-cloud" #TC-003-004
-  deployer: "test-deployer" #TC-003-009
-  description: "TEST-DESCRIPTION" #TC-003-013 
-  owners: "Qubership.org" #TC-003-015
-  cloudPassport: "test-cloud-passport" #TC-003-020
+  environmentName: "test-environment"
+  tenantName: "test-tenant"
+  cloudName: "test-cloud"
+  deployer: "test-deployer"
+  description: "TEST-DESCRIPTION"
+  owners: "Qubership.org"
+  cloudPassport: "test-cloud-passport"
 envTemplate:
-  name: "test-template-1" #TC-003-017
+  name: "test-template-1"
   additionalTemplateVariables:
     Variable_1: "Value 1"
     Variable_2: "Value 2"
