@@ -62,7 +62,6 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - test_data/test_templates/parameters/app/Namespaces/test-parameters-1.yml.j2
 - test_data/test_environments/cluster01/env03/Inventory/env_definition.yml
 
-
 **Pre-requisites:**
 
 - Namespace template uses `current_env.name` in attributes:
@@ -89,7 +88,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 
 ## TC-003-003: Using `current_env.tenant`
 
-**Status:** Not Implemented
+**Status:** Implemented
 
 **Test Data:**
 - test_data/test_templates/env_templates/test-template-1/tenant.yml.j2
@@ -111,7 +110,7 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 
 ## TC-003-004: Using `current_env.cloud`. `inventory.cloudName` set in Environment Inventory
 
-**Status:** Not Implemented
+**Status:** Implemented
 
 **Test Data:**
 - test_data/test_templates/env_templates/test-template-1/cloud.yml.j2
@@ -204,7 +203,6 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 **Test Data:**
 - test_data/test_templates/env_templates/test-template-2/cloud.yml.j2
 - test_data/test_environments/cluster01/env04/Inventory/env_definition.yml
-
 
 **Pre-requisites:**
 
@@ -338,7 +336,6 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 **Test Data:**
 - test_data/test_templates/env_templates/test-template-2/tenant.yml.j2
 - test_data/test_environments/cluster01/env04/Inventory/env_definition.yml
-
 
 **Pre-requisites:**
 
@@ -582,7 +579,6 @@ Test Cases for [Template Macros](/docs/template-macros.md)
 - test_data/test_templates/env_templates/test-template-2/Namespaces/app.yml.j2
 - test_data/test_templates/parameters/app/test-parameters-1.yml.j2
 - test_data/test_environments/cluster01/env04/Inventory
-
 
 **Pre-requisites:**
 
