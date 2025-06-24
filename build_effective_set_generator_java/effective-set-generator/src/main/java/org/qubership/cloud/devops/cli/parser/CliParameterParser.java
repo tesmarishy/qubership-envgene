@@ -20,6 +20,7 @@ package org.qubership.cloud.devops.cli.parser;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.qubership.cloud.devops.cli.exceptions.DirectoryCreateException;
 import org.qubership.cloud.devops.cli.pojo.dto.input.InputData;
@@ -92,10 +93,10 @@ public class CliParameterParser {
                     try {
                         logInfo("Started processing of application: " + app.getAppName() + ":" + app.getAppVersion() + " from the namespace " + namespaceName);
                         generateOutput(tenantName, cloudName, namespaceName, app.getAppName(), app.getAppVersion(), app.getAppFileRef(), k8TokenMap);
-                        String deployPostFixDir = String.format("%s/%s/%s/%s", sharedData.getEnvsPath(), sharedData.getEnvId(), "Namespaces", namespaceName).replace('\\', '/');
+                        String deployPostFixDir = String.format("%s/%s/%s/%s", sharedData.getEnvsPath(), sharedData.getEnvId(), "effective-set/deployment", namespaceName).replace('\\', '/');
                         int index = deployPostFixDir.indexOf("/environments/");
                         if (index != 1) {
-                            deployPostFixDir = deployPostFixDir.substring(index + 1);
+                            deployPostFixDir = deployPostFixDir.substring(index);
                         }
                         mappingFileData.put(inputData.getNamespaceDTOMap().get(namespaceName).getName(), deployPostFixDir);
                         logInfo("Finished processing of application: " + app.getAppName() + ":" + app.getAppVersion() + " from the namespace " + namespaceName);
@@ -124,6 +125,12 @@ public class CliParameterParser {
 
     public void generateE2EOutput(String tenantName, String cloudName, Map<String, String> k8TokenMap) throws IOException {
         ParameterBundle parameterBundle = parametersService.getCliE2EParameter(tenantName, cloudName);
+        if (parameterBundle.getE2eParams() == null) {
+            parameterBundle.setE2eParams(new HashMap<>());
+        }
+        if (parameterBundle.getSecuredE2eParams() == null) {
+            parameterBundle.setSecuredE2eParams(new HashMap<>());
+        }
         parameterBundle.getE2eParams().put("composite_structure", inputData.getCompositeStructureMap());
         parameterBundle.getE2eParams().put("environments", inputData.getClusterMap());
         parameterBundle.getSecuredE2eParams().put("k8s_tokens", k8TokenMap);
@@ -204,6 +211,15 @@ public class CliParameterParser {
             //deployment
             fileDataConverter.writeToFile(parameterBundle.getDeployParams(), deploymentDir, "deployment-parameters.yaml");
             fileDataConverter.writeToFile(parameterBundle.getPerServiceParams(), perServiceDir, "deployment-parameters.yaml");
+            if (MapUtils.isNotEmpty(parameterBundle.getPerServiceParams())) {
+                parameterBundle.getPerServiceParams().entrySet().stream().forEach(entry -> {
+                    try {
+                        fileDataConverter.writeToFile((Map<String, Object>) entry.getValue(), perServiceDir, entry.getKey() + ".yaml");
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to write per service parameters of service " + entry.getKey());
+                    }
+                });
+            }
             fileDataConverter.writeToFile(parameterBundle.getSecuredDeployParams(), deploymentDir, "credentials.yaml");
             fileDataConverter.writeToFile(parameterBundle.getDeployDescParams(), deploymentDir, "deploy-descriptor.yaml");
 

@@ -109,18 +109,19 @@ public class ParametersCalculationService {
 
         Map<String, Object> deployDescParamMap = new LinkedHashMap<>();
         deployDescParamMap.put("deployDescriptor", deployDescParams);
-        finalDeployDescMap.putAll(commonParamMap);
-        deployDescParamMap.entrySet().stream().forEach(entry -> finalDeployDescMap.put(entry.getKey(), entry.getValue()));
+
         Map<String, Object> globalMap = new HashMap<>();
         globalMap.put("global", deployDescParamMap);
         globalMap.entrySet().stream().forEach(entry -> finalDeployDescMap.put(entry.getKey(), entry.getValue()));
 
         Map<String, Object> serviceParamsMap = new LinkedHashMap<>();
         commonParamMap.entrySet().stream().forEach(entry -> serviceParamsMap.put(entry.getKey(), entry.getValue()));
-        serviceParamsMap.put("deployDescriptor", finalDeployDescMap.get("deployDescriptor"));
+        serviceParamsMap.put("deployDescriptor", deployDescParamMap.get("deployDescriptor"));
         serviceParamsMap.put("global", finalDeployDescMap.get("global"));
 
+        deployDescParamMap.entrySet().stream().forEach(entry -> finalDeployDescMap.put(entry.getKey(), entry.getValue()));
         deployDescParams.entrySet().stream().forEach(entry -> finalDeployDescMap.put(entry.getKey(), serviceParamsMap));
+        commonParamMap.entrySet().stream().forEach(entry -> finalDeployDescMap.put(entry.getKey(), entry.getValue()));
 
 
         parameterBundle.setDeployDescParams(finalDeployDescMap);
@@ -142,7 +143,7 @@ public class ParametersCalculationService {
             LOGGER.debug("No Parameters found. Check if the input values are correct");
             return;
         }
-        filterSecuredParams(parameters, securedParams, inSecuredParams);
+        filterSecuredParams(parameters, securedParams, inSecuredParams, parameterType);
 
         Map<String, Object> finalSecuredParams = ParametersProcessor.convertParameterMapToObject(securedParams);
         Map<String, Object> inSecuredParamsAsObject = ParametersProcessor.convertParameterMapToObject(inSecuredParams);
@@ -151,7 +152,7 @@ public class ParametersCalculationService {
             parameterBundle.setE2eParams(inSecuredParamsAsObject);
         } else if (parameterType == ParameterType.DEPLOY) {
             Map<String, Object> finalInsecureParams = prepareFinalParams(inSecuredParamsAsObject, parameterBundle.isProcessPerServiceParams());
-            parameterBundle.setSecuredDeployParams(finalSecuredParams);
+            parameterBundle.setSecuredDeployParams(prepareFinalParams(finalSecuredParams, false));
             parameterBundle.setDeployParams(finalInsecureParams);
         } else if (parameterType == ParameterType.TECHNICAL) {
             parameterBundle.setSecuredConfigParams(finalSecuredParams);
@@ -192,8 +193,11 @@ public class ParametersCalculationService {
         return orderedMap;
     }
 
-    private void filterSecuredParams(Map<String, Parameter> map, Map<String, Parameter> securedParams, Map<String, Parameter> inSecuredParams) {
+    private void filterSecuredParams(Map<String, Parameter> map, Map<String, Parameter> securedParams, Map<String, Parameter> inSecuredParams, ParameterType parameterType) {
         for (Map.Entry<String, Parameter> entry : map.entrySet()) {
+            if (parameterType == ParameterType.DEPLOY && entities.contains(entry.getKey())) {
+                securedParams.put(entry.getKey(), entry.getValue());
+            }
             if (!entities.contains(entry.getKey()) && containsSecuredParams(entry.getValue())) {
                 securedParams.put(entry.getKey(), entry.getValue());
             } else {
