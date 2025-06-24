@@ -129,7 +129,8 @@ def prepare_git_commit_job(pipeline, full_env, enviroment_name, cluster_name, de
       "module_ansible_cfg": "/module/ansible/ansible.cfg",
       "module_config_default": "/module/templates/defaults.yaml",
       "GIT_STRATEGY": "none",
-      "COMMIT_ENV": "true"
+      "COMMIT_ENV": "true",
+      "DEPLOYMENT-SESSION-ID": deployment_session_id
   }
   git_commit_job = job_instance(params=git_commit_params, vars=git_commit_vars)
   git_commit_job.artifacts.add_paths("${CI_PROJECT_DIR}/environments/" + f"{full_env}")
