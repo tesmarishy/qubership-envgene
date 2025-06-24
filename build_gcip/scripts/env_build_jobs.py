@@ -108,7 +108,6 @@ def prepare_git_commit_job(pipeline, full_env, enviroment_name, cluster_name, de
       "image":  '${envgen_image}',
       "stage":  'git_commit',
       "script": [ 'if [ -d "${CI_PROJECT_DIR}/configuration/certs" ]; then cert_path=$(ls -A "${CI_PROJECT_DIR}/configuration/certs"); for path in $cert_path; do . /module/scripts/update_ca_cert.sh ${CI_PROJECT_DIR}/configuration/certs/$path; done; fi',
-                  "export DEPLOYMENT_SESSION_ID=$(echo $deployment_session_id)",
                   f'/module/scripts/prepare.sh "git_commit.yaml"',
                   "export env_name=$(echo $ENV_NAME | awk -F '/' '{print $NF}')",
                   'env_path=$(sudo find $CI_PROJECT_DIR/environments -type d -name "$env_name")',
@@ -129,7 +128,8 @@ def prepare_git_commit_job(pipeline, full_env, enviroment_name, cluster_name, de
       "module_ansible_cfg": "/module/ansible/ansible.cfg",
       "module_config_default": "/module/templates/defaults.yaml",
       "GIT_STRATEGY": "none",
-      "COMMIT_ENV": "true"
+      "COMMIT_ENV": "true",
+      "DEPLOYMENT_SESSION_ID": deployment_session_id
   }
   git_commit_job = job_instance(params=git_commit_params, vars=git_commit_vars)
   git_commit_job.artifacts.add_paths("${CI_PROJECT_DIR}/environments/" + f"{full_env}")
