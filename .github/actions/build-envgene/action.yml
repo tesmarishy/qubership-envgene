@@ -9,7 +9,7 @@ inputs:
   image-name:
     description: 'Docker image name'
     required: false
-    default: 'netcracker/qubership-envgene'
+    default: '${{ github.repository }}/qubership-envgene'
   dockerfile-path:
     description: 'Path to Dockerfile'
     required: false

@@ -9,7 +9,7 @@ inputs:
   image-name:
     description: 'Docker image name'
     required: false
-    default: 'netcracker/qubership-effective-set-generator'
+    default: '${{ github.repository }}/qubership-effective-set-generator'
   dockerfile-path:
     description: 'Path to Dockerfile'
     required: false

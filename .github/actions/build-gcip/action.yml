@@ -9,7 +9,7 @@ inputs:
   image-name:
     description: 'Docker image name'
     required: false
-    default: 'netcracker/qubership-gcip'
+    default: '${{ github.repository }}/qubership-gcip'
   dockerfile-path:
     description: 'Path to Dockerfile'
     required: false
