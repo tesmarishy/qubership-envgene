@@ -24,6 +24,9 @@ jobs:
       attestations: write
       id-token: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Build Qubership GCIP Docker Image
         uses: ./.github/actions/build-gcip
         with:
@@ -40,6 +43,9 @@ jobs:
       attestations: write
       id-token: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Build Qubership Envgene Docker Image
         uses: ./.github/actions/build-envgene
         with:
@@ -55,6 +61,9 @@ jobs:
       attestations: write
       id-token: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Build Instance Repo Pipeline Docker Image
         uses: ./.github/actions/build-pipeline
         with:
@@ -70,6 +79,9 @@ jobs:
       attestations: write
       id-token: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Build Effective Set Generator Docker Image
         uses: ./.github/actions/build-effective-set
         with:
