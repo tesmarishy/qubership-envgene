@@ -1,0 +1,195 @@
+# Docker Build Workflow Documentation
+
+This document describes how to use the automated Docker image build workflow for Qubership EnvGene project.
+
+## Overview
+
+The `build-all-docker-images.yml` workflow automatically builds and pushes Docker images to the GitHub Container Registry (ghcr.io) when specific conditions are met. It supports both automatic triggering on commits and manual execution with customizable options.
+
+## Docker Images Built
+
+The workflow builds four Docker images:
+
+1. **Qubership GCIP** (`qubership-gcip`)
+2. **Qubership Envgene** (`qubership-envgene`) 
+3. **Instance Repo Pipeline** (`qubership-instance-repo-pipeline`)
+4. **Effective Set Generator** (`qubership-effective-set-generator`)
+
+## Automatic Triggering
+
+### Commit Message Format
+
+The workflow automatically triggers when commits are pushed with specific prefixes. Use conventional commit format:
+
+```
+<type>: <description>
+```
+
+### Supported Commit Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `feat:` | New features | `feat: add new authentication system` |
+| `fix:` | Bug fixes | `fix: resolve docker build issue` |
+| `perf:` | Performance improvements | `perf: optimize image build time` |
+| `refactor:` | Code refactoring | `refactor: restructure docker layers` |
+| `build:` | Build system changes | `build: update docker base image` |
+| `ci:` | CI/CD changes | `ci: add new build step` |
+| `chore:` | Maintenance tasks | `chore: update dependencies` |
+| `BREAKING CHANGE:` | Breaking changes | `BREAKING CHANGE: major refactor` |
+
+### Examples of Valid Commit Messages
+
+```bash
+git commit -m "feat: add new docker build optimization"
+git commit -m "fix: resolve effective-set generator build issue"
+git commit -m "ci: update workflow configuration"
+git commit -m "BREAKING CHANGE: major refactor of build system"
+```
+
+### Ignored Files
+
+The workflow **will not trigger** for changes to:
+- `**.md` files (all markdown files)
+- `docs/**` directory
+- `README.md`
+- `CHANGELOG.md`
+
+## Manual Execution
+
+### How to Run Manually
+
+1. Go to the **Actions** tab in your GitHub repository
+2. Select **"Dev: Build Qubership EnvGene docker images"** workflow
+3. Click **"Run workflow"** button
+4. Configure the build options (see below)
+5. Click **"Run workflow"** to start
+
+### Manual Build Options
+
+When running manually, you can choose which images to build:
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `build-gcip` | Build Qubership GCIP image | ✅ Enabled |
+| `build-envgene` | Build Qubership Envgene image | ✅ Enabled |
+| `build-pipeline` | Build Instance Repo Pipeline image | ✅ Enabled |
+| `build-effective-set` | Build Effective Set Generator image | ✅ Enabled |
+
+### Manual Execution Scenarios
+
+#### Build All Images (Default)
+- Leave all options enabled
+- All four Docker images will be built
+
+#### Build Single Image
+- Disable three options, enable only the one you need
+- Example: Enable only `build-envgene` to build just the Envgene image
+
+#### Build Multiple Images
+- Enable only the specific images you need
+- Example: Enable `build-gcip` and `build-envgene` to build two images
+
+## Workflow Execution
+
+### Job Dependencies
+
+```
+tests
+├── build-qubership-gcip
+├── build-qubership-envgene  
+├── build-instance-repo-pipeline
+├── build-effective-set-jar
+    └── build-effective-set-generator
+```
+
+### Execution Flow
+
+1. **Tests** - Runs first and must pass
+2. **Build Jobs** - Run in parallel after tests pass:
+   - `build-qubership-gcip`
+   - `build-qubership-envgene`
+   - `build-instance-repo-pipeline`
+   - `build-effective-set-jar` (builds JAR artifact)
+3. **build-effective-set-generator** - Runs after JAR is built
+
+### Special Case: Effective Set Generator
+
+The Effective Set Generator has a two-step build process:
+1. **build-effective-set-jar** - Builds Java JAR using Maven
+2. **build-effective-set-generator** - Builds Docker image using the JAR
+
+## Image Registry
+
+All images are pushed to **GitHub Container Registry (ghcr.io)** with the following naming convention:
+
+```
+ghcr.io/<repository-owner>/<repository-name>/<image-name>
+```
+
+### Example Image Names
+
+- `ghcr.io/your-username/qubership-envgene/qubership-gcip`
+- `ghcr.io/your-username/qubership-envgene/qubership-envgene`
+- `ghcr.io/your-username/qubership-envgene/qubership-instance-repo-pipeline`
+- `ghcr.io/your-username/qubership-envgene/qubership-effective-set-generator`
+
+## Troubleshooting
+
+### Workflow Not Triggering
+
+**Problem**: Workflow doesn't run on commit push
+
+**Solutions**:
+1. Check commit message format - must start with supported type
+2. Verify files changed are not in ignored paths
+3. Ensure you're pushing to a branch (not a tag)
+
+### Job Skipped
+
+**Problem**: Some jobs are skipped during execution
+
+**Solutions**:
+1. For manual runs: Check if the corresponding option is enabled
+2. For automatic runs: Verify commit message format
+3. Check job dependencies - some jobs require others to complete first
+
+### Build Failures
+
+**Problem**: Docker build fails
+
+**Solutions**:
+1. Check Dockerfile syntax and paths
+2. Verify required secrets are configured:
+   - `GITHUB_TOKEN` (automatic)
+   - `GIT_USER` (for GCIP and Effective Set)
+   - `GIT_TOKEN` (for GCIP and Effective Set)
+   - `GH_ACCESS_TOKEN` (for Envgene and Pipeline)
+3. Check if Dockerfile exists in the specified path
+
+## Best Practices
+
+### Commit Messages
+
+- Use conventional commit format consistently
+- Be descriptive in commit messages
+- Use appropriate commit types
+
+### Manual Execution
+
+- Use manual execution for testing specific images
+- Disable unnecessary builds to save time and resources
+- Test individual images before building all
+
+### Monitoring
+
+- Monitor workflow runs in the Actions tab
+- Check build logs for any issues
+- Verify images are pushed to the registry
+
+## Related Files
+
+- **Workflow**: `.github/workflows/build-all-docker-images.yml`
+- **Composite Actions**: `.github/actions/build-*`
+- **Dockerfiles**: Located in respective build directories
+- **Test Workflow**: `.github/workflows/perform_tests.yml` 
