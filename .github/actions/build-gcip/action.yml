@@ -1,5 +1,5 @@
-name: 'Build Effective Set Generator Docker Image'
-description: 'Build and push Effective Set Generator docker image to container registry'
+name: 'Build Qubership GCIP Docker Image'
+description: 'Build and push Qubership GCIP docker image to container registry'
 
 inputs:
   registry:
@@ -9,15 +9,11 @@ inputs:
   image-name:
     description: 'Docker image name'
     required: false
-    default: 'netcracker/qubership-effective-set-generator'
+    default: 'netcracker/qubership-gcip'
   dockerfile-path:
     description: 'Path to Dockerfile'
     required: false
-    default: './build_effective_set_generator_java/Dockerfile'
-  pom-path:
-    description: 'Path to Maven POM file'
-    required: false
-    default: './build_effective_set_generator_java/pom.xml'
+    default: './build_gcip/build/Dockerfile'
   git-user:
     description: 'Git username for build args'
     required: false
@@ -30,17 +26,6 @@ runs:
   steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-
-    - name: Build JAR with Maven
-      run: |
-        mvn --batch-mode package -Dgpg.skip=true -f ${{ inputs.pom-path }}
-      shell: bash
 
     - name: Log in to the Container registry
       uses: docker/login-action@v3

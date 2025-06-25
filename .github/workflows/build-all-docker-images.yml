@@ -25,7 +25,7 @@ jobs:
       id-token: write
     steps:
       - name: Build Qubership GCIP Docker Image
-        uses: ./.github/actions/build-qubership-gcip
+        uses: ./.github/actions/build-gcip
         with:
           registry: ${{ env.REGISTRY }}
           git-user: ${{ secrets.GIT_USER }}
@@ -41,7 +41,7 @@ jobs:
       id-token: write
     steps:
       - name: Build Qubership Envgene Docker Image
-        uses: ./.github/actions/build-qubership-envgene
+        uses: ./.github/actions/build-envgene
         with:
           registry: ${{ env.REGISTRY }}
           gh-access-token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -56,7 +56,7 @@ jobs:
       id-token: write
     steps:
       - name: Build Instance Repo Pipeline Docker Image
-        uses: ./.github/actions/build-instance-repo-pipeline
+        uses: ./.github/actions/build-pipeline
         with:
           registry: ${{ env.REGISTRY }}
           gh-access-token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -71,7 +71,7 @@ jobs:
       id-token: write
     steps:
       - name: Build Effective Set Generator Docker Image
-        uses: ./.github/actions/build-effective-set-generator
+        uses: ./.github/actions/build-effective-set
         with:
           registry: ${{ env.REGISTRY }}
           git-user: ${{ secrets.GIT_USER }}

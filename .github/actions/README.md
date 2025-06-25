@@ -4,7 +4,7 @@
 
 ## Доступные Actions
 
-### build-qubership-gcip
+### build-gcip
 Сборка Docker образа для Qubership GCIP.
 
 **Входные параметры:**
@@ -14,7 +14,7 @@
 - `git-user` (опционально): Git username для build args
 - `git-token` (опционально): Git token для build args
 
-### build-qubership-envgene
+### build-envgene
 Сборка Docker образа для Qubership Envgene.
 
 **Входные параметры:**
@@ -23,7 +23,7 @@
 - `dockerfile-path` (опционально): Путь к Dockerfile (по умолчанию: `./build_envgene/build/Dockerfile`)
 - `gh-access-token` (опционально): GitHub access token для build args
 
-### build-instance-repo-pipeline
+### build-pipeline
 Сборка Docker образа для Instance Repo Pipeline.
 
 **Входные параметры:**
@@ -32,7 +32,7 @@
 - `dockerfile-path` (опционально): Путь к Dockerfile (по умолчанию: `./github_workflows/instance-repo-pipeline/Dockerfile`)
 - `gh-access-token` (опционально): GitHub access token для build args
 
-### build-effective-set-generator
+### build-effective-set
 Сборка Docker образа для Effective Set Generator с предварительной сборкой JAR.
 
 **Входные параметры:**
@@ -48,7 +48,7 @@
 ### В workflow файле:
 ```yaml
 - name: Build Docker Image
-  uses: ./.github/actions/build-qubership-gcip
+  uses: ./.github/actions/build-gcip
   with:
     registry: ghcr.io
     git-user: ${{ secrets.GIT_USER }}
