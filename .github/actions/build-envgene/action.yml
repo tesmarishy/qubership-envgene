@@ -17,6 +17,9 @@ inputs:
   gh-access-token:
     description: 'GitHub access token for build args'
     required: false
+  github-token:
+    description: 'GitHub token for registry login'
+    required: true
 
 runs:
   using: composite
@@ -29,7 +32,7 @@ runs:
       with:
         registry: ${{ inputs.registry }}
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ inputs.github-token }}
 
     - name: Extract metadata (tags, labels) for Docker
       id: meta

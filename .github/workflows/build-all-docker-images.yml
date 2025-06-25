@@ -33,6 +33,7 @@ jobs:
           registry: ${{ env.REGISTRY }}
           git-user: ${{ secrets.GIT_USER }}
           git-token: ${{ secrets.GIT_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   build-qubership-envgene:
     needs: [tests]
@@ -51,6 +52,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           gh-access-token: ${{ secrets.GH_ACCESS_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   build-instance-repo-pipeline:
     needs: [tests]
@@ -69,6 +71,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           gh-access-token: ${{ secrets.GH_ACCESS_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   build-effective-set-generator:
     needs: [tests]
@@ -87,4 +90,5 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           git-user: ${{ secrets.GIT_USER }}
-          git-token: ${{ secrets.GIT_TOKEN }} 
+          git-token: ${{ secrets.GIT_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }} 
