@@ -162,9 +162,9 @@ if [ -e /tmp/gitlab-ci ]; then
   message="${ticket_id} [ci_build_parameters] Update gitlab-ci configurations"
 fi
 
-if [ -n "${SESSION_ID}" ]; then
-    echo "Deployment session id is ${SESSION_ID}"
-    message="${message}"$'\n\n'"DEPLOYMENT-SESSION-ID: ${SESSION_ID}"
+if [ -n "${DEPLOYMENT_SESSION_ID}" ]; then
+    echo "Deployment session id is ${DEPLOYMENT_SESSION_ID}"
+    message="${message}"$'\n\n'"DEPLOYMENT-SESSION-ID: ${DEPLOYMENT_SESSION_ID}"
     echo "Appended commit message with session id"
 fi
 
