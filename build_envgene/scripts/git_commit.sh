@@ -171,7 +171,7 @@ if [ -n "${DEPLOYMENT_SESSION_ID}" ]; then
     echo "Appended commit message with session id"
 fi
 if [ -n "${SESSION_ID}" ]; then
-    echo "Deployment session id is ${SESSION_ID}"
+    echo "session id is ${SESSION_ID}"
     message="${message}"$'\n\n'"DEPLOYMENT-SESSION-ID: ${SESSION_ID}"
     echo "Appended commit message with session id"
 fi

@@ -5,6 +5,7 @@ envgen_debug: "{{ lookup('env', 'envgen_debug') }}"
 
 env_name: "{{ lookup('env', 'ENV_NAME') }}"
 cluster_name: "{{ lookup('env', 'CLUSTER_NAME') }}"
+DEPLOYMENT_SESSION_ID: "{{ lookup('env', 'DEPLOYMENT_SESSION_ID') }}"
 environment_name: "{{ lookup('env', 'ENVIRONMENT_NAME') }}"
 base_dir: "{{ lookup('env', 'CI_PROJECT_DIR') }}"
 env_template_vers: "{{ lookup('env', 'ENV_TEMPLATE_VERSION') }}"
