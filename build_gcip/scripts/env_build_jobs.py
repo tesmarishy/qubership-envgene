@@ -132,8 +132,9 @@ def prepare_git_commit_job(pipeline, full_env, enviroment_name, cluster_name, de
       "GIT_STRATEGY": "none",
       "COMMIT_ENV": "true",
       "COMMIT_MESSAGE": "Testing commit message",
-      "SESSION_ID": deployment_session_id,
-      "DEPLOYMENT_SESSION_ID": deployment_session_id
+      "DEPLOY_SESSION_ID": deployment_session_id,
+      "DEPLOYMENT_SESSION_ID": deployment_session_id,
+      "DEPLOYMENT_TICKET_ID": "123456"
   }
   git_commit_job = job_instance(params=git_commit_params, vars=git_commit_vars)
   git_commit_job.artifacts.add_paths("${CI_PROJECT_DIR}/environments/" + f"{full_env}")
