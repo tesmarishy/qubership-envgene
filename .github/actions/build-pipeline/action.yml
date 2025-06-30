@@ -9,7 +9,7 @@ inputs:
   image-name:
     description: 'Docker image name'
     required: false
-    default: '${{ github.repository }}/qubership-instance-repo-pipeline'
+    default: 'qubership-instance-repo-pipeline'
   dockerfile-path:
     description: 'Path to Dockerfile'
     required: false
@@ -38,7 +38,7 @@ runs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ inputs.registry }}/${{ inputs.image-name }}
+        images: ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}
     
     - name: Build and push Docker image
       id: push

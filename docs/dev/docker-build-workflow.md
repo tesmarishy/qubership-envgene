@@ -31,11 +31,6 @@ The workflow automatically triggers when commits are pushed with specific prefix
 |------|-------------|---------|
 | `feat:` | New features | `feat: add new authentication system` |
 | `fix:` | Bug fixes | `fix: resolve docker build issue` |
-| `perf:` | Performance improvements | `perf: optimize image build time` |
-| `refactor:` | Code refactoring | `refactor: restructure docker layers` |
-| `build:` | Build system changes | `build: update docker base image` |
-| `ci:` | CI/CD changes | `ci: add new build step` |
-| `chore:` | Maintenance tasks | `chore: update dependencies` |
 | `BREAKING CHANGE:` | Breaking changes | `BREAKING CHANGE: major refactor` |
 
 ### Examples of Valid Commit Messages
@@ -43,17 +38,8 @@ The workflow automatically triggers when commits are pushed with specific prefix
 ```bash
 git commit -m "feat: add new docker build optimization"
 git commit -m "fix: resolve effective-set generator build issue"
-git commit -m "ci: update workflow configuration"
 git commit -m "BREAKING CHANGE: major refactor of build system"
 ```
-
-### Ignored Files
-
-The workflow **will not trigger** for changes to:
-- `**.md` files (all markdown files)
-- `docs/**` directory
-- `README.md`
-- `CHANGELOG.md`
 
 ## Manual Execution
 
@@ -124,15 +110,15 @@ The Effective Set Generator has a two-step build process:
 All images are pushed to **GitHub Container Registry (ghcr.io)** with the following naming convention:
 
 ```
-ghcr.io/<repository-owner>/<repository-name>/<image-name>
+ghcr.io/<repository-owner>/<image-name>
 ```
 
 ### Example Image Names
 
-- `ghcr.io/your-username/qubership-envgene/qubership-gcip`
-- `ghcr.io/your-username/qubership-envgene/qubership-envgene`
-- `ghcr.io/your-username/qubership-envgene/qubership-instance-repo-pipeline`
-- `ghcr.io/your-username/qubership-envgene/qubership-effective-set-generator`
+- `ghcr.io/netcracker/qubership-gcip`
+- `ghcr.io/netcracker/qubership-envgene`
+- `ghcr.io/netcracker/qubership-instance-repo-pipeline`
+- `ghcr.io/netcracker/qubership-effective-set-generator`
 
 ## Troubleshooting
 
@@ -141,7 +127,7 @@ ghcr.io/<repository-owner>/<repository-name>/<image-name>
 **Problem**: Workflow doesn't run on commit push
 
 **Solutions**:
-1. Check commit message format - must start with supported type
+1. Check commit message format - must start with `feat:`, `fix:`, or `BREAKING CHANGE:`
 2. Verify files changed are not in ignored paths
 3. Ensure you're pushing to a branch (not a tag)
 
@@ -171,9 +157,9 @@ ghcr.io/<repository-owner>/<repository-name>/<image-name>
 
 ### Commit Messages
 
-- Use conventional commit format consistently
+- Use [conventional commit format](https://www.conventionalcommits.org/en/v1.0.0/) consistently
 - Be descriptive in commit messages
-- Use appropriate commit types
+- Use appropriate commit types: `feat:`, `fix:`, or `BREAKING CHANGE:`
 
 ### Manual Execution
 

@@ -39,12 +39,17 @@ env:
 
 jobs:
   tests:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'perf:') || contains(github.event.head_commit.message, 'refactor:') || contains(github.event.head_commit.message, 'build:') || contains(github.event.head_commit.message, 'ci:') || contains(github.event.head_commit.message, 'chore:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')
-    uses: ./.github/workflows/perform_tests.yml
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.10-slim-bookworm
+    steps:
+      - name: Run Tests
+        uses: ./.github/actions/run-tests
 
   build-qubership-gcip:
     needs: [tests]
-    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-gcip == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'perf:') || contains(github.event.head_commit.message, 'refactor:') || contains(github.event.head_commit.message, 'build:') || contains(github.event.head_commit.message, 'ci:') || contains(github.event.head_commit.message, 'chore:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
+    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-gcip == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -65,7 +70,7 @@ jobs:
 
   build-qubership-envgene:
     needs: [tests]
-    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-envgene == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'perf:') || contains(github.event.head_commit.message, 'refactor:') || contains(github.event.head_commit.message, 'build:') || contains(github.event.head_commit.message, 'ci:') || contains(github.event.head_commit.message, 'chore:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
+    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-envgene == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -85,7 +90,7 @@ jobs:
 
   build-instance-repo-pipeline:
     needs: [tests]
-    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-pipeline == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'perf:') || contains(github.event.head_commit.message, 'refactor:') || contains(github.event.head_commit.message, 'build:') || contains(github.event.head_commit.message, 'ci:') || contains(github.event.head_commit.message, 'chore:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
+    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-pipeline == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -105,7 +110,7 @@ jobs:
 
   build-effective-set-jar:
     needs: [tests]
-    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-effective-set == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'perf:') || contains(github.event.head_commit.message, 'refactor:') || contains(github.event.head_commit.message, 'build:') || contains(github.event.head_commit.message, 'ci:') || contains(github.event.head_commit.message, 'chore:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
+    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-effective-set == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
     uses: netcracker/qubership-workflow-hub/.github/workflows/maven-publish.yml@main
     with:
       maven-command: "--batch-mode package -Dgpg.skip=true -f build_effective_set_generator_java/pom.xml"
@@ -118,7 +123,7 @@ jobs:
 
   build-effective-set-generator:
     needs: [build-effective-set-jar]
-    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-effective-set == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'perf:') || contains(github.event.head_commit.message, 'refactor:') || contains(github.event.head_commit.message, 'build:') || contains(github.event.head_commit.message, 'ci:') || contains(github.event.head_commit.message, 'chore:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
+    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-effective-set == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
     runs-on: ubuntu-latest
     permissions:
       contents: read
