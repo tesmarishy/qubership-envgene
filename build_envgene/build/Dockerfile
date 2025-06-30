@@ -35,7 +35,7 @@ RUN apk update && \
     chmod +x sops-v3.9.0.linux.amd64 && \
     mv sops-v3.9.0.linux.amd64 /usr/local/bin/sops && \
     # Install Python packages
-    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r /build/requirements.txt && \
     pip install --no-cache-dir ansible --upgrade && \
     rm -rf /usr/lib/python3.10/site-packages/ansible_collections/* && \
