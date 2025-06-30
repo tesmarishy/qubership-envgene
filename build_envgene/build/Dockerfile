@@ -1,6 +1,6 @@
 #########################################
 ## Stage 1: Builder
-FROM ghcr.io/netcracker/qubership-base-module-dockerimage:v2.0.0 as builder
+FROM python:3.11-slim as builder
 
 USER root
 
@@ -10,13 +10,13 @@ COPY build_envgene/build/requirements.txt /build/requirements.txt
 COPY build_envgene/build/requirements.yml /build/requirements.yml
 
 # Install build dependencies and runtime packages in a single layer
-RUN apk update && \
-    apk add --no-cache \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
         git \
         python3 \
-        py3-pip \
-        py3-cryptography \
-        py3-openssl \
+        python3-pip \
+        python3-cryptography \
+        python3-openssl \
         openssh-client \
         ca-certificates \
         coreutils \
@@ -26,10 +26,10 @@ RUN apk update && \
         unzip \
         jq \
         # Build dependencies
-        build-base \
+        build-essential \
         libxml2-dev \
         libxslt-dev \
-        zlib-dev && \
+        zlib1g-dev && \
     # Install sops
     curl --retry 3 --retry-connrefused --retry-delay 5 -LO https://github.com/mozilla/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64 && \
     chmod +x sops-v3.9.0.linux.amd64 && \
@@ -37,13 +37,13 @@ RUN apk update && \
     # Install Python packages
     pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r /build/requirements.txt && \
-    pip install --no-cache-dir --force-reinstall ansible-core==2.14.0 && \
-    rm -rf /usr/lib/python3.10/site-packages/ansible_collections/* && \
+    mkdir -p /module/ansible/collections && \
     ansible-galaxy collection install -r /build/requirements.yml -p /module/ansible/collections && \
     pip install --no-cache-dir PyYAML && \
     # Cleanup
-    apk del build-base libxml2-dev libxslt-dev zlib-dev && \
-    rm -rf /var/cache/apk/* /tmp/* /var/tmp/* /root/.cache
+    apt-get remove -y build-essential libxml2-dev libxslt-dev zlib1g-dev && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache
 
 # Copy remaining application files
 COPY build_envgene/ansible /module/ansible
