@@ -37,7 +37,6 @@ RUN apk update && \
     # Install Python packages
     pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r /build/requirements.txt && \
-    pip install --no-cache-dir ansible --upgrade && \
     rm -rf /usr/lib/python3.10/site-packages/ansible_collections/* && \
     ansible-galaxy collection install -r /build/requirements.yml -p /module/ansible/collections && \
     pip install --no-cache-dir PyYAML && \
@@ -65,6 +64,6 @@ RUN pip install --no-cache-dir \
     # Cleanup pip cache
     rm -rf /root/.cache
 
-ENV ANSIBLE_LIBRARY=/module/ansible/library:$ANSIBLE_LIBRARY
+ENV ANSIBLE_LIBRARY=/module/ansible/library
 
 WORKDIR /module/ansible
