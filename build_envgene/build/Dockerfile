@@ -37,6 +37,7 @@ RUN apk update && \
     # Install Python packages
     pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r /build/requirements.txt && \
+    pip install --no-cache-dir --force-reinstall ansible-core==2.14.0 && \
     rm -rf /usr/lib/python3.10/site-packages/ansible_collections/* && \
     ansible-galaxy collection install -r /build/requirements.yml -p /module/ansible/collections && \
     pip install --no-cache-dir PyYAML && \
