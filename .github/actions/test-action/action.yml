@@ -1,9 +1,0 @@
-name: 'Test Action'
-description: 'Simple test action'
-
-runs:
-  using: composite
-  steps:
-    - name: Test step
-      shell: bash
-      run: echo "Test action works!" 
