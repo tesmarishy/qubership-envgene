@@ -1,4 +1,4 @@
-# Docker Build Workflow Documentation
+# On-Commit Build Workflow Documentation
 
 This document describes how to use the automated Docker image build workflow for Qubership EnvGene project.
 
