@@ -173,9 +173,59 @@ ghcr.io/<repository-owner>/<image-name>
 - Check build logs for any issues
 - Verify images are pushed to the registry
 
+## Code Quality Workflows
+
+### Super Linter
+
+The `super-linter.yaml` workflow automatically checks code quality and style across the entire codebase.
+
+#### Triggering Conditions
+
+- **Push events**: Runs on commits to any branch except `main`
+- **Pull requests**: Runs on all pull requests to any branch
+- **Manual execution**: Can be triggered manually via workflow dispatch
+
+#### What It Does
+
+- Lints code based on file extensions and languages detected
+- Checks for code style violations
+- Validates syntax and formatting
+- Supports multiple programming languages (Python, YAML, JSON, etc.)
+
+#### Configuration
+
+- Configuration files should be placed in `.github/linters/`
+- Environment variables can be set in `.github/super-linter.env`
+- Supports full codebase scan via manual execution with `full_scan: true`
+
+### Link Checker
+
+The `link-checker.yaml` workflow validates all links in markdown files to ensure they are working correctly.
+
+#### Triggering Conditions
+
+- **Push events**: Runs on commits to any branch except `main`
+- **Pull requests**: Runs on all pull requests to any branch
+- **Manual execution**: Can be triggered manually via workflow dispatch
+
+#### What It Does
+
+- Scans all `.md` files in the repository
+- Validates HTTP/HTTPS links
+- Reports broken or inaccessible links
+- Accepts status codes: 100-103, 200-299, 429 (rate limiting)
+
+#### Configuration
+
+- Uses Lychee link checker tool
+- Accepts certain HTTP status codes as valid (rate limiting, redirects)
+- Fails the workflow if broken links are found
+
 ## Related Files
 
 - **Workflow**: `.github/workflows/build-all-docker-images.yml`
 - **Composite Actions**: `.github/actions/build-*`
 - **Dockerfiles**: Located in respective build directories
-- **Test Workflow**: `.github/workflows/perform_tests.yml` 
+- **Test Workflow**: `.github/workflows/perform_tests.yml`
+- **Linter Workflow**: `.github/workflows/super-linter.yaml`
+- **Link Checker Workflow**: `.github/workflows/link-checker.yaml` 
