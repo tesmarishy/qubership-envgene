@@ -2,9 +2,41 @@
 
 This document describes how to use the automated Docker image build workflow for Qubership EnvGene project.
 
-## Overview
+## CI/CD Pipeline Architecture
 
-The `build-all-docker-images.yml` workflow automatically builds and pushes Docker images to the GitHub Container Registry (ghcr.io) when specific conditions are met. It supports both automatic triggering on commits and manual execution with customizable options.
+When commits are pushed to any branch (except `main`), the following workflows run in parallel:
+
+### Parallel Execution on Commits
+
+1. **Super Linter** (`.github/workflows/super-linter.yaml`)
+   - Checks code quality and style
+   - Validates syntax and formatting
+   - Runs across all supported languages
+
+2. **Link Checker** (`.github/workflows/link-checker.yaml`)
+   - Validates all links in markdown files
+   - Ensures documentation links are working
+
+3. **Conditional Execution Based on Commit Message**:
+
+   **For commits with `fix:`, `feat:`, or `BREAKING CHANGE:`**:
+   - **Docker Builds** (`.github/workflows/build-all-docker-images.yml`)
+     - Builds and pushes Docker images to registry
+     - Runs after code quality checks pass
+
+   **For commits WITHOUT conventional commit prefixes**:
+   - **Tests** (`.github/workflows/perform_tests.yml`)
+     - Runs unit and integration tests
+     - Validates code functionality
+
+### Pull Request Workflow
+
+On pull requests, the following workflows run regardless of commit message format:
+- Super Linter
+- Link Checker  
+- Tests
+
+This ensures comprehensive validation before code is merged. Docker builds are not triggered on pull requests to avoid unnecessary builds during code review.
 
 ## Docker Images Built
 
@@ -19,7 +51,7 @@ The workflow builds four Docker images:
 
 ### Commit Message Format
 
-The workflow automatically triggers when commits are pushed with specific prefixes. Use conventional commit format:
+The Docker build workflow automatically triggers when commits are pushed with conventional commit prefixes. Use conventional commit format:
 
 ```
 <type>: <description>
@@ -40,6 +72,12 @@ git commit -m "feat: add new docker build optimization"
 git commit -m "fix: resolve effective-set generator build issue"
 git commit -m "BREAKING CHANGE: major refactor of build system"
 ```
+
+### Commit Message Behavior
+
+- **Commits with `feat:`, `fix:`, or `BREAKING CHANGE:`** → Triggers Docker builds
+- **Commits without conventional prefixes** → Triggers tests only
+- **All commits** → Trigger code quality checks (Linter + Link Checker)
 
 ## Manual Execution
 
@@ -76,28 +114,14 @@ When running manually, you can choose which images to build:
 - Enable only the specific images you need
 - Example: Enable `build-gcip` and `build-envgene` to build two images
 
-## Workflow Execution
-
-### Job Dependencies
-
-```
-tests
-├── build-qubership-gcip
-├── build-qubership-envgene  
-├── build-instance-repo-pipeline
-├── build-effective-set-jar
-    └── build-effective-set-generator
-```
-
-### Execution Flow
+## Docker images execution Flow
 
 1. **Tests** - Runs first and must pass
 2. **Build Jobs** - Run in parallel after tests pass:
    - `build-qubership-gcip`
    - `build-qubership-envgene`
    - `build-instance-repo-pipeline`
-   - `build-effective-set-jar` (builds JAR artifact)
-3. **build-effective-set-generator** - Runs after JAR is built
+   - `build-effective-set-jar --> build-effective-set-generator`
 
 ### Special Case: Effective Set Generator
 
