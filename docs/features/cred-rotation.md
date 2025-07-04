@@ -94,7 +94,6 @@ Supports working with SOPS encryption.
     }
   ]
 }
-- ...
 ```
 
 | Attribute | Mandatory | Description | Default | Example |
