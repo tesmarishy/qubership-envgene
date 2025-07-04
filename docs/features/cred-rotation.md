@@ -257,6 +257,7 @@ The `affected-sensitive-parameters.yaml` is created using the reverse logic desc
     application: string
     context: enum[`pipeline`,`deployment`,`runtime`]
     parameter_key: string
+    cred_field: enum[`username`,`password`,`secret`]
   affected_parameters:
     - # Mandatory
       # Environment id (in cluster-name/env-name notation) where affected parameter is located
@@ -274,29 +275,16 @@ The `affected-sensitive-parameters.yaml` is created using the reverse logic desc
       # Affected parameter key
       parameter_key: string
       # Mandatory
-      # Contains affected creds in Environment Credentials File
-      environment_creds:
-        # Mandatory
-        # Path to Environment Credentials File with affected creds
-        cred_filepath: string
-        # Mandatory
-        # Affected Credential ID. Located in `cred_filepath`
-        cred_id: string
-        # Mandatory
-        # Affected Credential field name of cred_id
-        cred_field: enum[`username`,`password`,`secret`]
+      # Affected Credential ID
+      cred_id: string
+      # Mandatory
+      # Path to Environment Credentials File with affected creds
+      environment_creds_filepath: string
       # Mandatory. Default `[]`
-      # Contains all affected creds in Shared Credentials Files
-      shared_creds:
-          # Optional
-          # Path to Shared Credentials Files with affected creds
-        - cred_filepath: string
-          # Optional
-          # Affected Credential ID. Located in `cred_filepath`
-          cred_id: string
-          # Optional
-          # Affected Credential field name of cred_id
-          cred_field: enum[`username`,`password`,`secret`]
+      # Contains affected creds in all Shared Credentials Files
+      shared_creds_filepath:
+        - string
+        - string
 - ...
 ```
 
