@@ -278,10 +278,10 @@ The `affected-sensitive-parameters.yaml` is created using the reverse logic desc
       # Affected Credential ID
       cred_id: string
       # Mandatory
-      # Path to Environment Credentials File with affected creds
+      # Path to Environment Credentials File with affected cred
       environment_creds_filepath: string
       # Mandatory. Default `[]`
-      # Contains affected creds in all Shared Credentials Files
+      # Path to all Shared Credentials Files with affected cred
       shared_creds_filepath:
         - string
         - string
