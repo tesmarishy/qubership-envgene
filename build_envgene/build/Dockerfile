@@ -1,6 +1,6 @@
 #########################################
 ## Stage 1
-FROM ghcr.io/netcracker/base-images-module-base:main as base-image
+FROM ghcr.io/netcracker/qubership-base-module-dockerimage:v2.0.0 as base-image
 
 USER root
 
@@ -16,6 +16,11 @@ COPY build_* create_* produce_* sort* /build_env/
 COPY scripts /build_env/scripts
 COPY env-builder /build_env/env-builder
 COPY schemas /build_env/schemas
+
+# Copy creds_rotation files
+COPY creds_rotation/build/pip.conf /etc/pip.conf
+COPY creds_rotation/build/requirements.txt /build/creds_rotation_requirements.txt
+COPY creds_rotation/scripts /module/creds_rotation_scripts
 
 
 ENV ANSIBLE_LIBRARY /module/ansible/library:$ANSIBLE_LIBRARY
@@ -51,7 +56,9 @@ RUN apk update \
     && pip install /python/jschon-sort \
     && pip install /python/envgene \
     && pip install /python/integration \
+    && pip install --no-cache-dir --no-deps -r /build/creds_rotation_requirements.txt \
     && chmod 754 /module/scripts/* \
+    && chmod 754 /module/creds_rotation_scripts/* \
     && apk del build-base libxml2-dev libxslt-dev zlib-dev \
     && rm -rf /var/cache/apk/* /tmp/* /var/tmp/* \
     && pip install PyYAML
