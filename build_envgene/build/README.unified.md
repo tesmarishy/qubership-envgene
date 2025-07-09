@@ -25,7 +25,7 @@ The final image size is approximately **310MB**, which is a significant reductio
 ## Components Included
 
 - **Python 3.12.8** with virtual environment
-- **Ansible Core 2.18.6** with essential collections
+- **Ansible Core 2.18.6** with essential collections (ansible.utils, ansible.posix)
 - **SOPS 3.9.0** for secrets management
 - **jschon-sort** for JSON Schema sorting
 - **envgene** and **integration** Python packages
@@ -126,6 +126,10 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 ### Ansible Issues
 If Ansible fails to start, ensure that test directories were not accidentally removed during the build process.
+
+**Common Issues:**
+- **Callback plugin errors**: If you see "Invalid callback for stdout specified", ensure that the required Ansible collections are installed (ansible.posix for debug callback)
+- **Inventory parsing errors**: These are usually related to missing inventory files or permission issues in CI/CD environments
 
 ### Permission Issues
 The image runs as root, so permission issues should be minimal. If you encounter permission problems, check that the required directories exist and have proper permissions.

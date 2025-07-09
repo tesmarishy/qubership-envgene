@@ -45,8 +45,9 @@ RUN python -m venv /module/venv
 RUN /module/venv/bin/pip install --upgrade pip setuptools wheel
 RUN /module/venv/bin/pip install --no-cache-dir --retries 10 --timeout 60 -r /build/requirements.txt
 RUN /module/venv/bin/pip install ansible-core --upgrade
-# Install only essential Ansible collections to reduce size
+# Install essential Ansible collections
 RUN /module/venv/bin/ansible-galaxy collection install ansible.utils -p /module/ansible/collections
+RUN /module/venv/bin/ansible-galaxy collection install ansible.posix -p /module/ansible/collections
 RUN /module/venv/bin/pip install /python/jschon-sort
 RUN /module/venv/bin/pip install /python/envgene
 RUN /module/venv/bin/pip install /python/integration
