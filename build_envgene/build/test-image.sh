@@ -16,6 +16,7 @@ docker run --rm $IMAGE_NAME bash --version
 echo "=== Testing Ansible ==="
 docker run --rm $IMAGE_NAME ansible --version
 docker run --rm $IMAGE_NAME ansible-doc -t callback -l | grep -E "(default|posix)"
+docker run --rm $IMAGE_NAME ansible-doc community.general.maven_artifact | head -5
 
 echo "=== Testing SOPS ==="
 docker run --rm $IMAGE_NAME sops --version
