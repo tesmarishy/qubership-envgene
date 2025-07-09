@@ -14,7 +14,7 @@ This Dockerfile creates a unified, optimized Docker image that combines function
 
 ## Image Size Optimization
 
-The final image size is approximately **343MB**, which is a significant reduction from the original ~1.3GB image. This was achieved through:
+The final image size is approximately **344MB**, which is a significant reduction from the original ~1.3GB image. This was achieved through:
 
 1. **Multi-stage build**: Build dependencies are not included in the final image
 2. **Alpine Linux**: Much smaller base image compared to Debian/Ubuntu
@@ -29,6 +29,7 @@ The final image size is approximately **343MB**, which is a significant reductio
 - **SOPS 3.9.0** for secrets management
 - **jschon-sort** for JSON Schema sorting
 - **envgene** and **integration** Python packages
+- **ansible-runner** for programmatic Ansible execution
 - **Essential tools**: bash, curl, jq, yq, git, openssh-client, etc.
 
 ## CI/CD Compatibility

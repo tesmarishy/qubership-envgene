@@ -24,6 +24,9 @@ docker run --rm $IMAGE_NAME sops --version
 echo "=== Testing jschon-sort ==="
 docker run --rm $IMAGE_NAME jschon-sort --help
 
+echo "=== Testing ansible-runner ==="
+docker run --rm $IMAGE_NAME python -c "import ansible_runner; print('ansible_runner imported successfully')"
+
 echo "=== Testing CI/CD directories ==="
 docker run --rm $IMAGE_NAME ls -la /__w/_temp/_runner_file_commands
 docker run --rm $IMAGE_NAME ls -la /github/workspace
