@@ -90,25 +90,27 @@ Supports working with SOPS encryption.
       "application": "<application-name>",
       "context": "enum[`pipeline`,`deployment`, `runtime`]",
       "parameter_key": "<parameter-key>",
-      "parameter_value": "<new-parameter-value>"
+      "parameter_value": "<new-parameter-value>",
+      "literal": "boolean"
     }
   ]
 }
 ```
 
-| Attribute | Mandatory | Description | Default | Example |
-|---|---|---|---|---|
-| `namespace` | Mandatory | The name of the namespace where the parameter to be modified is defined | None | `env-1-platform-monitoring` |
-| `application` | Optional | The name of the application (sub-resource under `namespace`) where the parameter to be modified is defined. Cannot be used with `pipeline` context | None | `MONITORING` |
-| `context` | Mandatory | The context of the parameter being modified. Valid values: `pipeline`, `deployment`, `runtime` | None | `deployment` |
-| `parameter_key` | Mandatory | The name (key) of the parameter to be modified | None | `login` |
-| `parameter_value` | Mandatory | New value (plaintext or encrypted). Envgene, depending on the value of the [`crypt`](/docs/envgene-configs.md#configyml) attribute, will either decrypt, encrypt, or leave the value unchanged. If an encrypted value is passed, it must be encrypted with a key that Envgene can decrypt. | None | `admin`|
+| Attribute         | Mandatory | Description                                                                                                                                                                                                 | Default | Example |
+|-------------------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|---------|
+| `namespace`       | Mandatory | The name of the namespace where the parameter to be modified is defined                                                                                               | None    | `env-1-platform-monitoring` |
+| `application`     | Optional  | The name of the application (sub-resource under `namespace`) where the parameter to be modified is defined. Cannot be used with `pipeline` context                   | None    | `MONITORING` |
+| `context`         | Mandatory | The context of the parameter being modified. Valid values: `pipeline`, `deployment`, `runtime`                                                                       | None    | `deployment` |
+| `parameter_key`   | Mandatory | The name (key) of the parameter to be modified. If it contains a dot (`.`) and `literal: true`, it is treated as a literal string. If `literal: false` (default), it is treated as a path in the map. | None    | `login` or `db.connection.password` |
+| `parameter_value` | Mandatory | New value (plaintext or encrypted). Envgene, depending on the value of the [`crypt`](/docs/envgene-configs.md#configyml) attribute, will either decrypt, encrypt, or leave the value unchanged. If an encrypted value is passed, it must be encrypted with a key that Envgene can decrypt. | None    | `admin` |
+| `literal`         | Optional  | If true, `parameter_key` is treated as a literal string even if it contains dots. If false (default), dots in `parameter_key` are interpreted as path separators.   | false   | true |
 
 A sensitive parameter can be defined within a complex parameter structure. In such cases during rotation, the `parameter_key` should use dot notation (e.g., `key1.key2.username`)
 
 ##### `CRED_ROTATION_PAYLOAD` example
 
-```yaml
+```json
 {
   "rotation_items": [
     {
@@ -135,22 +137,19 @@ A sensitive parameter can be defined within a complex parameter structure. In su
       "namespace": "env-1-platform-monitoring",
       "context": "deployment",
       "parameter_key": "global.secrets.password",
-      "parameter_value": "user"
+      "parameter_value": "user",
+      "literal": false
     }
   ]
 }
 ```
 
+> [!NOTE]
+>
+> - If `parameter_key` contains a dot and `literal: true`, it is treated as a literal key.
+> - If `parameter_key` contains a dot and `literal: false` (default or omitted), it is treated as a path in the map.
+
 ### `credential_rotation` Job Workflow Principle
-
-<!-- Initial Validations (performed once per job):
-
-1. Perform following validation:
-   1. crypt: true + crypt_backend: Fernet (or not set) + CRED_ROTATION_PAYLOAD = fail
-   2. CRED_ROTATION_PAYLOAD with encrypted value + envgene can not decrypt = fail
-   3. crypt: true + crypt_backend: Fernet (or not set) + SECRET_KEY is not set = fail
-   4. crypt: true + crypt_backend: SOPS + ENVGENE_AGE_PRIVATE_KEY or ENVGENE_AGE_PUBLIC_KEY is not set = fail
-   5. ENV_NAMES малтипл + CRED_ROTATION_PAYLOAD = fail -->
 
 Per-Item Processing (for each item in `CRED_ROTATION_PAYLOAD`):
 
@@ -166,8 +165,9 @@ Per-Item Processing (for each item in `CRED_ROTATION_PAYLOAD`):
 5. Save affected parameters in job artifacts
 6. Perform [force mode](#force-mode) check
 7. Replace the Credential with cred-id from step 3 value with item's `parameter_value` (taking into account [encryption](#encryption)) in:
-   1. [Environment Credentials file](/docs/envgene-objects.md#environment-credentials-file)
-   2. All [Shared Credentials file](/docs/envgene-objects.md#shared-credentials-file)
+   1. [Environment Credentials file](/docs/envgene-objects.md#environment-credentials-file) of the Environment for which the operation is being performed
+   2. All affected [Shared Credentials file](/docs/envgene-objects.md#shared-credentials-file)
+   3. Environment Credentials files of all affected Environments
 
 > [!NOTE]
 > The above description represents a high-level abstraction of the workflow logic, not an exact algorithmic specification
@@ -215,7 +215,7 @@ Credential rotation is only compatible with `SOPS` `crypt_backend`. Key characte
 
 ### Affected parameters
 
-Sensitive parameters defined across one or more objects in one or more Environment Instances can be linked. Changing a Credential's value for one parameter will update all linked parameters.
+Sensitive parameters defined across one or more objects in one or more Environment Instances can be linked. Changing a Credential's value for one parameter will update **all linked parameters in all Environments that reference this credential**.
 
 This linkage occurs when multiple parameters reference the same:
 
@@ -245,6 +245,8 @@ EnvGene only permits rotation of credentials with affected parameters in **force
 For user and external system awareness, an `affected-sensitive-parameters.yaml` file is generated whenever affected parameters exist, regardless of force mode. This file is saved in the `credential_rotation` job artifacts.
 
 The `affected-sensitive-parameters.yaml` is created using the reverse logic described in the [`credential_rotation` Job Workflow Principle](#credential_rotation-job-workflow-principle).
+
+> **Note:** If the credential is shared, this file will list all parameters and environments that will be updated by the rotation operation.
 
 #### `affected-sensitive-parameters.yaml` File
 
@@ -290,4 +292,4 @@ The `affected-sensitive-parameters.yaml` is created using the reverse logic desc
 
 ### Test Cases
 
-  1. TBD
+  1. [cred-rotation](/docs/test-cases/cred-rotation.md)

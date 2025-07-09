@@ -20,6 +20,7 @@
   - [`SD_DATA`](#sd_data)
   - [`SD_DELTA`](#sd_delta)
   - [`CRED_ROTATION_PAYLOAD`](#cred_rotation_payload)
+    - [Affected Parameters and Troubleshooting](#affected-parameters-and-troubleshooting)
   - [`CRED_ROTATION_FORCE`](#cred_rotation_force)
 
 The following are the launch parameters for the instance repository pipeline. These parameters influence, the execution of specific jobs within the pipeline.
@@ -323,8 +324,7 @@ See details in [SD processing](/docs/sd-processing.md)
 
 ## `CRED_ROTATION_PAYLOAD`
 
-**Description**: A parameter used to dynamically update sensitive parameters (those defined via the EnvGene cred macro). It modifies values across different contexts within a specified namespace and optional application. **JSON in string** format. See details in [Credential Rotation](/docs/cred-rotation.md)
-The value can be provided as plain text or encrypted.
+**Description**: A parameter used to dynamically update sensitive parameters (those defined via the [cred macro](/docs/template-macros.md#credential-macros)). It modifies values across different contexts within a specified namespace and optional application. The value can be provided as plain text or encrypted. **JSON in string** format. See details in [feature description](/docs/features/cred-rotation.md)
 
 ```json
 {
@@ -334,20 +334,21 @@ The value can be provided as plain text or encrypted.
       "application": "<application-name>",
       "context": "enum[`pipeline`,`deployment`, `runtime`]",
       "parameter_key": "<parameter-key>",
-      "parameter_value": "<new-parameter-value>"
+      "parameter_value": "<new-parameter-value>",
+      "literal": "boolean"
     }
   ]
 }
-- ...
 ```
 
-| Attribute | Mandatory | Description | Default | Example |
-|---|---|---|---|---|
-| `namespace` | Mandatory | The name of the namespace where the parameter to be modified is defined | None | `env-1-platform-monitoring` |
-| `application` | Optional | The name of the application (sub-resource under `namespace`) where the parameter to be modified is defined. Cannot be used with `pipeline` context | None | `MONITORING` |
-| `context` | Mandatory | The context of the parameter being modified. Valid values: `pipeline`, `deployment`, `runtime` | None | `deployment` |
-| `parameter_key` | Mandatory | The name (key) of the parameter to be modified | None | `login` |
-| `parameter_value` | Mandatory | New value (plaintext or encrypted). Envgene, depending on the value of the [`crypt`](/docs/envgene-configs.md#configyml) attribute, will either decrypt, encrypt, or leave the value unchanged. If an encrypted value is passed, it must be encrypted with a key that Envgene can decrypt. | None | `admin`|
+| Attribute         | Mandatory | Description                                                                                                                                                                                                 | Default | Example |
+|-------------------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|---------|
+| `namespace`       | Mandatory | The name of the Namespace where the parameter to be modified is defined                                                                                               | None    | `env-1-platform-monitoring` |
+| `application`     | Optional  | The name of the Application (sub-resource under `namespace`) where the parameter to be modified is defined. Cannot be used with `pipeline` context                   | None    | `MONITORING` |
+| `context`         | Mandatory | The context of the parameter being modified. Valid values: `pipeline`, `deployment`, `runtime`                                                                       | None    | `deployment` |
+| `parameter_key`   | Mandatory | The name (key) of the parameter to be modified. If it contains a dot (`.`) and `literal: true`, it is treated as a literal string. If `literal: false` (default), it is treated as a path in the map. | None    | `login` or `db.connection.password` |
+| `parameter_value` | Mandatory | New value (plaintext or encrypted). Envgene, depending on the value of the [`crypt`](/docs/envgene-configs.md#configyml) attribute, will either decrypt, encrypt, or leave the value unchanged. If an encrypted value is passed, it must be encrypted with a key that Envgene can decrypt. | None    | `admin` |
+| `literal`         | Optional  | If true, `parameter_key` is treated as a literal string even if it contains dots. If false (default or omitted), dots in `parameter_key` are interpreted as path separators.   | false   | true |
 
 **Default Value**: None
 
@@ -355,18 +356,59 @@ The value can be provided as plain text or encrypted.
 
 **Example**:
 
-```yaml
-- namespace: env-1-platform-monitoring
-  application: MONITORING
-  context: deployment
-  parameter_key: db_login
-  parameter_value: s3cr3tN3wLogin
-- namespace: env-1-platform-monitoring
-  application: MONITORING
-  context: deployment
-  parameter_key: db_password
-  parameter_value: s3cr3tN3wP@ss
+```json
+{
+  "rotation_items": [
+    {
+      "namespace": "env-1-platform-monitoring",
+      "application": "MONITORING",
+      "context": "deployment",
+      "parameter_key": "db_login",
+      "parameter_value": "s3cr3tN3wLogin"
+    },
+    {
+      "namespace": "env-1-platform-monitoring",
+      "application": "MONITORING",
+      "context": "deployment",
+      "parameter_key": "db_password",
+      "parameter_value": "s3cr3tN3wP@ss"
+    },
+    {
+      "namespace": "env-1-platform-monitoring",
+      "context": "deployment",
+      "parameter_key": "db_password",
+      "parameter_value": "s3cr3tN3wP@ss"
+    },
+    {
+      "namespace": "env-1-platform-monitoring",
+      "context": "deployment",
+      "parameter_key": "global.secrets.password",
+      "parameter_value": "user",
+      "literal": false
+    },
+    {
+      "namespace": "env-1-platform-monitoring",
+      "context": "deployment",
+      "parameter_key": "a.b.c.d",
+      "parameter_value": "somevalue",
+      "literal": true
+    }
+  ]
+}
 ```
+
+### Affected Parameters and Troubleshooting
+
+When rotating sensitive parameters, EnvGene checks if the Credential is [shared](https://github.com/Netcracker/qubership-envgene/blob/feature/cred-rotation/docs/features/cred-rotation.md#affected-parameters) (used by multiple parameters or Environments). If shared Credentials are detected and force mode is not enabled, the credential_rotation job will fail to prevent accidental mass updates.
+
+- In this case, the job will generate an [`affected-sensitive-parameters.yaml`](https://github.com/Netcracker/qubership-envgene/blob/feature/cred-rotation/docs/features/cred-rotation.md#affected-parameters-reporting) file as an artifact. This file lists all parameters and locations affected by the Credential change, including those in shared Credentials files and all Environments that reference this credential.
+- To resolve:
+  - Review `affected-sensitive-parameters.yaml` to see which parameters and environments are linked by the shared Credential.
+  - Either:
+    - Manually split the shared Credential in the repository so each parameter uses its own Credential, **or**
+    - Rerun the Credential rotation job with force mode enabled (`CRED_ROTATION_FORCE=true`) to update all linked parameters.
+
+> **Note:** When rotating a shared credential, all parameters in all Environments that reference this credential will be updated. This is why force mode is required for such operations to avoid accidental mass changes. The `affected-sensitive-parameters.yaml` file will list all such parameters and environments.
 
 ## `CRED_ROTATION_FORCE`
 
