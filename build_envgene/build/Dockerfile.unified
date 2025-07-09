@@ -1,0 +1,127 @@
+#########################################
+# Stage 1: Build
+FROM python:3.12-alpine3.19 AS build
+
+# Install build dependencies
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    libxml2-dev \
+    libxslt-dev \
+    zlib-dev \
+    git \
+    curl \
+    jq \
+    openssh-client \
+    sudo \
+    zip \
+    unzip
+
+# Copy unified configuration files
+COPY build_envgene/build/pip.conf.unified /etc/pip.conf
+COPY build_envgene/build/requirements.txt.unified /build/requirements.txt
+COPY build_envgene/build/requirements.yml /build/requirements.yml
+COPY build_envgene/build/constraint.txt.unified /build/constraint.txt
+COPY creds_rotation/build/requirements.txt /build/creds_rotation_requirements.txt
+
+# Copy source code
+COPY python /python
+COPY base_module/scripts/ /module/scripts/
+COPY build_envgene/ansible /module/ansible
+COPY build_envgene/scripts /module/scripts
+COPY creds_rotation/scripts /module/creds_rotation_scripts
+COPY build_* create_* produce_* sort* /build_env/
+COPY scripts /build_env/scripts
+COPY env-builder /build_env/env-builder
+COPY schemas /build_env/schemas
+
+ENV ANSIBLE_LIBRARY=/module/ansible/library
+
+# Create virtual environment and install only essential Python packages
+RUN python -m venv /module/venv
+RUN /module/venv/bin/pip install --upgrade pip setuptools wheel
+RUN /module/venv/bin/pip install --no-cache-dir --retries 10 --timeout 60 -r /build/requirements.txt
+RUN /module/venv/bin/pip install ansible-core --upgrade
+# Install only essential Ansible collections, not all
+RUN /module/venv/bin/ansible-galaxy collection install ansible.utils -p /module/ansible/collections
+RUN /module/venv/bin/pip install /python/jschon-sort
+RUN /module/venv/bin/pip install /python/envgene
+RUN /module/venv/bin/pip install /python/integration
+RUN /module/venv/bin/pip install --no-cache-dir --no-deps -r /build/creds_rotation_requirements.txt
+
+# Download and install SOPS
+RUN wget --tries=3 \
+    https://github.com/mozilla/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64 \
+    -O /usr/local/bin/sops && \
+    chmod +x /usr/local/bin/sops
+
+# Aggressive cleanup to reduce image size
+RUN apk del gcc musl-dev libffi-dev openssl-dev libxml2-dev libxslt-dev zlib-dev
+RUN rm -rf /var/cache/apk/* /tmp/* /var/tmp/* /root/.cache
+# Remove unnecessary files from Python packages
+RUN find /module/venv/lib/python3.12/site-packages -name '*.pyc' -delete
+RUN find /module/venv/lib/python3.12/site-packages -name 'tests' -type d -exec rm -rf {} + 2>/dev/null || true
+RUN find /module/venv/lib/python3.12/site-packages -name 'test' -type d -exec rm -rf {} + 2>/dev/null || true
+RUN find /module/venv/lib/python3.12/site-packages -name '*.pyo' -delete
+RUN find /module/venv/lib/python3.12/site-packages -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
+# Remove heavy Ansible collections that are not essential
+RUN rm -rf /module/venv/lib/python3.12/site-packages/ansible_collections/amazon /module/venv/lib/python3.12/site-packages/ansible_collections/azure /module/venv/lib/python3.12/site-packages/ansible_collections/google /module/venv/lib/python3.12/site-packages/ansible_collections/kubernetes 2>/dev/null || true
+# Remove test packages and build tools that are not needed in runtime
+RUN rm -rf /module/venv/lib/python3.12/site-packages/pytest* /module/venv/lib/python3.12/site-packages/_pytest* /module/venv/lib/python3.12/site-packages/ansible_test 2>/dev/null || true
+RUN /module/venv/bin/pip cache purge
+
+# Set permissions
+RUN chmod 754 /module/scripts/*
+RUN chmod 754 /module/creds_rotation_scripts/*
+
+#########################################
+# Stage 2: Runtime
+FROM python:3.12-alpine3.19 AS runtime
+
+# Install only essential runtime dependencies
+RUN apk add --no-cache \
+    bash \
+    ca-certificates \
+    curl \
+    jq \
+    git \
+    openssh-client \
+    sudo
+
+# Copy everything from build stage
+COPY --from=build /module /module
+COPY --from=build /usr/local/bin/sops /usr/local/bin/sops
+COPY --from=build /build_env /build_env
+COPY --from=build /python /python
+COPY --from=build /etc/pip.conf /etc/pip.conf
+
+# Create user and set permissions
+RUN addgroup -g 1000 ci && \
+    adduser -D -u 1000 -h /module/ -s /bin/bash -G ci ci && \
+    chown -R ci:ci /module && \
+    chmod +x /usr/local/bin/sops
+
+# Final cleanup
+RUN rm -rf /var/cache/apk/* /tmp/* /var/tmp/* /root/.cache
+RUN find /module/venv/lib/python3.12/site-packages -name '*.pyc' -delete
+RUN find /module/venv/lib/python3.12/site-packages -name 'tests' -type d -exec rm -rf {} + 2>/dev/null || true
+# Clear pip cache before removing pip
+RUN /module/venv/bin/pip cache purge
+# Remove build tools from runtime (pip, setuptools, wheel)
+RUN rm -rf /module/venv/lib/python3.12/site-packages/pip* /module/venv/lib/python3.12/site-packages/setuptools* /module/venv/lib/python3.12/site-packages/wheel* 2>/dev/null || true
+
+# Set environment
+ENV PATH=/module/venv/bin:$PATH \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    ANSIBLE_LIBRARY=/module/ansible/library
+
+# Switch to non-root user
+USER ci:ci
+WORKDIR /module/ansible
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import sys; sys.exit(0)" || exit 1 

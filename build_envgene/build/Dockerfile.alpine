@@ -1,0 +1,115 @@
+#########################################
+# Stage 1: build
+FROM ghcr.io/netcracker/qubership-base-module-dockerimage:feature-optimize_docker_image AS build
+
+USER root
+
+# Install additional build dependencies
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    libxml2-dev \
+    libxslt-dev \
+    zlib-dev \
+    git \
+    curl \
+    jq \
+    openssh-client \
+    sudo \
+    zip \
+    unzip
+
+# Copy pip configuration and requirements
+COPY build_envgene/build/pip.conf /etc/pip.conf
+COPY build_envgene/build/requirements.txt /build/requirements.txt
+COPY build_envgene/build/requirements.yml /build/requirements.yml
+COPY creds_rotation/build/requirements.txt /build/creds_rotation_requirements.txt
+
+# Copy source code
+COPY python /python
+COPY build_envgene/ansible /module/ansible
+COPY build_envgene/scripts /module/scripts
+COPY creds_rotation/scripts /module/creds_rotation_scripts
+COPY build_* create_* produce_* sort* /build_env/
+COPY scripts /build_env/scripts
+COPY env-builder /build_env/env-builder
+COPY schemas /build_env/schemas
+
+ENV ANSIBLE_LIBRARY=/module/ansible/library
+
+# Install Python packages using the virtual environment from base image
+RUN /module/venv/bin/pip install --no-cache-dir --retries 10 --timeout 60 -r /build/requirements.txt
+RUN /module/venv/bin/pip install ansible --upgrade
+RUN /module/venv/bin/ansible-galaxy collection install -r /build/requirements.yml -p /module/ansible/collections
+RUN /module/venv/bin/pip install /python/jschon-sort
+RUN /module/venv/bin/pip install /python/envgene
+RUN /module/venv/bin/pip install /python/integration
+RUN /module/venv/bin/pip install --no-cache-dir --no-deps -r /build/creds_rotation_requirements.txt
+
+# Download and install SOPS (if not already in base image)
+RUN if [ ! -f /usr/local/bin/sops ]; then \
+        wget --tries=3 \
+        https://github.com/mozilla/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64 \
+        -O /usr/local/bin/sops && \
+        chmod +x /usr/local/bin/sops; \
+    fi
+
+# Clean up build dependencies and cache
+RUN apk del libxml2-dev libxslt-dev zlib-dev
+RUN rm -rf /var/cache/apk/* /tmp/* /var/tmp/* /root/.cache
+RUN find /module/venv/lib/python3.12/site-packages -name '*.pyc' -delete
+RUN find /module/venv/lib/python3.12/site-packages -name 'tests' -type d -exec rm -rf {} + 2>/dev/null || true
+RUN /module/venv/bin/pip cache purge
+
+# Stage 2: runtime
+FROM ghcr.io/netcracker/qubership-base-module-dockerimage:feature-optimize_docker_image AS runtime
+
+USER root
+
+# Install additional runtime dependencies if needed
+RUN apk add --no-cache \
+    git \
+    curl \
+    jq \
+    openssh-client \
+    sudo \
+    zip \
+    unzip
+
+# Copy source code from build stage
+COPY --from=build /build_env /build_env
+COPY --from=build /python /python
+COPY --from=build /etc/pip.conf /etc/pip.conf
+COPY --from=build /build/requirements.txt /build/requirements.txt
+COPY --from=build /build/creds_rotation_requirements.txt /build/creds_rotation_requirements.txt
+
+ENV ANSIBLE_LIBRARY=/module/ansible/library
+
+# Install runtime dependencies using the virtual environment
+RUN /module/venv/bin/pip install --upgrade pip
+RUN /module/venv/bin/pip install --no-cache-dir --retries 10 --timeout 60 -r /build/requirements.txt
+RUN /module/venv/bin/pip install --no-cache-dir --no-deps -r /build/creds_rotation_requirements.txt
+RUN /module/venv/bin/pip install /python/jschon-sort
+RUN /module/venv/bin/pip install /python/envgene
+RUN /module/venv/bin/pip install /python/integration
+RUN /module/venv/bin/pip install PyYAML
+
+# Set permissions
+RUN chmod 754 /module/scripts/*
+RUN chmod 754 /module/creds_rotation_scripts/*
+
+# Clean up cache
+RUN rm -rf /var/cache/apk/* /tmp/* /var/tmp/* /root/.cache
+RUN find /module/venv/lib/python3.12/site-packages -name '*.pyc' -delete
+RUN find /module/venv/lib/python3.12/site-packages -name 'tests' -type d -exec rm -rf {} + 2>/dev/null || true
+RUN /module/venv/bin/pip cache purge
+
+# Switch to non-root user (ci user should already exist in base image)
+USER ci:ci
+WORKDIR /module/ansible
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import sys; sys.exit(0)" || exit 1 
