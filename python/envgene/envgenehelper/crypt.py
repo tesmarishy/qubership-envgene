@@ -39,6 +39,8 @@ EXTRACT_FUNCTIONS = {
     'Fernet': extract_value_Fernet
 }
 
+def get_configured_encryption_type():
+    return CRYPT_BACKEND, IS_CRYPT
 
 def _handle_missing_file(file_path, default_yaml, allow_default):
     if check_file_exists(file_path):
