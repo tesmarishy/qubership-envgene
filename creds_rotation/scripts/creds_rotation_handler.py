@@ -89,6 +89,7 @@ def cred_rotation():
         raise Exception("No affected parameters found for the given target keys. Hence Failing the job")
 
     if not creds_rotation_enabled:
+        logger.info(f"✅ Cred Rotation without file update completed in {round(time.time() - start, 2)} seconds.")
         raise Exception("Credential rotation is disabled. Set CRED_ROTATION_FORCE=true to enable it.")
     updated_content, original_content = update_cred_content(processed_cred_and_files)
     write_updated_cred_into_file(updated_content, original_content, is_encrypted, envgene_age_public_key)

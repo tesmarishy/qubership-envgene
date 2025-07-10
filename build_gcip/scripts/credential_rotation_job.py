@@ -6,18 +6,16 @@ def prepare_credential_rotation_job(pipeline, full_env, environment_name, cluste
   logger.info(f'Prepare credential_rotation_job job for {full_env}.')
   credential_rotation_params = {
     "name":   f'credential_rotation.{full_env}',
-    "image":  '${credential_rotation_image}',
+    "image":  '${envgen_image}',
     "stage":  'credential_rotation',
     "script": [
-            f"python3 /module/scripts/creds_rotation_handler.py",
+            f"python3 /module/creds_rotation_scripts/creds_rotation_handler.py",
         ],    
   } 
 
   credential_rotation_vars = {
     "CLUSTER_NAME": cluster_name,
-    "ENV_NAME": environment_name,
-    #"CRED_ROTATION_PAYLOAD": cred_rotation_payload,
-    #"CRED_ROTATION_FORCE": cred_rotation_force    
+    "ENV_NAME": environment_name,   
     "envgen_args": " -vv",
     "envgen_debug": "true"   
   }
