@@ -47,6 +47,9 @@ def _handle_missing_file(file_path, default_yaml, allow_default):
         raise FileNotFoundError(f"{file_path} not found or is not a file")
     return default_yaml()
 
+def get_configured_encryption_type():
+    return CRYPT_BACKEND, IS_CRYPT
+
 def decrypt_file(file_path, *, secret_key=None, in_place=True, public_key=None, crypt_backend=None, ignore_is_crypt=True, 
                  default_yaml: Callable = get_empty_yaml, allow_default=False, is_crypt=None, **kwargs):
     res = _handle_missing_file(file_path, default_yaml, allow_default)
