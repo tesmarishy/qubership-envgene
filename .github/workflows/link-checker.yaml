@@ -2,11 +2,14 @@
 name: Link Checker
 
 on:
-  push: null
-  repository_dispatch: null
-  workflow_dispatch: null
-permissions:
-  contents: read
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch:
+
 jobs:
   linkChecker:
     runs-on: ubuntu-latest
@@ -17,15 +20,6 @@ jobs:
         id: lychee
         uses: lycheeverse/lychee-action@v2
         with:
-          args: >-
-            './**/*.md'
-            --verbose
-            --no-progress
-            --user-agent 'Mozilla/5.0 (X11; Linux x86_64) Chrome/134.0.0.0'
-            --retry-wait-time 30
-            --max-retries 5
-            --accept 100..=103,200..=299,429
-            --cookie-jar cookies.json
-            --exclude-all-private
+          args: --base . --verbose --no-progress './**/*.md' --accept 100..=103,200..=299,429
           format: markdown
           fail: true
