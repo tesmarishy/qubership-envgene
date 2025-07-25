@@ -1,19 +1,36 @@
-name: "Tests: Perform Qubership Envgene tests"
+name: "Tests: Qubership Envgene tests"
 
-run-name: "Perform smoke tests on commit ${{ github.sha }}"
+run-name: "Smoke tests on commit ${{ github.sha }}"
 
 on:
   workflow_dispatch:
+  workflow_call:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - '**'
 
 jobs:
   pytest:
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'workflow_call' ||
+      (github.event_name == 'pull_request') ||
+      (github.event_name == 'push' && 
+       github.ref != 'refs/heads/main' &&
+       !contains(github.event.head_commit.message, 'fix') && 
+       !contains(github.event.head_commit.message, 'feat') && 
+       !contains(github.event.head_commit.message, 'breaking change'))
     container:
       image: python:3.10-slim-bookworm
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install dependencies
       - name: Install dependencies
         run: |
           
@@ -50,6 +67,14 @@ jobs:
           mv junit.xml junit_envgenehelper.xml  
       
       - name: BUILD ENV test
+      - name: ENVGENE HELPER test
+        run: |
+          cd python/envgene/envgenehelper
+          pytest --capture=no -W ignore::DeprecationWarning --junitxml=../../../junit.xml
+          cd ../../..
+          mv junit.xml junit_envgenehelper.xml  
+      
+      - name: BUILD ENV test
         run: |
           cd scripts/build_env
           pytest --capture=no -W ignore::DeprecationWarning --junitxml=../../junit.xml
@@ -60,11 +85,24 @@ jobs:
         run: |
           junitparser merge junit_build_env.xml junit_envgenehelper.xml junit.xml    
 
+      - name: Merge test results
+        run: |
+          junitparser merge junit_build_env.xml junit_envgenehelper.xml junit.xml    
+
       - name: Upload test results
+        if: always()
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
+          path: junit.xml
+
+      - name: Upload test environments
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_artifact
+          path: tmp/  
           path: junit.xml
 
       - name: Upload test environments
