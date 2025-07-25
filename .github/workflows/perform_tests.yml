@@ -31,7 +31,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-      - name: Install dependencies
         run: |
           
           apt-get update && apt-get install -y --no-install-recommends \
@@ -67,14 +66,6 @@ jobs:
           mv junit.xml junit_envgenehelper.xml  
       
       - name: BUILD ENV test
-      - name: ENVGENE HELPER test
-        run: |
-          cd python/envgene/envgenehelper
-          pytest --capture=no -W ignore::DeprecationWarning --junitxml=../../../junit.xml
-          cd ../../..
-          mv junit.xml junit_envgenehelper.xml  
-      
-      - name: BUILD ENV test
         run: |
           cd scripts/build_env
           pytest --capture=no -W ignore::DeprecationWarning --junitxml=../../junit.xml
@@ -85,24 +76,11 @@ jobs:
         run: |
           junitparser merge junit_build_env.xml junit_envgenehelper.xml junit.xml    
 
-      - name: Merge test results
-        run: |
-          junitparser merge junit_build_env.xml junit_envgenehelper.xml junit.xml    
-
       - name: Upload test results
-        if: always()
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: junit.xml
-
-      - name: Upload test environments
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test_artifact
-          path: tmp/  
           path: junit.xml
 
       - name: Upload test environments
