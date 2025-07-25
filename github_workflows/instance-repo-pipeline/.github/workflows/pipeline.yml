@@ -47,12 +47,12 @@ on:
         required: false
         default: ""
       CRED_ROTATION_PAYLOAD:
-        description: "Input for credentials update"
+        description: "Input for credentials update in json string"
         required: false
         default: ""
         type: string
       CRED_ROTATION_FORCE:
-        description: "Update sensitive parameters"
+        description: "Flag to enable credential update in credential files"
         required: false
         default: "false"
         type: string
