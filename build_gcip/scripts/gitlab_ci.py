@@ -93,7 +93,7 @@ def build_pipeline(params: dict):
             logger.info(f'Preparing of env inventory generation job for {env} is skipped because we are in template test mode.')
 
         if params['CRED_ROTATION_PAYLOAD']:
-            jobs_map["credential_rotation_job"] = prepare_credential_rotation_job(pipeline, env, environment_name, cluster_name, params['CRED_ROTATION_PAYLOAD'], params['CRED_ROTATION_FORCE'])
+            jobs_map["credential_rotation_job"] = prepare_credential_rotation_job(pipeline, env, environment_name, cluster_name)
         else:
             logger.info(f'Credential rotation job for {env} is skipped because CRED_ROTATION_PAYLOAD is empty.')
             
