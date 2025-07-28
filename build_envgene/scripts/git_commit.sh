@@ -120,7 +120,23 @@ git remote add origin "${REMOTE_URL}"
 echo "Pulling contents from GIT (branch: ${REF_NAME})"
 git pull origin "${REF_NAME}"
 
+# Listing the artifact_environments
+echo "listing artifact env"
+ls -lhrt "/tmp/artifact_environments"
 
+# Listing the artifact_environments
+echo "listing environments"
+ls -lhrt "environments"
+
+FILE_PATH="/tmp/credfilestoupdate.yml"
+if [ -f "$FILE_PATH" ]; then
+  echo "File exists: $FILE_PATH"
+  echo "---- File Content ----"
+  cat "$FILE_PATH"
+  echo "----------------------"
+else
+  echo "File does not exist: $FILE_PATH"
+fi
 
 # moving back environments folder and committing
 echo "Restoring environments/${CLUSTER_NAME}/${ENVIRONMENT_NAME}"
