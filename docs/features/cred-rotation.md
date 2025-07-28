@@ -89,8 +89,7 @@ Supports working with SOPS encryption.
       "application": "<application-name>",
       "context": "enum[`pipeline`,`deployment`, `runtime`]",
       "parameter_key": "<parameter-key>",
-      "parameter_value": "<new-parameter-value>",
-      "literal": "boolean"
+      "parameter_value": "<new-parameter-value>"
     }
   ]
 }
@@ -101,9 +100,8 @@ Supports working with SOPS encryption.
 | `namespace`       | Mandatory | The name of the namespace where the parameter to be modified is defined                                                                                               | None    | `env-1-platform-monitoring` |
 | `application`     | Optional  | The name of the application (sub-resource under `namespace`) where the parameter to be modified is defined. Cannot be used with `pipeline` context                   | None    | `MONITORING` |
 | `context`         | Mandatory | The context of the parameter being modified. Valid values: `pipeline`, `deployment`, `runtime`                                                                       | None    | `deployment` |
-| `parameter_key`   | Mandatory | The name (key) of the parameter to be modified. If it contains a dot (`.`) and `literal: true`, it is treated as a literal string. If `literal: false` (default), it is treated as a path in the map. | None    | `login` or `db.connection.password` |
+| `parameter_key`   | Mandatory | The name (key) of the parameter to be modified. | None    | `login` or `db.connection.password` |
 | `parameter_value` | Mandatory | New value (plaintext or encrypted). Envgene, depending on the value of the [`crypt`](/docs/envgene-configs.md#configyml) attribute, will either decrypt, encrypt, or leave the value unchanged. If an encrypted value is passed, it must be encrypted with a key that Envgene can decrypt. | None    | `admin` |
-| `literal`         | Optional  | If true, `parameter_key` is treated as a literal string even if it contains dots. If false (default), dots in `parameter_key` are interpreted as path separators.   | false   | true |
 
 A sensitive parameter can be defined within a complex parameter structure. In such cases during rotation, the `parameter_key` should use dot notation (e.g., `key1.key2.username`)
 
@@ -136,17 +134,11 @@ A sensitive parameter can be defined within a complex parameter structure. In su
       "namespace": "env-1-platform-monitoring",
       "context": "deployment",
       "parameter_key": "global.secrets.password",
-      "parameter_value": "user",
-      "literal": false
+      "parameter_value": "user"
     }
   ]
 }
 ```
-
-> [!NOTE]
->
-> - If `parameter_key` contains a dot and `literal: true`, it is treated as a literal key.
-> - If `parameter_key` contains a dot and `literal: false` (default or omitted), it is treated as a path in the map.
 
 ### `credential_rotation` Job Workflow Principle
 

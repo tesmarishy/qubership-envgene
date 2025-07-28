@@ -334,8 +334,7 @@ See details in [SD processing](/docs/sd-processing.md)
       "application": "<application-name>",
       "context": "enum[`pipeline`,`deployment`, `runtime`]",
       "parameter_key": "<parameter-key>",
-      "parameter_value": "<new-parameter-value>",
-      "literal": "boolean"
+      "parameter_value": "<new-parameter-value>"
     }
   ]
 }
@@ -346,9 +345,8 @@ See details in [SD processing](/docs/sd-processing.md)
 | `namespace`       | Mandatory | The name of the Namespace where the parameter to be modified is defined                                                                                               | None    | `env-1-platform-monitoring` |
 | `application`     | Optional  | The name of the Application (sub-resource under `namespace`) where the parameter to be modified is defined. Cannot be used with `pipeline` context                   | None    | `MONITORING` |
 | `context`         | Mandatory | The context of the parameter being modified. Valid values: `pipeline`, `deployment`, `runtime`                                                                       | None    | `deployment` |
-| `parameter_key`   | Mandatory | The name (key) of the parameter to be modified. If it contains a dot (`.`) and `literal: true`, it is treated as a literal string. If `literal: false` (default), it is treated as a path in the map. | None    | `login` or `db.connection.password` |
+| `parameter_key`   | Mandatory | The name (key) of the parameter to be modified | None    | `login` or `db.connection.password` |
 | `parameter_value` | Mandatory | New value (plaintext or encrypted). Envgene, depending on the value of the [`crypt`](/docs/envgene-configs.md#configyml) attribute, will either decrypt, encrypt, or leave the value unchanged. If an encrypted value is passed, it must be encrypted with a key that Envgene can decrypt. | None    | `admin` |
-| `literal`         | Optional  | If true, `parameter_key` is treated as a literal string even if it contains dots. If false (default or omitted), dots in `parameter_key` are interpreted as path separators.   | false   | true |
 
 **Default Value**: None
 
@@ -383,15 +381,13 @@ See details in [SD processing](/docs/sd-processing.md)
       "namespace": "env-1-platform-monitoring",
       "context": "deployment",
       "parameter_key": "global.secrets.password",
-      "parameter_value": "user",
-      "literal": false
+      "parameter_value": "user"
     },
     {
       "namespace": "env-1-platform-monitoring",
       "context": "deployment",
       "parameter_key": "a.b.c.d",
-      "parameter_value": "somevalue",
-      "literal": true
+      "parameter_value": "somevalue"
     }
   ]
 }
