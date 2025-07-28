@@ -10,6 +10,7 @@
       - [`CRED_ROTATION_PAYLOAD`](#cred_rotation_payload)
         - [`CRED_ROTATION_PAYLOAD` example](#cred_rotation_payload-example)
     - [`credential_rotation` Job Workflow Principle](#credential_rotation-job-workflow-principle)
+    - [Dot-Notation Keys Processing](#dot-notation-keys-processing)
     - [Encryption](#encryption)
       - [Processing Flow](#processing-flow)
     - [Affected parameters](#affected-parameters)
@@ -162,6 +163,21 @@ Per-Item Processing (for each item in `CRED_ROTATION_PAYLOAD`):
 
 > [!NOTE]
 > The above description represents a high-level abstraction of the workflow logic, not an exact algorithmic specification
+
+### Dot-Notation Keys Processing
+
+1. Literal Search: First, search for the exact key as a literal string (including dots)
+2. Recursive Map Traversal: If not found, split the key at the first dot:
+3. Use the part before the dot as a map key
+4. Search for the remaining part (after the dot) as a literal within that map
+5. Iterative Process: If still not found, repeat the process for each subsequent dot in the key
+6. Error Handling: If no match is found after processing all dots, return an error
+
+Example: For key `a.b.c`:
+
+First try: search for literal `a.b.c`
+Second try: search for `b.c` within map `a`
+Third try: search for `c` within map `a.b`
 
 ### Encryption
 
