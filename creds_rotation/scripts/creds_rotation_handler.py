@@ -52,7 +52,7 @@ def cred_rotation():
     logger.info(f"base env path is {base_env_path}")
     convert_json_to_yaml(creds_path, cred_payload)
 
-    #Decrypt Payload file if encrypted
+    #Decrypt the Payload file if encrypted
     payload_data = decrypt_file(envgene_age_public_key, creds_path, True, 'SOPS', ErrorMessages.PAYLOAD_DECRYPT_ERROR, ErrorCodes.INVALID_CONFIG_CODE) 
 
     fileread = time.time()
