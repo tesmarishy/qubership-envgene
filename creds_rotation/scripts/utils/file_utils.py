@@ -5,6 +5,7 @@ import aiofiles
 import yaml, json
 from typing import Any, Dict, List, Tuple, Set
 from utils.error_constants import  *
+from utils.search_utils import trim_path_from_environments
 import envgenehelper.logger as logger
 from envgenehelper.errors import  ValidationError
 try:
@@ -119,7 +120,7 @@ def openJson(path: str) -> dict:
         content = f.read()
     return json.loads(content)
 
-def write_cred_file_path(cred_paths:  List[str]):
-    with open("/tmp/credfilestoupdate.yml", "w") as f:
+def write_cred_file_path(cred_paths:  List[str], env_dir: str):
+    with open(f"{env_dir}/credfilestoupdate.yml", "w") as f:
         for cred_path in cred_paths:
-            f.write(f"{cred_path}\n")
+            f.write(f"{trim_path_from_environments(cred_path)}\n")
