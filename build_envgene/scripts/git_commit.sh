@@ -128,7 +128,11 @@ ls -lhrt "/tmp/artifact_environments"
 echo "listing environments"
 ls -lhrt "environments"
 
-FILE_PATH="/tmp/credfilestoupdate.yml"
+# Listing the artifact_environments
+echo "listing tmp"
+ls -lhrt "/tmp"
+
+FILE_PATH="environments/credfilestoupdate.yml"
 if [ -f "$FILE_PATH" ]; then
   echo "File exists: $FILE_PATH"
   echo "---- File Content ----"
