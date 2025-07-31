@@ -11,8 +11,9 @@ def is_inventory_generation_needed(is_template_test, inv_gen_params):
         return True
     params_processed_by_inv_gen = ['ENV_SPECIFIC_PARAMETERS', 'ENV_TEMPLATE_NAME', 'SD_DATA', 'SD_VERSION']
     for param in params_processed_by_inv_gen:
-        if inv_gen_params[param] != '':
-            return True
+        #if inv_gen_params[param] != '':
+        if inv_gen_params[param] not in (None, ''):
+             return True
     return False
 
 def prepare_inventory_generation_job(pipeline, full_env, environment_name, cluster_name, env_generation_params):
