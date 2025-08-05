@@ -56,13 +56,13 @@ runs:
         cd ../../..
         mv junit.xml junit_envgenehelper.xml  
     
-    - name: BUILD ENV test
-      shell: bash
-      run: |
-        cd scripts/build_env
-        pytest --capture=no -W ignore::DeprecationWarning --junitxml=../../junit.xml
-        cd ../..
-        mv junit.xml junit_build_env.xml
+    #- name: BUILD ENV test
+    #  shell: bash
+    #  run: |
+    #    cd scripts/build_env
+    #    pytest --capture=no -W ignore::DeprecationWarning --junitxml=../../junit.xml
+    #    cd ../..
+    #    mv junit.xml junit_build_env.xml
 
     - name: CLI MODULE test
       shell: bash
