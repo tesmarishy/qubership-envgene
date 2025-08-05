@@ -65,7 +65,6 @@ runs:
         upload-artifact: true
         artifact-id: cli-test-artifact
         ref: ${{ github.ref }}
-      secrets:
         maven-token: ${{ secrets.GITHUB_TOKEN }}
 
 
