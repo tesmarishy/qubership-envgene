@@ -40,6 +40,13 @@ runs:
         curl -LO https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64
         mv sops-v3.9.0.linux.amd64 /usr/local/bin/sops
         chmod +x /usr/local/bin/sops
+    
+    - name: Set up Java and Maven
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
 
     - name: ENVGENE HELPER test
       shell: bash
@@ -57,10 +64,17 @@ runs:
         cd ../..
         mv junit.xml junit_build_env.xml
 
+    - name: CLI MODULE test
+      shell: bash
+      run: |
+        cd build_effective_set_generator_java
+        mvn clean install
+        cp target/surefire-reports/*.xml ../junit_java.xml
+
     - name: Merge test results
       shell: bash
       run: |
-        junitparser merge junit_build_env.xml junit_envgenehelper.xml junit.xml    
+        junitparser merge junit_build_env.xml junit_envgenehelper.xml junit_java.xml junit.xml    
 
     - name: Upload test results
       if: always()
