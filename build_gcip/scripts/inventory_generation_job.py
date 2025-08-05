@@ -13,7 +13,7 @@ def is_inventory_generation_needed(is_template_test, inv_gen_params):
     for param in params_processed_by_inv_gen:
         #if inv_gen_params[param] != '':
         if inv_gen_params[param] not in (None, ''):
-             return True
+            return True
     return False
 
 def prepare_inventory_generation_job(pipeline, full_env, environment_name, cluster_name, env_generation_params):
