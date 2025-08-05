@@ -42,8 +42,24 @@ def validate_json(value, key):
             value = value.strip().replace("\n", " ")
         parsed_json = json.loads(value)
         return json.dumps(parsed_json)
-    except (json.JSONDecodeError, TypeError):
-        raise ValueError(f"{key} must be a valid JSON object")
+    except (json.JSONDecodeError, TypeError) as e:
+        print(f"🔍 JSON validation failed for {key}: {e}")
+        print(f"🔍 Attempting to fix malformed JSON for {key}...")
+        
+        # Try to fix common JSON formatting issues
+        try:
+            import re
+            # Pattern to match unquoted keys: key:value
+            pattern = r'(\w+):([^,}]+)'
+            fixed_value = re.sub(pattern, r'"\1":"\2"', value)
+            print(f"🔍 Fixed {key}: {fixed_value}")
+            
+            # Validate the fixed JSON
+            json.loads(fixed_value)
+            return json.dumps(json.loads(fixed_value))
+        except Exception as fix_error:
+            print(f"❌ Could not fix {key}: {fix_error}")
+            raise ValueError(f"{key} must be a valid JSON object: {str(e)}")
 
 
 def validate_string(value, key):
@@ -72,7 +88,27 @@ def validate_cred_rotation_payload(value, key):
             value = value.strip().replace("\n", " ")
             if not value:  # Empty string is valid (default empty payload)
                 return "{}"
-            parsed_json = json.loads(value)
+            
+            # Check if it's malformed JSON (missing quotes)
+            if value.startswith('{') and 'rotation_items:' in value and '"' not in value:
+                print(f"🔍 Detected malformed CRED_ROTATION_PAYLOAD, attempting to fix...")
+                try:
+                    import re
+                    # Pattern to match unquoted keys: key:value
+                    pattern = r'(\w+):([^,}]+)'
+                    fixed_value = re.sub(pattern, r'"\1":"\2"', value)
+                    print(f"🔍 Fixed CRED_ROTATION_PAYLOAD: {fixed_value}")
+                    
+                    # Validate the fixed JSON
+                    parsed_json = json.loads(fixed_value)
+                    print("✅ Successfully fixed CRED_ROTATION_PAYLOAD")
+                except Exception as fix_error:
+                    print(f"❌ Could not fix CRED_ROTATION_PAYLOAD: {fix_error}")
+                    print(f"🔍 Original value: {value}")
+                    # Continue with original value for further validation
+                    parsed_json = json.loads(value)
+            else:
+                parsed_json = json.loads(value)
         else:
             parsed_json = value
 
@@ -132,7 +168,25 @@ def validate_cred_rotation_payload(value, key):
         encoded_json = base64.b64encode(json_str.encode("utf-8")).decode("utf-8")
         return encoded_json
     except (json.JSONDecodeError, TypeError) as e:
-        raise ValueError(f"{key} must be a valid JSON object: {str(e)}")
+        print(f"🔍 CRED_ROTATION_PAYLOAD validation failed: {e}")
+        print(f"🔍 Attempting to fix malformed JSON...")
+        
+        # Try to fix common JSON formatting issues
+        try:
+            import re
+            # Pattern to match unquoted keys: key:value
+            pattern = r'(\w+):([^,}]+)'
+            fixed_value = re.sub(pattern, r'"\1":"\2"', value)
+            print(f"🔍 Fixed CRED_ROTATION_PAYLOAD: {fixed_value}")
+            
+            # Validate the fixed JSON
+            json.loads(fixed_value)
+            print("✅ Successfully fixed CRED_ROTATION_PAYLOAD")
+            return validate_cred_rotation_payload(fixed_value, key)
+        except Exception as fix_error:
+            print(f"❌ ERROR: Could not fix CRED_ROTATION_PAYLOAD: {fix_error}")
+            print(f"🔍 Original value: {value}")
+            raise ValueError(f"{key} must be a valid JSON object: {str(e)}")
 
 
 def main():
@@ -162,8 +216,13 @@ def main():
                     os.environ[key] = value
                     print(f"Loaded environment variable: {key}={value}")
 
+    # Check if we're in API mode
+    api_mode = os.getenv("GITHUB_PIPELINE_API_INPUT") is not None
+    print(f"🔍 API Mode detected: {api_mode}")
+
     # Default values for all variables
     default_values = {
+        "ENV_NAMES": "",
         "ENV_INVENTORY_INIT": "false",
         "GENERATE_EFFECTIVE_SET": "false",
         "ENV_TEMPLATE_TEST": "false",
@@ -182,8 +241,13 @@ def main():
         "CRED_ROTATION_FORCE": "false",
     }
 
+    # API-specific validations
+    api_required_vars = ["ENV_NAMES"]
+    api_recommended_vars = ["DEPLOYMENT_TICKET_ID", "ENV_TEMPLATE_VERSION"]
+
     validators = {
         # Variables from pipeline_vars.yaml
+        "ENV_NAMES": validate_string,
         "ENV_INVENTORY_INIT": validate_boolean,
         "GENERATE_EFFECTIVE_SET": validate_boolean,
         "ENV_TEMPLATE_TEST": validate_boolean,
@@ -210,18 +274,22 @@ def main():
         # Priority: 1. Environment variable (from API input), 2. File value, 3. Default
         env_value = os.getenv(key)
         # Debug only for specific variables
-        if key in ["ENV_BUILDER", "GET_PASSPORT", "CMDB_IMPORT"]:
+        if key in ["ENV_BUILDER", "GET_PASSPORT", "CMDB_IMPORT", "ENV_NAMES"]:
             print(
                 f"DEBUG: Checking {key}, env_value={env_value}, env_value is None={env_value is None}"
             )
         if env_value is not None:
             raw_value = env_value
             print(f"Using environment value for {key}: {raw_value}")
+            if key == "ENV_NAMES":
+                print(f"🔍 ENV_NAMES from environment: '{raw_value}'")
         else:
             raw_value = data.get(key, default_values[key])
             print(
                 f"Using {'file' if key in data else 'default'} value for {key}: {raw_value}"
             )
+            if key == "ENV_NAMES":
+                print(f"🔍 ENV_NAMES from {'file' if key in data else 'default'}: '{raw_value}'")
 
         try:
             if validator == validate_boolean:
@@ -250,6 +318,80 @@ def main():
             print(f"Warning: {e}, using default value '{default_values[key]}'")
             validated_data[key] = default_values[key]
 
+    # API-specific validations
+    if api_mode:
+        print("🔍 Performing API-specific validations...")
+        
+        # Check required variables for API mode
+        for var in api_required_vars:
+            if not validated_data.get(var) or validated_data[var].strip() == "":
+                print(f"❌ ERROR: {var} is required for API mode but is empty or missing!")
+                print(f"Available variables: {list(validated_data.keys())}")
+                sys.exit(1)
+        
+        # Check recommended variables for API mode
+        for var in api_recommended_vars:
+            if not validated_data.get(var) or validated_data[var].strip() == "":
+                print(f"⚠️  WARNING: {var} is recommended for API mode but is empty or missing")
+        
+        # Special validation for ENV_NAMES in API mode
+        if "ENV_NAMES" in validated_data:
+            env_names = validated_data["ENV_NAMES"]
+            if env_names:
+                # Split and validate individual environment names
+                envs = [env.strip() for env in env_names.split(",") if env.strip()]
+                print(f"🔍 Validated environments: {envs}")
+                
+                # Check for common environment name patterns
+                for env in envs:
+                    if not env or env == "":
+                        print(f"❌ ERROR: Empty environment name found in ENV_NAMES: '{env_names}'")
+                        sys.exit(1)
+                    if "/" not in env:
+                        print(f"⚠️  WARNING: Environment name '{env}' doesn't contain '/' - may be invalid")
+                
+                if not envs:
+                    print(f"❌ ERROR: No valid environments found in ENV_NAMES: '{env_names}'")
+                    sys.exit(1)
+        
+        # Special validation for CRED_ROTATION_PAYLOAD in API mode
+        if "CRED_ROTATION_PAYLOAD" in validated_data:
+            cred_payload = validated_data["CRED_ROTATION_PAYLOAD"]
+            if cred_payload and cred_payload != "{}":
+                try:
+                    # Try to decode base64 if it's encoded
+                    import base64
+                    try:
+                        decoded = base64.b64decode(cred_payload).decode('utf-8')
+                        json.loads(decoded)  # Validate JSON structure
+                        print("🔍 CRED_ROTATION_PAYLOAD is valid base64-encoded JSON")
+                    except:
+                        # If not base64, try direct JSON
+                        json.loads(cred_payload)
+                        print("🔍 CRED_ROTATION_PAYLOAD is valid JSON")
+                except Exception as e:
+                    print(f"⚠️  WARNING: CRED_ROTATION_PAYLOAD validation failed: {e}")
+                    print("🔍 Attempting to fix malformed CRED_ROTATION_PAYLOAD...")
+                    
+                    # Try to fix common JSON formatting issues
+                    try:
+                        import re
+                        # Pattern to match unquoted keys: key:value
+                        pattern = r'(\w+):([^,}]+)'
+                        fixed_payload = re.sub(pattern, r'"\1":"\2"', cred_payload)
+                        print(f"🔍 Fixed CRED_ROTATION_PAYLOAD: {fixed_payload}")
+                        
+                        # Validate the fixed JSON
+                        json.loads(fixed_payload)
+                        validated_data["CRED_ROTATION_PAYLOAD"] = fixed_payload
+                        print("✅ Successfully fixed and validated CRED_ROTATION_PAYLOAD")
+                    except Exception as fix_error:
+                        print(f"❌ ERROR: Could not fix CRED_ROTATION_PAYLOAD: {fix_error}")
+                        print("🔍 Original payload: " + cred_payload)
+                        print("🔍 This will cause validation to fail later")
+        
+        print("✅ API-specific validations completed")
+
     with open(github_env_file, "a", encoding="utf-8") as env_file, open(
         github_output_file, "a", encoding="utf-8"
     ) as output_file:
@@ -263,8 +405,12 @@ def main():
                 print(
                     f"Overwriting {key} from environment with validated value: {converted_value}"
                 )
+                if key == "ENV_NAMES":
+                    print(f"🔍 Final ENV_NAMES value: '{converted_value}'")
             else:
                 print(f"Setting {key} to: {converted_value}")
+                if key == "ENV_NAMES":
+                    print(f"🔍 Final ENV_NAMES value: '{converted_value}'")
 
 
 if __name__ == "__main__":
