@@ -6,10 +6,6 @@ inputs:
     description: 'Python version to use for tests'
     required: false
     default: '3.10'
-  java-version:
-    description: 'Java version to use for tests'
-    required: false
-    default: '17'
 
 runs:
   using: composite
@@ -60,6 +56,11 @@ runs:
     #    pytest --capture=no -W ignore::DeprecationWarning --junitxml=../../junit.xml
     #    cd ../..
     #    mv junit.xml junit_build_env.xml
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
     - name: CLI Java Module tests
       shell: bash
