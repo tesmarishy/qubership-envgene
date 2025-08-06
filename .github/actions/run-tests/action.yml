@@ -6,6 +6,10 @@ inputs:
     description: 'Python version to use for tests'
     required: false
     default: '3.10'
+  java-version:
+    description: 'Java version to use for tests'
+    required: false
+    default: '17'
 
 runs:
   using: composite
@@ -57,27 +61,25 @@ runs:
     #    cd ../..
     #    mv junit.xml junit_build_env.xml
 
-    - name: Test CLI Module
-      uses: netcracker/qubership-workflow-hub/.github/workflows/maven-publish.yml@main
-      with:
-        maven-command: "--batch-mode verify"
-        java-version: "17"
-        upload-artifact: true
-        artifact-id: cli-test-artifact
-        ref: ${{ github.ref }}
-
-
-    - name: Download Java test artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: cli-test-artifact
-        path: cli-test-results
-
-
-    - name: Move Java JUnit XML
+    - name: CLI Java Module tests
       shell: bash
       run: |
-        find cli-test-results -name "TEST-*.xml" -exec cp {} junit_java.xml \;
+        cd build_effective_set_generator_java
+
+        if [ -f pom.xml ]; then
+          echo "Running Maven tests..."
+
+          if [ -f mvnw ]; then
+            ./mvnw test
+          else
+            mvn test
+          fi
+
+          find effective-set-generator/target/surefire-reports -name "*.xml" -exec cat {} \; > ../junit_java.xml
+        else
+          echo "pom.xml not found, skipping tests."
+        fi
+
 
     - name: Merge test results
       shell: bash
