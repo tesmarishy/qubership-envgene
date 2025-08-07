@@ -1,3 +1,4 @@
+# This action is hidden from the GitHub Actions UI
 name: 'Build Qubership GCIP Docker Image'
 description: 'Build and push Qubership GCIP docker image to container registry'
 
