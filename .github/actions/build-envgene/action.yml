@@ -64,7 +64,7 @@ runs:
         echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
         echo "branch_latest_tag=$BRANCH_LATEST_TAG" >> $GITHUB_OUTPUT
 
-        - name: Extract metadata (tags, labels) for Docker
+    - name: Extract metadata (tags, labels) for Docker
       id: meta
       uses: docker/metadata-action@v5
       with:
@@ -74,7 +74,7 @@ runs:
           type=ref,event=pr
           type=sha,prefix={{branch}}-{{sha}},suffix={{timestamp}}
           type=raw,value={{branch}}_{{timestamp}}
-  
+    
     - name: Build and push Docker image
       id: push
       uses: docker/build-push-action@v6
