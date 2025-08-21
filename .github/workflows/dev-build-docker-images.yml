@@ -15,11 +15,6 @@ on:
         required: false
         default: true
         type: boolean
-      build-pipeline:
-        description: 'Build Instance Repo Pipeline image'
-        required: false
-        default: true
-        type: boolean
       build-effective-set:
         description: 'Build Effective Set Generator image'
         required: false
@@ -30,6 +25,11 @@ on:
         required: false
         default: true
         type: boolean
+      build-pipeline:
+        description: 'Build Instance Repo Pipeline image'
+        required: false
+        default: true
+        type: boolean  
   push:
     branches:
       - '**'
@@ -240,7 +240,10 @@ jobs:
 
   build-instance-repo-pipeline:
     needs: [tests, update-pipeline-yml]
-    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-pipeline == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
+    if: |
+      always() &&
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.build-pipeline == 'true') || 
+      (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
     runs-on: ubuntu-latest
     permissions:
       contents: read
