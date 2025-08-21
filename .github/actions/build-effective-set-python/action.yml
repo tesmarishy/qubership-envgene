@@ -37,6 +37,7 @@ runs:
 
     - name: Generate custom tags with timestamp
       id: tags
+      shell: bash
       run: |
         # Get current branch name and convert slashes to dashes
         BRANCH_NAME="${{ github.ref_name }}"
