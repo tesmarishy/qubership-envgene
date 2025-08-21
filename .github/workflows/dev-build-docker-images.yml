@@ -190,11 +190,10 @@ jobs:
           echo "Current branch: $BRANCH_NAME"
           echo "Docker tag: $DOCKER_TAG"
           
-          # Update pipeline.yml with new docker image tags
-          # Replace any existing tag (after colon) with the new branch-based tag
-          sed -i "s|qubership-gcip:[^[:space:]]*|qubership-gcip:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
-          sed -i "s|qubership-envgene:[^[:space:]]*|qubership-envgene:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
-          sed -i "s|qubership-effective-set-generator:[^[:space:]]*|qubership-effective-set-generator:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+          sed -i "s|qubership-gcip:[^'[:space:]]*|qubership-gcip:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+          sed -i "s|qubership-envgene:[^'[:space:]]*|qubership-envgene:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+          sed -i "s|qubership-effective-set-generator:[^'[:space:]]*|qubership-effective-set-generator:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+          sed -i "s|qubership-effective-set-generator-python:[^'[:space:]]*|qubership-effective-set-generator-python:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
           
           echo "Updated pipeline.yml with docker tag: $DOCKER_TAG"
           
