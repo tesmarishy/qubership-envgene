@@ -7,6 +7,10 @@ inputs:
     description: 'Container registry URL'
     required: false
     default: 'ghcr.io'
+  repository-owner:
+    description: 'Repository owner for Docker images'
+    required: false
+    default: 'netcracker'
   image-name:
     description: 'Docker image name'
     required: false
@@ -71,7 +75,7 @@ runs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ inputs.registry }}/${{ github.repository_owner | lower }}/${{ inputs.image-name }}
+        images: ${{ inputs.registry }}/${{ inputs.repository-owner }}/${{ inputs.image-name }}
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -86,8 +90,8 @@ runs:
         file: ${{ inputs.dockerfile-path }}
         push: true
         tags: |
-          ${{ inputs.registry }}/${{ github.repository_owner | lower }}/${{ inputs.image-name }}:${{ steps.tags.outputs.custom_tag }}
-          ${{ inputs.registry }}/${{ github.repository_owner | lower }}/${{ inputs.image-name }}:${{ steps.tags.outputs.branch_latest_tag }}
+          ${{ inputs.registry }}/${{ inputs.repository-owner }}/${{ inputs.image-name }}:${{ steps.tags.outputs.custom_tag }}
+          ${{ inputs.registry }}/${{ inputs.repository-owner }}/${{ inputs.image-name }}:${{ steps.tags.outputs.branch_latest_tag }}
           ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |
