@@ -107,26 +107,6 @@ jobs:
           gh-access-token: ${{ secrets.GH_ACCESS_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-  build-instance-repo-pipeline:
-    needs: [tests]
-    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-pipeline == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build Instance Repo Pipeline Docker Image
-        uses: ./.github/actions/build-pipeline
-        with:
-          registry: ${{ env.REGISTRY }}
-          gh-access-token: ${{ secrets.GH_ACCESS_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
   build-effective-set-jar:
     needs: [tests]
     if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-effective-set == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
@@ -180,3 +160,73 @@ jobs:
           registry: ${{ env.REGISTRY }}
           gh-access-token: ${{ secrets.GH_ACCESS_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  update-pipeline-yml:
+    needs: 
+      - tests
+      - build-qubership-gcip
+      - build-qubership-envgene
+      - build-effective-set-generator
+      - build-effective-set-generator-python
+    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-pipeline == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update Docker Image Tags in Pipeline
+        run: |
+          # Get current branch name and convert slashes to dashes for docker tag
+          BRANCH_NAME="${{ github.ref_name }}"
+          DOCKER_TAG=$(echo "$BRANCH_NAME" | sed 's|/|-|g')
+          
+          echo "Current branch: $BRANCH_NAME"
+          echo "Docker tag: $DOCKER_TAG"
+          
+          # Update pipeline.yml with new docker image tags
+          # Replace any existing tag (after colon) with the new branch-based tag
+          sed -i "s|qubership-gcip:[^[:space:]]*|qubership-gcip:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+          sed -i "s|qubership-envgene:[^[:space:]]*|qubership-envgene:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+          sed -i "s|qubership-effective-set-generator:[^[:space:]]*|qubership-effective-set-generator:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+          
+          echo "Updated pipeline.yml with docker tag: $DOCKER_TAG"
+          
+          # Show the changes
+          echo "Changes made to pipeline.yml:"
+          git diff github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml || true
+          
+          # Commit the changes
+          git config --global user.name "qubership-actions[bot]"
+          git config --global user.email "qubership-actions[bot]@users.noreply.github.com"
+          git add github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+          git commit -m "Update docker image tags to $DOCKER_TAG for branch $BRANCH_NAME" || echo "No changes to commit"
+          
+          # Push the changes
+          git push origin HEAD:${{ github.ref_name }} || echo "Failed to push changes"
+
+  build-instance-repo-pipeline:
+    needs: [tests, update-pipeline-yml]
+    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.build-pipeline == 'true') || (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Instance Repo Pipeline Docker Image
+        uses: ./.github/actions/build-pipeline
+        with:
+          registry: ${{ env.REGISTRY }}
+          gh-access-token: ${{ secrets.GH_ACCESS_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}          
