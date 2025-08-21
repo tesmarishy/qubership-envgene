@@ -195,7 +195,7 @@ jobs:
           CUSTOM_TAG="${DOCKER_TAG}_${TIMESTAMP}"
           
           # Create branch-latest tag for the current branch
-          BRANCH_LATEST_TAG="${DOCKER_TAG}-latest"
+          BRANCH_LATEST_TAG="${DOCKER_TAG}"
           
           echo "Current branch: $BRANCH_NAME"
           echo "Docker tag: $DOCKER_TAG"
