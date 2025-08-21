@@ -161,7 +161,7 @@ jobs:
           gh-access-token: ${{ secrets.GH_ACCESS_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-  update-pipeline-yml:
+  build-instance-repo-pipeline:
     needs: 
       - tests
       - build-qubership-gcip
@@ -174,15 +174,13 @@ jobs:
       (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: write
       attestations: write
       id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Update Docker Image Tags in Pipeline
         run: |
@@ -238,25 +236,9 @@ jobs:
             echo "No changes to commit - skipping git operations"
           fi
 
-  build-instance-repo-pipeline:
-    needs: [tests, update-pipeline-yml]
-    if: |
-      always() &&
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.build-pipeline == 'true') || 
-      (github.event_name == 'push' && (contains(github.event.head_commit.message, 'feat:') || contains(github.event.head_commit.message, 'fix:') || contains(github.event.head_commit.message, 'BREAKING CHANGE')))
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Build Instance Repo Pipeline Docker Image
         uses: ./.github/actions/build-pipeline
         with:
           registry: ${{ env.REGISTRY }}
           gh-access-token: ${{ secrets.GH_ACCESS_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}          
+          github-token: ${{ secrets.GITHUB_TOKEN }}
