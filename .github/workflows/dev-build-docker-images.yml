@@ -188,35 +188,47 @@ jobs:
           BRANCH_NAME="${{ github.ref_name }}"
           DOCKER_TAG=$(echo "$BRANCH_NAME" | sed 's|/|-|g')
           
+          # Generate timestamp in format YYYYMMDD-HHMMSS
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          
+          # Create custom tag: branch_timestamp
+          CUSTOM_TAG="${DOCKER_TAG}_${TIMESTAMP}"
+          
+          # Create branch-latest tag for the current branch
+          BRANCH_LATEST_TAG="${DOCKER_TAG}-latest"
+          
           echo "Current branch: $BRANCH_NAME"
           echo "Docker tag: $DOCKER_TAG"
+          echo "Timestamp: $TIMESTAMP"
+          echo "Custom tag: $CUSTOM_TAG"
+          echo "Branch latest tag: $BRANCH_LATEST_TAG"
           
           # Check which images were built and update accordingly
           if [[ "${{ needs.build-qubership-gcip.result }}" == "success" ]]; then
-            echo "Updating qubership-gcip tag to $DOCKER_TAG"
-            sed -i "s|qubership-gcip:[^'[:space:]]*|qubership-gcip:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+            echo "Updating qubership-gcip tag to $BRANCH_LATEST_TAG"
+            sed -i "s|qubership-gcip:[^'[:space:]]*|qubership-gcip:$BRANCH_LATEST_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
           fi
           
           if [[ "${{ needs.build-qubership-envgene.result }}" == "success" ]]; then
-            echo "Updating qubership-envgene tag to $DOCKER_TAG"
-            sed -i "s|qubership-envgene:[^'[:space:]]*|qubership-envgene:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+            echo "Updating qubership-envgene tag to $BRANCH_LATEST_TAG"
+            sed -i "s|qubership-envgene:[^'[:space:]]*|qubership-envgene:$BRANCH_LATEST_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
           fi
           
           if [[ "${{ needs.build-effective-set-generator.result }}" == "success" ]]; then
-            echo "Updating qubership-effective-set-generator tag to $DOCKER_TAG"
-            sed -i "s|qubership-effective-set-generator:[^'[:space:]]*|qubership-effective-set-generator:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+            echo "Updating qubership-effective-set-generator tag to $BRANCH_LATEST_TAG"
+            sed -i "s|qubership-effective-set-generator:[^'[:space:]]*|qubership-effective-set-generator:$BRANCH_LATEST_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
           fi
           
           if [[ "${{ needs.build-effective-set-generator-python.result }}" == "success" ]]; then
-            echo "Updating qubership-effective-set-generator-python tag to $DOCKER_TAG"
-            sed -i "s|qubership-effective-set-generator-python:[^'[:space:]]*|qubership-effective-set-generator-python:$DOCKER_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
+            echo "Updating qubership-effective-set-generator-python tag to $BRANCH_LATEST_TAG"
+            sed -i "s|qubership-effective-set-generator-python:[^'[:space:]]*|qubership-effective-set-generator-python:$BRANCH_LATEST_TAG|g" github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
           fi
           
           # Check if any images were updated
           if git diff --quiet github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml; then
             echo "No changes to commit - no images were built or tags were already up to date"
           else
-            echo "Updated pipeline.yml with docker tag: $DOCKER_TAG"
+            echo "Updated pipeline.yml with docker tag: $BRANCH_LATEST_TAG"
           fi
           
           # Show the changes
@@ -228,7 +240,7 @@ jobs:
             git config --global user.name "qubership-actions[bot]"
             git config --global user.email "qubership-actions[bot]@users.noreply.github.com"
             git add github_workflows/instance-repo-pipeline/.github/workflows/pipeline.yml
-            git commit -m "Update docker image tags to $DOCKER_TAG for branch $BRANCH_NAME"
+            git commit -m "Update docker image tags to $BRANCH_LATEST_TAG for branch $BRANCH_NAME"
             
             # Push the changes
             git push origin HEAD:${{ github.ref_name }} || echo "Failed to push changes"
