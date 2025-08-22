@@ -3,16 +3,16 @@ name: 'Generate Docker Tags'
 description: 'Generate custom Docker tags with timestamp and branch information'
 
 outputs:
-  custom-tag:
+  custom_tag:
     description: 'Custom tag with timestamp'
     value: ${{ steps.tags.outputs.custom_tag }}
-  branch-tag:
+  branch_tag:
     description: 'Branch-based tag'
     value: ${{ steps.tags.outputs.branch_tag }}
   timestamp:
     description: 'Generated timestamp'
     value: ${{ steps.tags.outputs.timestamp }}
-  branch-latest-tag:
+  branch_latest_tag:
     description: 'Branch latest tag'
     value: ${{ steps.tags.outputs.branch_latest_tag }}
 
