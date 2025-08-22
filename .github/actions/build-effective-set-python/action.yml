@@ -74,8 +74,8 @@ runs:
         tags: |
           type=ref,event=branch
           type=ref,event=pr
-          type=sha,prefix={{branch}}-{{sha}},suffix={{timestamp}}
-          type=raw,value={{branch}}_{{timestamp}}
+          type=sha,prefix={{branch}}-{{sha}},suffix={{date 'YYYYMMDD-HHMMSS'}}
+          type=raw,value={{branch}}_{{date 'YYYYMMDD-HHMMSS'}}
     
     - name: Build and push Docker image
       id: push
