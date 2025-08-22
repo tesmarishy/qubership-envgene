@@ -43,24 +43,12 @@ runs:
       id: tags
       shell: bash
       run: |
-        # Get current branch name and convert slashes to dashes
+        # Transform branch name to docker tag format
         BRANCH_NAME="${{ github.ref_name }}"
-        DOCKER_TAG=$(echo "$BRANCH_NAME" | sed 's|/|-|g')
-        
-        # Generate timestamp in format YYYYMMDD-HHMMSS
+        DOCKER_TAG=$(echo "$BRANCH_NAME" | sed 's|/|_|g')
         TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-        
-        # Create custom tag: branch_timestamp
         CUSTOM_TAG="${DOCKER_TAG}_${TIMESTAMP}"
-        
-        # Create branch-latest tag for the current branch
         BRANCH_LATEST_TAG="${DOCKER_TAG}"
-        
-        echo "Branch: $BRANCH_NAME"
-        echo "Docker tag: $DOCKER_TAG"
-        echo "Timestamp: $TIMESTAMP"
-        echo "Custom tag: $CUSTOM_TAG"
-        echo "Branch latest tag: $BRANCH_LATEST_TAG"
         
         # Set output for next steps
         echo "custom_tag=$CUSTOM_TAG" >> $GITHUB_OUTPUT
