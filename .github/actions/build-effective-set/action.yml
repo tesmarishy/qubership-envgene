@@ -32,16 +32,16 @@ inputs:
 outputs:
   custom-tag:
     description: 'Custom tag with timestamp'
-    value: ${{ steps.generate-tags.outputs.custom-tag }}
+    value: ${{ steps.generate-tags.outputs.custom_tag }}
   branch-tag:
     description: 'Branch-based tag'
-    value: ${{ steps.generate-tags.outputs.branch-tag }}
+    value: ${{ steps.generate-tags.outputs.branch_tag }}
   timestamp:
     description: 'Generated timestamp'
     value: ${{ steps.generate-tags.outputs.timestamp }}
   branch-latest-tag:
     description: 'Branch latest tag'
-    value: ${{ steps.generate-tags.outputs.branch-latest-tag }}
+    value: ${{ steps.generate-tags.outputs.branch_latest_tag }}
 
 runs:
   using: composite

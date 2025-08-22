@@ -29,16 +29,16 @@ inputs:
 outputs:
   custom-tag:
     description: 'Custom tag with timestamp'
-    value: ${{ steps.generate-tags.outputs.custom-tag }}
+    value: ${{ steps.generate-tags.outputs.custom_tag }}
   branch-tag:
     description: 'Branch-based tag'
-    value: ${{ steps.generate-tags.outputs.branch-tag }}
+    value: ${{ steps.generate-tags.outputs.branch_tag }}
   timestamp:
     description: 'Generated timestamp'
     value: ${{ steps.generate-tags.outputs.timestamp }}
   branch-latest-tag:
     description: 'Branch latest tag'
-    value: ${{ steps.generate-tags.outputs.branch-latest-tag }}
+    value: ${{ steps.generate-tags.outputs.branch_latest_tag }}
 
 runs:
   using: composite
@@ -56,6 +56,23 @@ runs:
     - name: Generate Docker tags
       id: generate-tags
       uses: ./.github/actions/generate-docker-tags
+
+    - name: Debug outputs
+      shell: bash
+      run: |
+        echo "DEBUG: Checking outputs from generate-docker-tags action:"
+        echo "custom_tag: ${{ steps.generate-tags.outputs.custom_tag }}"
+        echo "branch_tag: ${{ steps.generate-tags.outputs.branch_tag }}"
+        echo "timestamp: ${{ steps.generate-tags.outputs.timestamp }}"
+        echo "branch_latest_tag: ${{ steps.generate-tags.outputs.branch_latest_tag }}"
+
+    - name: Debug Docker tags
+      shell: bash
+      run: |
+        echo "DEBUG: Docker tags that will be used:"
+        echo "Tag 1: ${{ inputs.registry }}/${{ inputs.repository-owner }}/${{ inputs.image-name }}:${{ steps.generate-tags.outputs.custom_tag }}"
+        echo "Tag 2: ${{ inputs.registry }}/${{ inputs.repository-owner }}/${{ inputs.image-name }}:${{ steps.generate-tags.outputs.branch_latest_tag }}"
+        echo "Meta tags: ${{ steps.meta.outputs.tags }}"
 
     - name: Extract metadata (tags, labels) for Docker
       id: meta

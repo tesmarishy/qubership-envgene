@@ -5,22 +5,22 @@ description: 'Generate custom Docker tags with timestamp and branch information'
 outputs:
   custom-tag:
     description: 'Custom tag with timestamp'
-    value: ${{ steps.tags.outputs.custom_tag }}
+    value: ${{ steps.generate-tags.outputs.custom_tag }}
   branch-tag:
     description: 'Branch-based tag'
-    value: ${{ steps.tags.outputs.branch_tag }}
+    value: ${{ steps.generate-tags.outputs.branch_tag }}
   timestamp:
     description: 'Generated timestamp'
-    value: ${{ steps.tags.outputs.timestamp }}
+    value: ${{ steps.generate-tags.outputs.timestamp }}
   branch-latest-tag:
     description: 'Branch latest tag'
-    value: ${{ steps.tags.outputs.branch_latest_tag }}
+    value: ${{ steps.generate-tags.outputs.branch_latest_tag }}
 
 runs:
   using: composite
   steps:
     - name: Generate custom tags with timestamp
-      id: tags
+      id: generate-tags
       shell: bash
       run: |
         # Transform branch name to docker tag format
@@ -30,8 +30,19 @@ runs:
         CUSTOM_TAG="${DOCKER_TAG}_${TIMESTAMP}"
         BRANCH_LATEST_TAG="${DOCKER_TAG}"
         
+        # Debug output
+        echo "DEBUG: BRANCH_NAME=$BRANCH_NAME"
+        echo "DEBUG: DOCKER_TAG=$DOCKER_TAG"
+        echo "DEBUG: TIMESTAMP=$TIMESTAMP"
+        echo "DEBUG: CUSTOM_TAG=$CUSTOM_TAG"
+        echo "DEBUG: BRANCH_LATEST_TAG=$BRANCH_LATEST_TAG"
+        
         # Set output for next steps
         echo "custom_tag=$CUSTOM_TAG" >> $GITHUB_OUTPUT
         echo "branch_tag=$DOCKER_TAG" >> $GITHUB_OUTPUT
         echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
         echo "branch_latest_tag=$BRANCH_LATEST_TAG" >> $GITHUB_OUTPUT
+        
+        # Debug: show what was written to GITHUB_OUTPUT
+        echo "DEBUG: GITHUB_OUTPUT contents:"
+        cat $GITHUB_OUTPUT || echo "GITHUB_OUTPUT file not found"
