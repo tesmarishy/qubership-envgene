@@ -208,6 +208,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: "Prepare app token"
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.GH_BUMP_VERSION_APP_ID }}
+          private-key: ${{ secrets.GH_BUMP_VERSION_APP_KEY }}
+
       - name: Update Docker Image Tags in Pipeline
         run: |
           # Use outputs from previous jobs instead of regenerating tags
