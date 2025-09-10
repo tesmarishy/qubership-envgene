@@ -9,13 +9,13 @@ def prepare_credential_rotation_job(pipeline, full_env, environment_name, cluste
     "image":  '${envgen_image}',
     "stage":  'credential_rotation',
     "script": [
-            f"python3 /module/creds_rotation_scripts/creds_rotation_handler.py",
-        ],    
-  } 
+            "python3 /module/creds_rotation_scripts/creds_rotation_handler.py",
+        ],
+  }
 
   credential_rotation_vars = {
     "CLUSTER_NAME": cluster_name,
-    "ENV_NAME": environment_name,    
+    "ENV_NAME": environment_name,
     "envgen_args": " -vv",
     "envgen_debug": "true",
     "GITLAB_RUNNER_TAG_NAME" : tags  

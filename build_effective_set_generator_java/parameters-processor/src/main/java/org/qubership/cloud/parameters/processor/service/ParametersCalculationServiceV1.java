@@ -32,32 +32,34 @@ import java.util.*;
 import static org.qubership.cloud.devops.commons.utils.constant.ApplicationConstants.*;
 
 @ApplicationScoped
-public class ParametersCalculationService {
-    public static final Logger LOGGER = LoggerFactory.getLogger(ParametersCalculationService.class.getName());
+public class ParametersCalculationServiceV1 {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ParametersCalculationServiceV1.class.getName());
     private final ParametersProcessor parametersProcessor;
     private final List<String> entities = Arrays.asList(SERVICES, CONFIGURATIONS, FRONTENDS, SMARTPLUG, CDN, SAMPLREPO);
 
     @Inject
-    public ParametersCalculationService(ParametersProcessor parametersProcessor) {
+    public ParametersCalculationServiceV1(ParametersProcessor parametersProcessor) {
         this.parametersProcessor = parametersProcessor;
     }
 
     public ParameterBundle getCliParameter(String tenantName, String cloudName, String namespaceName, String applicationName,
-                                           DeployerInputs deployerInputs) {
-        return getParameterBundle(tenantName, cloudName, namespaceName, applicationName, deployerInputs);
+                                           DeployerInputs deployerInputs, String originalNamespace, Map<String, String> k8TokenMap) {
+        return getParameterBundle(tenantName, cloudName, namespaceName, applicationName, deployerInputs, originalNamespace, k8TokenMap);
     }
 
     public ParameterBundle getCliE2EParameter(String tenantName, String cloudName) {
         return getE2EParameterBundle(tenantName, cloudName);
     }
 
-    private ParameterBundle getParameterBundle(String tenantName, String cloudName, String namespaceName, String applicationName, DeployerInputs deployerInputs) {
+    private ParameterBundle getParameterBundle(String tenantName, String cloudName, String namespaceName, String applicationName, DeployerInputs deployerInputs
+            , String originalNamespace, Map<String, String> k8TokenMap) {
         Params parameters = parametersProcessor.processAllParameters(tenantName,
                 cloudName,
                 namespaceName,
                 applicationName,
                 "false",
-                deployerInputs);
+                deployerInputs,
+                originalNamespace);
 
 
         ParameterBundle parameterBundle = ParameterBundle.builder().build();
@@ -67,7 +69,7 @@ public class ParametersCalculationService {
     }
 
     private ParameterBundle getE2EParameterBundle(String tenantName, String cloudName) {
-        Params parameters = parametersProcessor.processE2EParameters(tenantName, cloudName, null, null, "false", null);
+        Params parameters = parametersProcessor.processE2EParameters(tenantName, cloudName, null, null, "false", null, null);
         ParameterBundle parameterBundle = ParameterBundle.builder().build();
         prepareSecureInsecureParams(parameters.getE2eParams(), parameterBundle, ParameterType.E2E);
         return parameterBundle;
@@ -88,6 +90,7 @@ public class ParametersCalculationService {
             parameterBundle.setSecuredE2eParams(finalSecuredParams);
             parameterBundle.setE2eParams(inSecuredParamsAsObject);
         } else if (parameterType == ParameterType.DEPLOY) {
+            removeUnusedParams(inSecuredParamsAsObject);
             Map<String, Object> finalInsecureParams = prepareFinalParams(inSecuredParamsAsObject);
             parameterBundle.setSecuredDeployParams(finalSecuredParams);
             parameterBundle.setDeployParams(finalInsecureParams);
@@ -95,6 +98,13 @@ public class ParametersCalculationService {
             parameterBundle.setSecuredConfigParams(finalSecuredParams);
             parameterBundle.setConfigServerParams(inSecuredParamsAsObject);
         }
+    }
+
+    private void removeUnusedParams(Map<String, Object> parameters) {
+        parameters.remove(COMMON_DEPLOY_DESC);
+        parameters.remove(DEPLOY_DESC);
+        parameters.remove(PER_SERVICE_DEPLOY_PARAMS);
+        parameters.remove(APPR_CHART_NAME);
     }
 
     private Map<String, Object> prepareFinalParams(Map<String, Object> parameters) {
@@ -143,7 +153,6 @@ public class ParametersCalculationService {
         } else if (params instanceof List) {
             return ((List<Parameter>) params).stream().anyMatch(this::containsSecuredParams);
         }
-
         return false;
     }
 }

@@ -21,6 +21,7 @@
       - [Application](#application)
       - [Resource Profile Override (in Instance)](#resource-profile-override-in-instance)
       - [Composite Structure](#composite-structure)
+      - [Environment Credentials File](#environment-credentials-file)
     - [Solution Descriptor](#solution-descriptor)
     - [Credential](#credential)
       - [`usernamePassword`](#usernamepassword)
@@ -82,8 +83,8 @@ cloud:
   # Optional
   # Template Override configuration
   # See details in https://github.com/Netcracker/qubership-envgene/blob/main/docs/template-override.md
-  template_override:     
-    <yaml or jinja expression>
+  template_override:
+    "<yaml or jinja expression>"
   # Optional
   # Template Inheritance configuration
   # See details in https://github.com/Netcracker/qubership-envgene/blob/main/docs/template-inheritance.md
@@ -107,6 +108,10 @@ composite_structure: <path-to-the-composite-structure-template-file>
 namespaces:
   - # Optional
     template_path: <path-to-the-namespace-template-file>
+    # Optional
+    # Used for determining the name of the parent folder for the Namespace when generating the Environment Instance
+    # If the value is not specified, the name of the namespace template file (without extension) is used
+    deploy_postfix: <deploy-postfix>
     # Optional
     # See details https://github.com/Netcracker/qubership-envgene/blob/main/docs/template-override.md
     template_override:
@@ -219,7 +224,7 @@ version: <paramset-version>
 # Mandatory
 # The name of the Parameter Set
 # Used to reference the Parameter Set in templates
-# Must match the Parameter Set file name
+# Must match the Parameter Set filename
 name: "parameter-set-name"
 # Mandatory
 # Key-value pairs of parameters
@@ -269,7 +274,7 @@ applications:
               - ALL
 ```
 
-The file name of the ParameterSet must match the value of the `name` attribute. The ParameterSet name must be unique within the template repository. This is validated during processing; if the validation fails, the operation will stop with an error.
+The filename of the ParameterSet must match the value of the `name` attribute. The ParameterSet name must be unique within the template repository. This is validated during processing; if the validation fails, the operation will stop with an error.
 
 The Parameter Set schema in the template repository is identical to the Parameter Sets in the [Instance repository](#parameterset-in-instance-repository).
 
@@ -359,18 +364,18 @@ artifactory-cred:
 gitlab-token-cred:
   type: secret
   data:
-    secret: "MGE3MjYwNTQtZGE4My00MTlkLWIzN2MtZjU5YTg3NDA2Yzk0MzlmZmViZGUtYWY4_PF84_ba"
+    secret: "example-secret-token-for-documentation-purposes-only"
 ```
 
 ## Instance Repository Objects
 
 ### Environment Instance Objects
 
-An Environment Instance is a file structure within the Envgene Instance Repository that describes the configuration for a specific environment/solution instance.  
+An Environment Instance is a file structure within the Envgene Instance Repository that describes the configuration for a specific environment/solution instance.
 
-It is generated during the rendering process of an Environment Template. During this rendering process, environment-agnostic parameters from the Environment Template are combined with environment-specific parameters, such as Cloud Passport, environment-specific ParameterSet, environment-specific Resource Profile Overrides, to produce a set of parameters specific to a particular environment/solution instance.  
+It is generated during the rendering process of an Environment Template. During this rendering process, environment-agnostic parameters from the Environment Template are combined with environment-specific parameters, such as Cloud Passport, environment-specific ParameterSet, environment-specific Resource Profile Overrides, to produce a set of parameters specific to a particular environment/solution instance.
 
-The Environment Inventory is mandatory for creating an Environment Instance. It is a configuration file that describes a specific environment, including which Environment Template artifact to use and which environment-specific parameters to apply during rendering. It serves as the "recipe" for creating an Environment Instance.  
+The Environment Inventory is mandatory for creating an Environment Instance. It is a configuration file that describes a specific environment, including which Environment Template artifact to use and which environment-specific parameters to apply during rendering. It serves as the "recipe" for creating an Environment Instance.
 
 The Environment Instance has a human-readable structure and is not directly used by parameter consumers. For parameter consumers, a consumer-specific structure is generated based on the Environment Instance. For example, for ArgoCD, an Effective Set is generated.
 
@@ -615,6 +620,26 @@ satellites:
     type: "namespace"
 ```
 
+#### Environment Credentials File
+
+This file stores all [Credential](#credential) objects of the Environment Instance upon generation
+
+**Location:** `/environments/<cluster-name>/<env-name>/Credentials/credentials.yml`
+
+**Example:**
+
+```yaml
+db_cred:
+  type: usernamePassword
+  data:
+    username: "s3cr3tN3wLogin"
+    password: "s3cr3tN3wP@ss"
+token:
+  type: secret
+  data:
+    secret: "example-secret-token-for-documentation-purposes-only"
+```
+
 ### Solution Descriptor
 
 The Solution Descriptor (SD) defines the application composition of a solution. In EnvGene it serves as the primary input for EnvGene's Effective Set calculations. The SD can also be used for template rendering through the [`current_env.solution_structure`](/docs/template-macros.md#current_envsolution_structure) variable.
@@ -716,11 +741,11 @@ The relationship between Shared Credentials and Environment is established throu
 
 Credentials can be defined at three scopes with different precedence:
 
-1. **Environment-level**  
+1. **Environment-level**
    **Location:** `/environments/<cluster-name>/<env-name>/Inventory/credentials/`
-2. **Cluster-level**  
+2. **Cluster-level**
    **Location:** `/environments/<cluster-name>/credentials/`
-3. **Site-level**  
+3. **Site-level**
    **Location:** `/environments/credentials/`
 
 EnvGene checks these locations in order (environment → cluster → site) and uses the first matching file found.
@@ -738,7 +763,7 @@ db_cred:
 token:
   type: secret
   data:
-    secret: "MGE3MjYwNTQtZGE4My00MTlkLWIzN2MtZjU5YTg3NDA2Yzk0MzlmZmViZGUtYWY4_PF84_ba"
+    secret: "example-secret-token-for-documentation-purposes-only"
 ```
 
 ### System Credentials File (in Instance repository)
@@ -746,7 +771,7 @@ token:
 This file contains [Credential](#credential) objects used by EnvGene to integrate with external systems like artifact registries, GitLab, GitHub, and others.
 
 Location:
-  
+
 - `/environments/configuration/credentials/credentials.yml|yaml`
 - `/environments/<cluster-name>/app-deployer/<any-string>-creds.yml|yaml`
 
@@ -761,7 +786,7 @@ registry-cred:
 gitlab-token-cred:
   type: secret
   data:
-    secret: "MGE3MjYwNTQtZGE4My00MTlkLWIzN2MtZjU5YTg3NDA2Yzk0MzlmZmViZGUtYWY4_PF84_ba"
+    secret: "example-secret-token-for-documentation-purposes-only"
 ```
 
 #### ParameterSet (in Instance repository)

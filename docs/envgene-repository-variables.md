@@ -9,8 +9,10 @@
     - [`PUBLIC_AGE_KEYS`](#public_age_keys)
     - [`IS_OFFSITE`](#is_offsite)
     - [`GITLAB_RUNNER_TAG_NAME`](#gitlab_runner_tag_name)
+    - [`DOCKER_REGISTRY` (in instance repository)](#docker_registry-in-instance-repository)
   - [Template EnvGene Repository](#template-envgene-repository)
-    - [`IS_TEMPLATE_TEST`](#is_template_test)
+    - [`ENV_TEMPLATE_TEST`](#env_template_test)
+    - [`DOCKER_REGISTRY` (in template repository)](#docker_registry-in-template-repository)
 
 The following are parameters that are set in GitLab CI/CD variables or GitHub environment variables.
 
@@ -52,8 +54,8 @@ Used by EnvGene at runtime, when using pre-commit hooks, the same value must be 
 
 **Description**: Contains a comma-separated list of public AGE keys from EnvGene and external systems (`<key_1>,<key_2>,...,<key_N>`). Used for credential encryption when [`crypt_backend`](/docs/envgene-configs.md#configyml) is `SOPS`
 
-Must include at least one key: EnvGene's own AGE public key.  
-If an external system provides encrypted parameters, its public AGE key must also be included.  
+Must include at least one key: EnvGene's own AGE public key.
+If an external system provides encrypted parameters, its public AGE key must also be included.
 Used by EnvGene at runtime, when using pre-commit hooks, the same value must be specified in `.git/public-age-key.txt`.
 
 **Default Value**: None
@@ -82,9 +84,19 @@ Used by EnvGene at runtime, when using pre-commit hooks, the same value must be 
 
 **Mandatory**: No
 
+### `DOCKER_REGISTRY` (in instance repository)
+
+**Description**: Specifies the registry where the EnvGene Docker images are located
+
+**Default Value**: `ghcr.io/netcracker`
+
+**Mandatory**: No
+
+**Example**: `registry.example.com/docker`
+
 ## Template EnvGene Repository
 
-### `IS_TEMPLATE_TEST`
+### `ENV_TEMPLATE_TEST`
 
 **Description**: Determines whether the generation of the Environment Instance is running in Template Testing mode.
 
@@ -93,3 +105,7 @@ Used by EnvGene at runtime, when using pre-commit hooks, the same value must be 
 **Mandatory**: No
 
 **Example**: `true`
+
+### `DOCKER_REGISTRY` (in template repository)
+
+The same as [`DOCKER_REGISTRY` in instance repository](#docker_registry-in-instance-repository)
