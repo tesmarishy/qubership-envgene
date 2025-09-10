@@ -103,15 +103,15 @@ public class NamespaceMap extends DynamicMap {
                     BgDomainEntityDTO.NamespaceDTO controller = bgDomainEntityDTO.getController();
 
                     //Primary Namespace & Secondary Namespace
-                    if (origin.getName().equalsIgnoreCase(namespaceName)) {
-                        map.put(ORIGIN_NAMESPACE, namespaceName);
+                    if (origin.getName().equalsIgnoreCase(originalNamespace)) {
+                        map.put(ORIGIN_NAMESPACE, originalNamespace);
                         map.put(PEER_NAMESPACE, peer.getName());
                         map.put(CONTROLLER_NAMESPACE, controller.getName());
-                    } else if (controller.getName().equalsIgnoreCase(namespaceName)) { //Controller Namespace
+                    } else if (controller.getName().equalsIgnoreCase(originalNamespace)) { //Controller Namespace
                         if (origin != null) {
                             map.put(ORIGIN_NAMESPACE, origin.getName());
                         } else {
-                            map.put(ORIGIN_NAMESPACE, namespaceName);
+                            map.put(ORIGIN_NAMESPACE, originalNamespace);
                         }
                         map.put(PEER_NAMESPACE, peer.getName());
                         map.put(CONTROLLER_NAMESPACE, controller.getName());
@@ -120,7 +120,7 @@ public class NamespaceMap extends DynamicMap {
                             if (controller.getUrl() != null && !controller.getUrl().isEmpty()) {
                                 map.put(BG_CONTROLLER_URL, controller.getUrl());
                             } else {
-                                String bg_url = String.format("%s://bluegreen-controller-%s.%s", protocol.toLowerCase(), namespaceName, customHost);
+                                String bg_url = String.format("%s://bluegreen-controller-%s.%s", protocol.toLowerCase(), originalNamespace, customHost);
                                 map.put(BG_CONTROLLER_URL, bg_url);
                             }
 
@@ -146,7 +146,7 @@ public class NamespaceMap extends DynamicMap {
 //                                rootUrl, tenant, cloud));
                     }
                 } else {
-                    map.put(ORIGIN_NAMESPACE, namespaceName);
+                    map.put(ORIGIN_NAMESPACE, originalNamespace);
                 }
 
                 if (compositeStructureDTO != null) {
@@ -226,22 +226,24 @@ public class NamespaceMap extends DynamicMap {
                 } else if (compositeStructureDTO != null) {
                     CompositeEntityDTO compositeEntityBase = compositeStructureDTO.getBaseline();
                     String namespaceFromBaseline = compositeEntityBase.getName();
-                    gatewayNamespace = namespaceName;
-                    idpUrlNamespace = namespaceFromBaseline;
+                    gatewayNamespace = originalNamespace;
+                    idpUrlNamespace = originalNamespace;
+                    if(!originalNamespace.equalsIgnoreCase(compositeEntityBase.getName())){
+                        gatewayNamespace = originalNamespace;
+                        idpUrlNamespace = namespaceFromBaseline;
+                    }
                 } else {
-                    gatewayNamespace = namespaceName;
-                    idpUrlNamespace = namespaceName;
+                    gatewayNamespace = originalNamespace;
+                    idpUrlNamespace = originalNamespace;
                 }
-
 
                 // Deployer parameters
                 addGatewayIdentityUrls(config.getCustomParameters(), map, false, protocol.toLowerCase(), customHost, gatewayNamespace, idpUrlNamespace);
                 addGatewayIdentityUrls(config.getCustomParameters(), map, true, protocol.toLowerCase(), cloudHostname, gatewayNamespace, idpUrlNamespace);
-                map.putIfAbsent(NAMESPACE, namespaceName);
                 map.putIfAbsent(SSL_SECRET, "defaultsslcertificate");
                 map.putIfAbsent(BUILD_TAG_NEW, "keycloak-database");
                 if (binding.getDeployerInputs() != null) {
-                    map.put("CLIENT_PREFIX", namespaceName);
+                    map.put("CLIENT_PREFIX", originalNamespace);
                     if (binding.getDeployerInputs().getSecretId() != null) {
                         setSecretValues(map, credentialUtils);
                     }
@@ -270,7 +272,8 @@ public class NamespaceMap extends DynamicMap {
                 map.put(BASELINE_PEER, bgDomainEntityDTO.getPeerNamespace().getName());
                 map.put(BASELINE_CONTROLLER, bgDomainEntityDTO.getController().getName());
                 map.put(BASELINE_PROJ, bgDomainEntityDTO.getController().getName());
-            } else if (baselineEntity.getType().equalsIgnoreCase(NAMESPACE)) {
+            } else if (baselineEntity.getType().equalsIgnoreCase(NAMESPACE) &&
+                    !baselineEntity.getName().equalsIgnoreCase(originalNamespace)) {
                 map.put(BASELINE_ORIGIN, baselineEntity.getName());
                 map.put(BASELINE_PROJ, baselineEntity.getName());
             }
