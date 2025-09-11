@@ -188,55 +188,6 @@ public class NamespaceMap extends DynamicMap {
                     idpUrlNamespace = originalNamespace;
                 }
 
-                String gatewayNamespace = "";
-                String idpUrlNamespace = "";
-
-                if (bgDomainEntityDTO != null) {
-                    if (bgDomainEntityDTO.getType().equalsIgnoreCase(BG_DOMAIN)) {
-                        gatewayNamespace = bgDomainEntityDTO.getOriginNamespace().getName();
-                        idpUrlNamespace = bgDomainEntityDTO.getName();
-                    } else {
-                        String originNamespaceName = bgDomainEntityDTO.getOriginNamespace().getName();
-                        gatewayNamespace = originNamespaceName;
-                        idpUrlNamespace = originNamespaceName;
-                    }
-                } else if (compositeStructureDTO != null) {
-                    CompositeEntityDTO compositeEntityBase = compositeStructureDTO.getBaseline();
-                    String namespaceFromBaseline = compositeEntityBase.getName();
-                    gatewayNamespace = namespaceName;
-                    idpUrlNamespace = namespaceFromBaseline;
-                } else {
-                    gatewayNamespace = namespaceName;
-                    idpUrlNamespace = namespaceName;
-                }
-
-
-                String gatewayNamespace = "";
-                String idpUrlNamespace = "";
-
-                if (bgDomainEntityDTO != null) {
-                    if (bgDomainEntityDTO.getType().equalsIgnoreCase(BG_DOMAIN)) {
-                        gatewayNamespace = bgDomainEntityDTO.getOriginNamespace().getName();
-                        idpUrlNamespace = bgDomainEntityDTO.getName();
-                    } else {
-                        String originNamespaceName = bgDomainEntityDTO.getOriginNamespace().getName();
-                        gatewayNamespace = originNamespaceName;
-                        idpUrlNamespace = originNamespaceName;
-                    }
-                } else if (compositeStructureDTO != null) {
-                    CompositeEntityDTO compositeEntityBase = compositeStructureDTO.getBaseline();
-                    String namespaceFromBaseline = compositeEntityBase.getName();
-                    gatewayNamespace = originalNamespace;
-                    idpUrlNamespace = originalNamespace;
-                    if(!originalNamespace.equalsIgnoreCase(compositeEntityBase.getName())){
-                        gatewayNamespace = originalNamespace;
-                        idpUrlNamespace = namespaceFromBaseline;
-                    }
-                } else {
-                    gatewayNamespace = originalNamespace;
-                    idpUrlNamespace = originalNamespace;
-                }
-
                 // Deployer parameters
                 addGatewayIdentityUrls(config.getCustomParameters(), map, false, protocol.toLowerCase(), customHost, gatewayNamespace, idpUrlNamespace);
                 addGatewayIdentityUrls(config.getCustomParameters(), map, true, protocol.toLowerCase(), cloudHostname, gatewayNamespace, idpUrlNamespace);
