@@ -3,6 +3,7 @@ name: "Release: EnvGene"
 run-name: "Release EnvGene: ${{ inputs.version }}"
 
 env:
+  REGISTRY: ghcr.io
   CI_PROJECT_DIR: ${{ github.workspace }}
 
 on:
@@ -13,20 +14,6 @@ on:
         default: '1.0.0'
         type: string
         description: 'Release version (e.g., 1.0.0)'
-      dry-run:
-        required: false
-        type: boolean
-        default: false
-        description: 'Dry run'
-      component:
-        default: '[
-                  {"name": "qubership-envgene", "file": "./build_envgene/build/Dockerfile", "context": "."},
-                  {"name": "qubership-pipegene", "file": "./build_pipegene/build/Dockerfile", "context": "."},
-                  {"name": "qubership-effective-set-generator", "file": "./build_effective_set_generator_java/Dockerfile", "context": "."},
-                  {"name": "qubership-instance-repo-pipeline", "file": "./github_workflows/instance-repo-pipeline/Dockerfile", "context": "."}
-                ]'
-        description: 'component'
-        required: true
 
 jobs:
   tests:
@@ -147,8 +134,6 @@ jobs:
       id: build-pipegene
       with:
         registry: ${{ env.REGISTRY }}
-        git-user: ${{ secrets.GIT_USER }}
-        git-token: ${{ secrets.GIT_TOKEN }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
         version: ${{ inputs.version }}
 
@@ -174,8 +159,6 @@ jobs:
       id: build-envgene
       with:
         registry: ${{ env.REGISTRY }}
-        git-user: ${{ secrets.GIT_USER }}
-        git-token: ${{ secrets.GIT_TOKEN }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
         version: ${{ inputs.version }}
 
@@ -213,8 +196,6 @@ jobs:
       id: build-effective-set-generator
       with:
         registry: ${{ env.REGISTRY }}
-        git-user: ${{ secrets.GIT_USER }}
-        git-token: ${{ secrets.GIT_TOKEN }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
         version: ${{ inputs.version }}
 
@@ -234,8 +215,6 @@ jobs:
       uses: ./.github/actions/build-pipeline
       with:
         registry: ${{ env.REGISTRY }}
-        git-user: ${{ secrets.GIT_USER }}
-        git-token: ${{ secrets.GIT_TOKEN }}
         github-token: ${{ secrets.GITHUB_TOKEN }}
         version: ${{ inputs.version }}
 
