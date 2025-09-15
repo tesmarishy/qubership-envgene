@@ -31,6 +31,7 @@ import org.qubership.cloud.devops.cli.utils.FileSystemUtils;
 import org.qubership.cloud.devops.commons.exceptions.ConsumerFileProcessingException;
 import org.qubership.cloud.devops.commons.exceptions.CreateWorkDirException;
 import org.qubership.cloud.devops.commons.exceptions.NotFoundException;
+import org.qubership.cloud.devops.commons.pojo.bg.BgDomainEntityDTO;
 import org.qubership.cloud.devops.commons.utils.HelmNameNormalizer;
 import org.qubership.cloud.devops.commons.pojo.consumer.ConsumerDTO;
 import org.qubership.cloud.devops.commons.pojo.credentials.dto.CredentialDTO;
@@ -155,6 +156,7 @@ public class CliParameterParser {
         if (parameterBundle.getSecuredE2eParams() == null) {
             parameterBundle.setSecuredE2eParams(new HashMap<>());
         }
+        processBgDomainParameters();
         createTopologyFiles(k8TokenMap);
         createE2EFiles(parameterBundle);
         createConsumerFiles(parameterBundle);
@@ -171,6 +173,19 @@ public class CliParameterParser {
         createCleanupFiles(parameterBundle, namespace);
     }
 
+    private void processBgDomainParameters() {
+        Map<String, String> parameters = new HashMap<>();
+        BgDomainEntityDTO bgDomainEntityDTO = inputData.getBgDomainEntityDTO();
+        if (bgDomainEntityDTO != null && bgDomainEntityDTO.getController().getCredentials() != null
+                && bgDomainEntityDTO.getController().getCredentials().contains("creds.")) {
+            parameters.put("bg_credId", bgDomainEntityDTO.getController().getCredentials());
+            Map<String, Object> processedParameters = parametersServiceV2.getProcessedParameters(parameters);
+            if (MapUtils.isNotEmpty(processedParameters)) {
+                bgDomainEntityDTO.getController().setCredentials(String.valueOf(processedParameters.get("bg_credId")));
+            }
+        }
+    }
+
     private void createCleanupFiles(ParameterBundle parameterBundle, String namespace) throws IOException {
         String cleanupDir = String.format("%s/%s/%s", sharedData.getOutputDir(), "cleanup", namespace);
         fileDataConverter.writeToFile(parameterBundle.getCleanupParameters(), cleanupDir, "parameters.yaml");
@@ -181,10 +196,13 @@ public class CliParameterParser {
         Map<String, Object> topologyParams = new TreeMap<>();
         Map<String, Object> topologySecuredParams = new TreeMap<>();
         Map<String, Object> clusterParameterMap = getClusterMap();
-        topologyParams.put("composite_structure", fileDataConverter.getObjectMap(inputData.getCompositeStructureDTO()));
+        topologyParams.put("composite_structure", fileDataConverter.getObjectMap(inputData.getCompositeStructureDTO() != null ?
+                inputData.getCompositeStructureDTO() : new HashMap<>()));
         topologyParams.put("environments", inputData.getClusterMap());
         topologyParams.put("cluster", clusterParameterMap);
         topologySecuredParams.put("k8s_tokens", k8TokenMap);
+        topologySecuredParams.put("bg_domain", fileDataConverter.getObjectMap(inputData.getBgDomainEntityDTO() != null ?
+                inputData.getBgDomainEntityDTO() : new HashMap<>()));
         String topologyDir = String.format("%s/%s", sharedData.getOutputDir(), "topology");
         fileDataConverter.writeToFile(topologyParams, topologyDir, "parameters.yaml");
         fileDataConverter.writeToFile(topologySecuredParams, topologyDir, "credentials.yaml");
