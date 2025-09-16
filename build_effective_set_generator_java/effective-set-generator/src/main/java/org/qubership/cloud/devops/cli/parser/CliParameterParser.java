@@ -37,6 +37,7 @@ import org.qubership.cloud.devops.commons.pojo.consumer.ConsumerDTO;
 import org.qubership.cloud.devops.commons.pojo.credentials.dto.CredentialDTO;
 import org.qubership.cloud.devops.commons.pojo.credentials.dto.SecretCredentialsDTO;
 import org.qubership.cloud.devops.commons.repository.interfaces.FileDataConverter;
+import org.qubership.cloud.devops.commons.utils.ParameterUtils;
 import org.qubership.cloud.parameters.processor.dto.DeployerInputs;
 import org.qubership.cloud.parameters.processor.dto.ParameterBundle;
 import org.qubership.cloud.parameters.processor.service.ParametersCalculationServiceV1;
@@ -176,12 +177,11 @@ public class CliParameterParser {
     private void processBgDomainParameters() {
         Map<String, String> parameters = new HashMap<>();
         BgDomainEntityDTO bgDomainEntityDTO = inputData.getBgDomainEntityDTO();
-        if (bgDomainEntityDTO != null && bgDomainEntityDTO.getController().getCredentials() != null
-                && bgDomainEntityDTO.getController().getCredentials().contains("creds.")) {
-            parameters.put("bg_credId", bgDomainEntityDTO.getController().getCredentials());
+        if (bgDomainEntityDTO != null && bgDomainEntityDTO.getControllerNamespace().getCredentialsId() != null) {
+            parameters.put("bg_credId", bgDomainEntityDTO.getControllerNamespace().getCredentialsId());
             Map<String, Object> processedParameters = parametersServiceV2.getProcessedParameters(parameters);
             if (MapUtils.isNotEmpty(processedParameters)) {
-                bgDomainEntityDTO.getController().setCredentials(String.valueOf(processedParameters.get("bg_credId")));
+                bgDomainEntityDTO.getControllerNamespace().setCredentialsId(String.valueOf(processedParameters.get("bg_credId")));
             }
         }
     }
@@ -196,17 +196,24 @@ public class CliParameterParser {
         Map<String, Object> topologyParams = new TreeMap<>();
         Map<String, Object> topologySecuredParams = new TreeMap<>();
         Map<String, Object> clusterParameterMap = getClusterMap();
-        topologyParams.put("composite_structure", fileDataConverter.getObjectMap(inputData.getCompositeStructureDTO() != null ?
-                inputData.getCompositeStructureDTO() : new HashMap<>()));
+        topologyParams.put("composite_structure", getObjectMap(inputData.getCompositeStructureDTO()));
         topologyParams.put("environments", inputData.getClusterMap());
         topologyParams.put("cluster", clusterParameterMap);
         topologySecuredParams.put("k8s_tokens", k8TokenMap);
-        topologySecuredParams.put("bg_domain", fileDataConverter.getObjectMap(inputData.getBgDomainEntityDTO() != null ?
-                inputData.getBgDomainEntityDTO() : new HashMap<>()));
+        Map<String, Object> bgDomainMap = getObjectMap(inputData.getBgDomainEntityDTO());
+        Map<String, Object> bgDomainSecureMap = new LinkedHashMap<>();
+        Map<String, Object> bgDomainParamsMap = new LinkedHashMap<>();
+        ParameterUtils.splitBgDomainParams(bgDomainMap, bgDomainSecureMap, bgDomainParamsMap);
+        topologySecuredParams.put("bg_domain", bgDomainSecureMap);
+        topologyParams.put("bg_domain", bgDomainParamsMap);
         String topologyDir = String.format("%s/%s", sharedData.getOutputDir(), "topology");
         fileDataConverter.writeToFile(topologyParams, topologyDir, "parameters.yaml");
         fileDataConverter.writeToFile(topologySecuredParams, topologyDir, "credentials.yaml");
 
+    }
+
+    private <T> Map<String, Object> getObjectMap(T input) {
+        return fileDataConverter.getObjectMap(input != null ? input : new HashMap<>());
     }
 
     private Map<String, Object> getClusterMap() {
